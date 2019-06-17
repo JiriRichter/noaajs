@@ -1,5 +1,6 @@
 import { toTime } from '../utils/time';
 import { toProducts } from '../endpoints/products';
+import { getValue } from './utils';
 
 /* @class Product
  * @aka NOAA.Product
@@ -7,13 +8,13 @@ import { toProducts } from '../endpoints/products';
  * */
 export class Product {
     constructor(data) {
-        this.id = data['id'];
-        this.wmoCollectiveId = data['wmoCollectiveId'];
-        this.issuingOffice = data['issuingOffice'];
-        this.issuanceTime = toTime(data['issuanceTime']);
-        this.productCode = data['productCode'];
-        this.productName = data['productName'];
-        this.productText = data['productText'];
+        this.id = getValue('id', data);
+        this.wmoCollectiveId = getValue('wmoCollectiveId', data);
+        this.issuingOffice = getValue('issuingOffice', data);
+        this.issuanceTime = toTime(getValue('issuanceTime', data));
+        this.productCode = getValue('productCode', data);
+        this.productName = getValue('productName', data);
+        this.productText = getValue('productText', data, true);
     }
 
     getProductText() {

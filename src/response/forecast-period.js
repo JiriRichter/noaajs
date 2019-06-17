@@ -1,5 +1,6 @@
 import { toTime } from '../utils/time';
 import { toValueUnits } from './value-units';
+import { getValue } from './utils';
 
 /*
     "number": 3,
@@ -19,17 +20,17 @@ import { toValueUnits } from './value-units';
 
 export class ForecastPeriod {
     constructor(data) {
-        this.number = parseInt(data['number']);
-        this.name = data['name'];
-        this.startTime = toTime(data['startTime']);
-        this.endTime = toTime(data['endTime']);
-        this.isDaytime = data['isDaytime'];
-        this.temperature = toValueUnits(data['temperature'], data['temperatureUnit']);
-        this.temperatureTrend = data['temperatureTrend'];
-        this.windSpeed = data['windSpeed'];
-        this.windDirection = data['windDirection'];
-        this.icon = data['icon'];
-        this.shortForecast = data['shortForecast'];
-        this.detailedForecast = data['detailedForecast'];
+        this.number = parseInt(getValue('number', data));
+        this.name = getValue('name', data);
+        this.startTime = toTime(getValue('startTime', data));
+        this.endTime = toTime(getValue('endTime', data));
+        this.isDaytime = getValue('isDaytime', data);
+        this.temperature = toValueUnits(getValue('temperature', data), getValue('temperatureUnit', data));
+        this.temperatureTrend = getValue('temperatureTrend', data);
+        this.windSpeed = getValue('windSpeed', data);
+        this.windDirection = getValue('windDirection', data);
+        this.icon = getValue('icon', data);
+        this.shortForecast = getValue('shortForecast', data);
+        this.detailedForecast = getValue('detailedForecast', data);
     }
 }

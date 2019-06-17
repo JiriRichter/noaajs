@@ -1,5 +1,6 @@
 import { toTime } from '../utils/time';
 import { ZoneForecastPeriod } from './zone-forecast-period';
+import { getValue } from './utils';
 
 /* @class ZoneForecast
  * @aka NOAA.ZoneForecast
@@ -8,10 +9,12 @@ import { ZoneForecastPeriod } from './zone-forecast-period';
  * */
 export class ZoneForecast {
     constructor(data) {
-        this.updated = toTime(data['updated']);
+        this.updated = toTime(getValue('updated', data));
         this.periods = [];
-        for (let i = 0; i < data['periods'].length; i++) {
-            this.periods.push(new ZoneForecastPeriod(data['periods'][i]));
+        if (data['periods']) {
+            for (let i = 0; i < data['periods'].length; i++) {
+                this.periods.push(new ZoneForecastPeriod(data['periods'][i]));
+            }
         }
     }
 }

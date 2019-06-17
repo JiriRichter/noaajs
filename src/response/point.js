@@ -5,7 +5,7 @@ import { toGridPoints } from '../endpoints/gridpoints';
 import { toAlerts } from '../endpoints/alerts';
 import { toStations } from '../endpoints/stations';
 import { toXY } from '../utils/xy';
-import { getUrlParameter } from '../utils/parameters';
+import { getUrlPart, getFeatureProperty } from './utils';
 
 
 /* @class Point
@@ -17,16 +17,16 @@ class Point extends Feature {
     constructor(data) {
         super(data);
 
-        this.xy = toXY(this.getProperty('gridX'), this.getProperty('gridY'));
-        this.office = new Office(this.getProperty('cwa'));
-        this.forecastZone = getUrlParameter(this.getProperty('forecastZone'), -1);
-        this.timeZone = this.getProperty('timeZone');
-        this.radarStation = this.getProperty('radarStation');
-        this.relativeLocation = toRelativeLocation(this.getProperty('relativeLocation'));
+        this.xy = toXY(getFeatureProperty('gridX', data), getFeatureProperty('gridY', data));
+        this.office = new Office(getFeatureProperty('cwa', data));
+        this.forecastZone = getUrlPart(getFeatureProperty('forecastZone', data), -1);
+        this.timeZone = getFeatureProperty('timeZone', data);
+        this.radarStation = getFeatureProperty('radarStation', data);
+        this.relativeLocation = toRelativeLocation(getFeatureProperty('relativeLocation', data));
 
         // optional properties
-        this.county = getUrlParameter(this.getProperty('county', true), -1);
-        this.fireWeatherZone = getUrlParameter(this.getProperty('fireWeatherZone', true), -1);
+        this.county = getUrlPart(getFeatureProperty('county', data, true), -1);
+        this.fireWeatherZone = getUrlPart(getFeatureProperty('fireWeatherZone', data, true), -1);
     }
 
     getAlerts(params = {}) {

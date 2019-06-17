@@ -1,6 +1,6 @@
 import { Endpoint } from './endpoint';
 import { Product } from '../response/product';
-import { validateParameter, toQueryParamValue } from '../utils/parameters';
+import { validateParameter, toQueryParamValue } from './parameters';
 
 /* class Glossary implements /glossary interface
  * */

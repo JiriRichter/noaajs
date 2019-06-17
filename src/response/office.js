@@ -1,5 +1,7 @@
-import { getUrlParameter } from '../utils/parameters';
+import { getUrlPart, getValue } from './utils';
 import { toProducts } from '../endpoints/products';
+import { Zone } from './zone';
+import { Station } from './station';
 
 /* @class Office
  * @aka NOAA.Office
@@ -11,27 +13,37 @@ export class Office {
             this.id = data;
         }
         else {
-            this.id = data['id'];
-            this.name = data['name'];
-            this.address = data['address'];
-            this.telephone = data['telephone'];
-            this.fax = data['faxNumber'];
-            this.email = data['email'];
-            this.url = data['sameAs'];
-            this.nwsRegion = data['nwsRegion'];
-            this.parentOrganization = getUrlParameter(data['parentOrganization'], -1);
-            this.responsibleCounties = this.getList('responsibleCounties', data);
-            this.responsibleForecastZones = this.getList('responsibleForecastZones', data);
-            this.responsibleFireZones = this.getList('responsibleFireZones', data);
-            this.approvedObservationStations = this.getList('approvedObservationStations', data);
+            this.id = getValue('id', data);
+            this.name = getValue('name', data);
+            this.address = getValue('address', data);
+            this.telephone = getValue('telephone', data);
+            this.fax = getValue('faxNumber', data);
+            this.email = getValue('email', data);
+            this.url = getValue('sameAs', data);
+            this.nwsRegion = getValue('nwsRegion', data);
+            this.parentOrganization = getUrlPart(getValue('parentOrganization', data), -1);
+            this.responsibleCounties = this.getZones('responsibleCounties', data);
+            this.responsibleForecastZones = this.getZones('responsibleForecastZones', data);
+            this.responsibleFireZones = this.getZones('responsibleFireZones', data);
+            this.approvedObservationStations = this.getStations('approvedObservationStations', data);
         }
     }
 
-    getList(key, data) {
+    getZones(key, data) {
         let list = [];
         if (data[key]) {
             for (let i = 0; i < data[key].length; i++) {
-                list.push(getUrlParameter(data[key][i], -1));
+                list.push(new Zone(data[key][i]));
+            }
+        }
+        return list;
+    }
+
+    getStations(key, data) {
+        let list = [];
+        if (data[key]) {
+            for (let i = 0; i < data[key].length; i++) {
+                list.push(new Station(getUrlPart(data[key][i], -1)));
             }
         }
         return list;

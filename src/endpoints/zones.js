@@ -1,6 +1,6 @@
 import { Endpoint } from './endpoint';
 import { Zone, zonesToArray } from '../response/zone';
-import { validateParameter, toQueryParameters, toQueryParamValue } from '../utils/parameters';
+import { validateParameter, toQueryParameters, toQueryParamValue } from './parameters';
 import { stationsToArray } from '../response/station';
 import { StateAreaCodes, MarineAreaCodes, RegionCodes } from '../utils/codes';
 import { ZoneForecast } from '../response/zone-forecast';

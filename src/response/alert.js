@@ -1,53 +1,47 @@
-import { Feature } from './feature';
-import { toZone } from './zone';
+import { Zone } from './zone';
 import { toTime } from '../utils/time';
-import { getUrlParameter } from '../utils/parameters';
+import { getFeatureProperty } from './utils';
 
 /* @class Alert
  * @aka NOAA.Alert
  *
  * Represents response from /points endpoint.
  * */
-export class Alert extends Feature {
+export class Alert {
     constructor(data) {
-        super(data);
-
-        this.id = this.getProperty('id');
-        this.areaDescription = this.getProperty('areaDesc');
-        this.geocode = this.getProperty('geocode');
+        this.id = getFeatureProperty('id', data);
+        this.areaDescription = getFeatureProperty('areaDesc', data);
+        this.geocode = getFeatureProperty('geocode', data);
 
         this.affectedZones = [];
-        let affectedZones = this.getProperty('affectedZones'), i;
+        let affectedZones = getFeatureProperty('affectedZones', data), i;
         for (i = 0; i < affectedZones.length; i++) {
-            this.affectedZones.push(
-                toZone(
-                    getUrlParameter(affectedZones[i], -2),
-                    getUrlParameter(affectedZones[i], -1)));
+            this.affectedZones.push(new Zone(affectedZones[i]));
         }
 
-        this.references = this.getProperty('references');
+        this.references = getFeatureProperty('references', data);
 
-        this.sent = toTime(this.getProperty('sent'));
-        this.effective = toTime(this.getProperty('effective'));
-        this.onset = toTime(this.getProperty('onset'));
-        this.expires = toTime(this.getProperty('expires'));
-        this.ends = toTime(this.getProperty('ends'));
+        this.sent = toTime(getFeatureProperty('sent', data));
+        this.effective = toTime(getFeatureProperty('effective', data));
+        this.onset = toTime(getFeatureProperty('onset', data));
+        this.expires = toTime(getFeatureProperty('expires', data));
+        this.ends = toTime(getFeatureProperty('ends', data));
 
-        this.status = this.getProperty('status');
-        this.messageType = this.getProperty('messageType');
-        this.category = this.getProperty('category');
-        this.severity = this.getProperty('severity');
-        this.certainty = this.getProperty('certainty');
-        this.urgency = this.getProperty('urgency');
+        this.status = getFeatureProperty('status', data);
+        this.messageType = getFeatureProperty('messageType', data);
+        this.category = getFeatureProperty('category', data);
+        this.severity = getFeatureProperty('severity', data);
+        this.certainty = getFeatureProperty('certainty', data);
+        this.urgency = getFeatureProperty('urgency', data);
 
-        this.event = this.getProperty('event');
-        this.sender = this.getProperty('sender');
-        this.senderName = this.getProperty('senderName');
-        this.headline = this.getProperty('headline');
-        this.description = this.getProperty('description');
-        this.instruction = this.getProperty('instruction');
-        this.response = this.getProperty('response');
+        this.event = getFeatureProperty('event', data);
+        this.sender = getFeatureProperty('sender', data);
+        this.senderName = getFeatureProperty('senderName', data);
+        this.headline = getFeatureProperty('headline', data);
+        this.description = getFeatureProperty('description', data);
+        this.instruction = getFeatureProperty('instruction', data);
+        this.response = getFeatureProperty('response', data);
 
-        this.parameters = this.getProperty('parameters');
+        this.parameters = getFeatureProperty('parameters', data);
     }
 }

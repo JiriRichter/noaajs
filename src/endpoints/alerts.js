@@ -2,7 +2,7 @@ import { Endpoint } from './endpoint';
 import { StateAreaCodes, MarineAreaCodes, RegionCodes } from '../utils/codes';
 import { AlertCollection } from '../response/alert-collection';
 import { Alert } from '../response/alert';
-import { toQueryParameters } from '../utils/parameters';
+import { toQueryParameters } from './parameters';
 
 /* class Alerts implements /alerts interface
  * */

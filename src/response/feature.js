@@ -7,6 +7,10 @@ import { toGeometry } from './geometry';
  * */
 export class Feature {
     constructor(data) {
+        if (data === undefined) {
+            return;
+        }
+
         if (data['type'] === undefined || data['type'] !== 'Feature') {
             throw new Error('Invalid data - Type property is missing or not "Feature"');
         }
@@ -23,19 +27,7 @@ export class Feature {
             }
         }
         else {
-            this.geometry = null;
+            throw new Error('Invalid geometry data');
         }
-        this.properties = data['properties'];
-    }
-
-    /**
-     * Gets feature property
-     * @param {string} key
-     */
-    getProperty(key, optional=false) {
-        if (!optional && !(key in this.properties)) {
-            throw new Error('Invalid property name: ' + key);
-        }
-        return this.properties[key];
     }
 }

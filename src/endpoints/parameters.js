@@ -1,20 +1,4 @@
-import { LatLon, toLatLon } from './latlon';
-
-/**
- * Exctrats URL component
- * @param {String} url
- * @param {number} index
- */
-export function getUrlParameter(url, index) {
-    if (!url) {
-        return null;
-    }
-    let parts = url.split('/');
-    if (index < 0) {
-        return parts[parts.length + index];
-    }
-    return parts[index];
-}
+import { LatLon, toLatLon } from '../utils/latlon';
 
 /**
  * Validates API parameter

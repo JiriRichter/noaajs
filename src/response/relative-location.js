@@ -1,5 +1,6 @@
 import { Feature } from './feature';
 import { toValueUnits } from './value-units';
+import { getFeatureProperty } from './utils';
 
 /* @class Point
  * @aka NOAA.Point
@@ -10,10 +11,10 @@ class RelativeLocation extends Feature {
     constructor(data) {
         super(data);
 
-        this.city = this.getProperty('city');
-        this.state = this.getProperty('state');
-        this.distance = toValueUnits(this.getProperty('distance'));
-        this.bearing = toValueUnits(this.getProperty('bearing'));
+        this.city = getFeatureProperty('city', data);
+        this.state = getFeatureProperty('state', data);
+        this.distance = toValueUnits(getFeatureProperty('distance', data));
+        this.bearing = toValueUnits(getFeatureProperty('bearing', data));
     }
 }
 

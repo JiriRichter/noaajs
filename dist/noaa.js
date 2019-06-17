@@ -1,5 +1,5 @@
 /* @preserve
- * NOAA 1.0.0+master.17233d5, a JS library for https://www.weather.gov/documentation/services-web-api.
+ * NOAA 1.0.0+master.a1748d7, a JS library for https://www.weather.gov/documentation/services-web-api.
  * (c) 2019-2020 Jiri Richter
  */
 
@@ -6470,61 +6470,38 @@
    * Represents base class for API GeoJSON responses.
    * */
 
-  var Feature =
-  /*#__PURE__*/
-  function () {
-    function Feature(data) {
-      _classCallCheck(this, Feature);
+  var Feature = function Feature(data) {
+    _classCallCheck(this, Feature);
 
-      if (data['type'] === undefined || data['type'] !== 'Feature') {
-        throw new Error('Invalid data - Type property is missing or not "Feature"');
-      }
+    if (data === undefined) {
+      return;
+    }
 
-      if (data['geometry'] && data['geometry']['type']) {
-        if (data['geometry']['type'] === 'GeometryCollection') {
-          this.geometries = [];
+    if (data['type'] === undefined || data['type'] !== 'Feature') {
+      throw new Error('Invalid data - Type property is missing or not "Feature"');
+    }
 
-          for (var i = 0; i < data['geometry']['geometries'].length; i++) {
-            this.geometries.push(toGeometry(data['geometry']['geometries'][i]));
-          }
-        } else {
-          this.geometry = toGeometry(data['geometry']);
+    if (data['geometry'] && data['geometry']['type']) {
+      if (data['geometry']['type'] === 'GeometryCollection') {
+        this.geometries = [];
+
+        for (var i = 0; i < data['geometry']['geometries'].length; i++) {
+          this.geometries.push(toGeometry(data['geometry']['geometries'][i]));
         }
       } else {
-        this.geometry = null;
+        this.geometry = toGeometry(data['geometry']);
       }
-
-      this.properties = data['properties'];
+    } else {
+      throw new Error('Invalid geometry data');
     }
-    /**
-     * Gets feature property
-     * @param {string} key
-     */
-
-
-    _createClass(Feature, [{
-      key: "getProperty",
-      value: function getProperty(key) {
-        var optional = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-
-        if (!optional && !(key in this.properties)) {
-          throw new Error('Invalid property name: ' + key);
-        }
-
-        return this.properties[key];
-      }
-    }]);
-
-    return Feature;
-  }();
+  };
 
   /**
    * Exctrats URL component
    * @param {String} url
    * @param {number} index
    */
-
-  function getUrlParameter(url, index) {
+  function getUrlPart(url, index) {
     if (!url) {
       return null;
     }
@@ -6537,6 +6514,64 @@
 
     return parts[index];
   }
+  /**
+   * Gets value from dictionary object
+   * @param {string} key
+   * @param {object} data
+   * @param {boolean?} optional
+   */
+
+  function getValue(key, data) {
+    var optional = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+    if (!optional && !(key in data)) {
+      throw new Error('Invalid property name: ' + key);
+    }
+
+    return data[key];
+  }
+  /**
+   * Gets feature property
+   * @param {string} key
+   * @param {object} data
+   * @param {boolean?} optional
+   */
+
+  function getFeatureProperty(key, data) {
+    var optional = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+    return getValue(key, data['properties'], optional);
+  }
+
+  /* @class Product
+   * @aka NOAA.Product
+   *
+   * */
+
+  var Product =
+  /*#__PURE__*/
+  function () {
+    function Product(data) {
+      _classCallCheck(this, Product);
+
+      this.id = getValue('id', data);
+      this.wmoCollectiveId = getValue('wmoCollectiveId', data);
+      this.issuingOffice = getValue('issuingOffice', data);
+      this.issuanceTime = toTime(getValue('issuanceTime', data));
+      this.productCode = getValue('productCode', data);
+      this.productName = getValue('productName', data);
+      this.productText = getValue('productText', data, true);
+    }
+
+    _createClass(Product, [{
+      key: "getProductText",
+      value: function getProductText() {
+        return toProducts().getProduct(this.id);
+      }
+    }]);
+
+    return Product;
+  }();
+
   /**
    * Validates API parameter
    * @param {string} name
@@ -6610,36 +6645,6 @@
     });
     return queryParams;
   }
-
-  /* @class Product
-   * @aka NOAA.Product
-   *
-   * */
-
-  var Product =
-  /*#__PURE__*/
-  function () {
-    function Product(data) {
-      _classCallCheck(this, Product);
-
-      this.id = data['id'];
-      this.wmoCollectiveId = data['wmoCollectiveId'];
-      this.issuingOffice = data['issuingOffice'];
-      this.issuanceTime = toTime(data['issuanceTime']);
-      this.productCode = data['productCode'];
-      this.productName = data['productName'];
-      this.productText = data['productText'];
-    }
-
-    _createClass(Product, [{
-      key: "getProductText",
-      value: function getProductText() {
-        return toProducts().getProduct(this.id);
-      }
-    }]);
-
-    return Product;
-  }();
 
   /* class Glossary implements /glossary interface
    * */
@@ -6838,72 +6843,18 @@
     return new Products();
   }
 
-  /* @class Office
-   * @aka NOAA.Office
-   *
-   * */
-
-  var Office =
-  /*#__PURE__*/
-  function () {
-    function Office(data) {
-      _classCallCheck(this, Office);
-
-      if (typeof data === 'string') {
-        this.id = data;
-      } else {
-        this.id = data['id'];
-        this.name = data['name'];
-        this.address = data['address'];
-        this.telephone = data['telephone'];
-        this.fax = data['faxNumber'];
-        this.email = data['email'];
-        this.url = data['sameAs'];
-        this.nwsRegion = data['nwsRegion'];
-        this.parentOrganization = getUrlParameter(data['parentOrganization'], -1);
-        this.responsibleCounties = this.getList('responsibleCounties', data);
-        this.responsibleForecastZones = this.getList('responsibleForecastZones', data);
-        this.responsibleFireZones = this.getList('responsibleFireZones', data);
-        this.approvedObservationStations = this.getList('approvedObservationStations', data);
-      }
-    }
-
-    _createClass(Office, [{
-      key: "getList",
-      value: function getList(key, data) {
-        var list = [];
-
-        if (data[key]) {
-          for (var i = 0; i < data[key].length; i++) {
-            list.push(getUrlParameter(data[key][i], -1));
-          }
-        }
-
-        return list;
-      }
-    }, {
-      key: "getAreaForecastDiscussion",
-      value: function getAreaForecastDiscussion() {
-        return toProducts().get({
-          'location': this.id,
-          'type': 'AFD'
-        });
-      }
-    }, {
-      key: "getProductTypes",
-      value: function getProductTypes() {
-        return toProducts().getLocationTypes(this.id);
-      }
-    }, {
-      key: "getProducts",
-      value: function getProducts(params) {
-        params['location'] = this.id;
-        return toProducts().get(params);
-      }
-    }]);
-
-    return Office;
-  }();
+  /**
+   * 
+   * @param {object} data
+   * @param {function} callback
+   */
+  function featureCollectionToArray(data, callback) {
+    var array = [];
+    data['features'].forEach(function (feature, index) {
+      array.push(callback(feature, index));
+    });
+    return array;
+  }
 
   /* @class ValueUnit
    * @aka NOAA.ValueUnit
@@ -6933,54 +6884,6 @@
     return new ValueUnits(a, b);
   }
 
-  /* @class Point
-   * @aka NOAA.Point
-   *
-   * Represents response from /points endpoint.
-   * */
-
-  var RelativeLocation =
-  /*#__PURE__*/
-  function (_Feature) {
-    _inherits(RelativeLocation, _Feature);
-
-    function RelativeLocation(data) {
-      var _this;
-
-      _classCallCheck(this, RelativeLocation);
-
-      _this = _possibleConstructorReturn(this, _getPrototypeOf(RelativeLocation).call(this, data));
-      _this.city = _this.getProperty('city');
-      _this.state = _this.getProperty('state');
-      _this.distance = toValueUnits(_this.getProperty('distance'));
-      _this.bearing = toValueUnits(_this.getProperty('bearing'));
-      return _this;
-    }
-
-    return RelativeLocation;
-  }(Feature);
-
-  function toRelativeLocation(data) {
-    if (!data) {
-      return null;
-    }
-
-    return new RelativeLocation(data);
-  }
-
-  /**
-   * 
-   * @param {object} data
-   * @param {function} callback
-   */
-  function featureCollectionToArray(data, callback) {
-    var array = [];
-    data['features'].forEach(function (feature, index) {
-      array.push(callback(feature, index));
-    });
-    return array;
-  }
-
   /* @class Observation
    * @aka NOAA.Observation
    *
@@ -6997,23 +6900,22 @@
       _classCallCheck(this, Observation);
 
       _this = _possibleConstructorReturn(this, _getPrototypeOf(Observation).call(this, data));
-      _this.elevation = toValueUnits(_this.getProperty('elevation'));
-      _this.stationId = getUrlParameter(_this.getProperty('station', true), -1);
-      _this.timestamp = toTime(_this.getProperty('timestamp'));
-      _this.rawMessage = _this.getProperty('rawMessage');
-      _this.textDescription = _this.getProperty('textDescription');
-      _this.iconUrl = _this.getProperty('icon');
-      _this.presentWeather = _this.getProperty('presentWeather');
+      _this.elevation = toValueUnits(getFeatureProperty('elevation', data));
+      _this.stationId = getUrlPart(getFeatureProperty('station', data, true), -1);
+      _this.timestamp = toTime(getFeatureProperty('timestamp', data));
+      _this.rawMessage = getFeatureProperty('rawMessage', data);
+      _this.textDescription = getFeatureProperty('textDescription', data);
+      _this.iconUrl = getFeatureProperty('icon', data);
+      _this.presentWeather = getFeatureProperty('presentWeather', data);
       _this.values = {};
-
-      var self = _assertThisInitialized(_this);
-
-      Object.keys(_this.properties).forEach(function (key) {
-        if (self.properties[key] && self.properties[key]['value'] && self.properties[key]['unitCode']) {
-          self.values[key] = toValueUnits(self.properties[key]);
+      var values = [];
+      Object.keys(data['properties']).forEach(function (key) {
+        if (data['properties'][key] && data['properties'][key]['value'] && data['properties'][key]['unitCode']) {
+          values[key] = toValueUnits(data['properties'][key]);
         }
       });
-      var cloudLayers = _this.properties['cloudLayers'];
+      _this.values = values;
+      var cloudLayers = data['properties']['cloudLayers'];
 
       if (cloudLayers) {
         _this.cloudLayers = [];
@@ -7239,15 +7141,21 @@
 
       _classCallCheck(this, Station);
 
-      _this = _possibleConstructorReturn(this, _getPrototypeOf(Station).call(this, data));
-      _this.elevation = toValueUnits(_this.getProperty('elevation'));
-      _this.id = _this.getProperty('stationIdentifier');
-      _this.name = _this.getProperty('name');
-      _this.timeZone = _this.getProperty('timeZone');
-      _this.forecastZone = getUrlParameter(_this.getProperty('forecast', true), -1);
-      _this.county = getUrlParameter(_this.getProperty('county', true), -1);
-      _this.fireWeatherZone = getUrlParameter(_this.getProperty('fireWeatherZone', true), -1);
-      return _this;
+      if (typeof data === 'string') {
+        _this = _possibleConstructorReturn(this, _getPrototypeOf(Station).call(this, undefined));
+        _this.id = data;
+      } else {
+        _this = _possibleConstructorReturn(this, _getPrototypeOf(Station).call(this, data));
+        _this.elevation = toValueUnits(getFeatureProperty('elevation', data));
+        _this.id = getFeatureProperty('stationIdentifier', data);
+        _this.name = getFeatureProperty('name', data);
+        _this.timeZone = getFeatureProperty('timeZone', data);
+        _this.forecastZone = getUrlPart(getFeatureProperty('forecast', data, true), -1);
+        _this.county = getUrlPart(getFeatureProperty('county', data, true), -1);
+        _this.fireWeatherZone = getUrlPart(getFeatureProperty('fireWeatherZone', data, true), -1);
+      }
+
+      return _possibleConstructorReturn(_this);
     }
 
     _createClass(Station, [{
@@ -7275,323 +7183,12 @@
     });
   }
 
-  var millisecondsPerHour = 60 * 60 * 1000;
-  var ValidTimePeriod =
-  /*#__PURE__*/
-  function () {
-    function ValidTimePeriod(s) {
-      _classCallCheck(this, ValidTimePeriod);
-
-      var parts = s.split('/');
-
-      if (parts.length !== 2) {
-        throw new Error('Invalid valid time value (' + s + ')');
-      }
-
-      this.time = toTime(parts[0]);
-      this.hours = 0;
-      this.days = 0; //period parsing
-
-      var period = parts[1],
-          num = 0;
-
-      if (period[0] !== 'P') {
-        throw new Error('Invalid valid time period value (' + parts[1] + ')');
-      }
-
-      for (var i = 1; i < period.length; i++) {
-        if (period.charAt(i) >= '0' && period.charAt(i) <= '9') {
-          num = num * 10 + (period.charCodeAt(i) - '0'.charCodeAt(0));
-          continue;
-        }
-
-        if (period.charAt(i) === 'T') {
-          num = 0;
-          continue;
-        }
-
-        if (period.charAt(i) === 'D') {
-          this.days = num;
-          num = 0;
-          continue;
-        }
-
-        if (period.charAt(i) === 'H') {
-          this.hours = num;
-          num = 0;
-          continue;
-        }
-      }
-
-      if (this.days === 0 && this.hours === 0) {
-        throw new Error('Invalid valid time period (' + period + ')');
-      }
-
-      this.totalHours = this.days * 24 + this.hours;
-    }
-
-    _createClass(ValidTimePeriod, [{
-      key: "toArray",
-      value: function toArray() {
-        var times = [];
-
-        for (var i = 0; i < this.totalHours; i++) {
-          times.push(toTime(this.time.milliseconds + i * millisecondsPerHour));
-        }
-
-        return times;
-      }
-    }]);
-
-    return ValidTimePeriod;
-  }();
-  function toValidTimePeriod(a) {
-    return new ValidTimePeriod(a);
-  }
-
-  /* @class GridPoint
-   * @aka NOAA.GridPoint
-   *
-   * Represents response from /gridpoints endpoint.
-   * */
-
-  var GridPoint =
-  /*#__PURE__*/
-  function (_Feature) {
-    _inherits(GridPoint, _Feature);
-
-    function GridPoint(data) {
-      var _this;
-
-      _classCallCheck(this, GridPoint);
-
-      _this = _possibleConstructorReturn(this, _getPrototypeOf(GridPoint).call(this, data));
-      _this.xy = toXY(_this.getProperty('gridX'), _this.getProperty('gridY'));
-      _this.office = new Office(_this.getProperty('gridId'));
-      _this.elevation = toValueUnits(_this.getProperty('elevation'));
-      _this.updateTime = toTime(_this.getProperty('updateTime'));
-      _this.validTimes = toValidTimePeriod(_this.getProperty('validTimes')).toArray();
-      _this.validTimesDict = {};
-
-      for (var i = 0; i < _this.validTimes.length; i++) {
-        _this.validTimesDict[_this.validTimes[i].milliseconds] = _this.validTimes[i].toString();
-      } // get forecast variables
-
-
-      _this.variables = {};
-
-      for (var _i = 0; _i < GridPoint.variables.length; _i++) {
-        _this.variables[GridPoint.variables[_i]] = _this.getVariable(GridPoint.variables[_i]);
-      }
-
-      _this.weather = _this.getVariable('weather');
-      _this.hazards = _this.getVariable('hazards');
-      return _this;
-    }
-
-    _createClass(GridPoint, [{
-      key: "getVariable",
-      value: function getVariable(name) {
-        var data = this.getProperty(name),
-            units,
-            timeValueDict = {},
-            validTime,
-            valueTime,
-            variable = {};
-        variable.values = [];
-
-        if (data['sourceUnit']) {
-          variable['sourceUnit'] = data['sourceUnit'];
-        }
-
-        if (data['uom']) {
-          units = ValueUnits.parseUnit(data['uom']);
-        }
-
-        if (data['values'] && data['values'].length > 0) {
-          for (var i = 0; i < data['values'].length; i++) {
-            validTime = toValidTimePeriod(data['values'][i]['validTime']);
-
-            for (var hour = 0; hour < validTime.totalHours; hour++) {
-              //value can be null
-              if (data['values'][i]['value']) {
-                valueTime = validTime.time.milliseconds + hour * millisecondsPerHour; //if (!(valueTime in this.validTimesDict)) {
-                //    throw new Error(name + ' value time does not match gridpoint valid times');
-                //}
-
-                if (valueTime <= this.validTimes[this.validTimes.length - 1].milliseconds) {
-                  if (typeof data['values'][i]['value'] === 'number') {
-                    timeValueDict[valueTime] = toValueUnits(data['values'][i]['value'], units);
-                  } else {
-                    timeValueDict[valueTime] = data['values'][i]['value'];
-                  }
-                }
-              }
-            }
-          }
-
-          for (var _i2 = 0; _i2 < this.validTimes.length; _i2++) {
-            variable.values.push(timeValueDict[this.validTimes[_i2].milliseconds]);
-          }
-        }
-
-        return variable;
-      }
-    }]);
-
-    return GridPoint;
-  }(Feature);
-  GridPoint.variables = ['temperature', 'dewpoint', 'maxTemperature', 'minTemperature', 'relativeHumidity', 'apparentTemperature', 'heatIndex', 'windChill', 'skyCover', 'windDirection', 'windSpeed', 'windGust', 'probabilityOfPrecipitation', 'quantitativePrecipitation', 'iceAccumulation', 'snowfallAmount', 'snowLevel', 'ceilingHeight', 'visibility', 'transportWindSpeed', 'transportWindDirection', 'mixingHeight', 'hainesIndex', 'lightningActivityLevel', 'twentyFootWindSpeed', 'twentyFootWindDirection', 'waveHeight', 'wavePeriod', 'waveDirection', 'primarySwellHeight', 'primarySwellDirection', 'secondarySwellHeight', 'secondarySwellDirection', 'wavePeriod2', 'windWaveHeight', 'dispersionIndex', 'pressure', 'probabilityOfTropicalStormWinds', 'probabilityOfHurricaneWinds', 'potentialOf15mphWinds', 'potentialOf25mphWinds', 'potentialOf35mphWinds', 'potentialOf45mphWinds', 'potentialOf20mphWindGusts', 'potentialOf30mphWindGusts', 'potentialOf40mphWindGusts', 'potentialOf50mphWindGusts', 'potentialOf60mphWindGusts', 'grasslandFireDangerIndex', 'probabilityOfThunder', 'davisStabilityIndex', 'atmosphericDispersionIndex', 'lowVisibilityOccurrenceRiskIndex', 'stability', 'redFlagThreatIndex'];
-
-  /*
-      "number": 3,
-      "name": "Thursday",
-      "startTime": "2019-06-13T06:00:00-05:00",
-      "endTime": "2019-06-13T18:00:00-05:00",
-      "isDaytime": true,
-      "temperature": 76,
-      "temperatureUnit": "F",
-      "temperatureTrend": null,
-      "windSpeed": "0 to 10 mph",
-      "windDirection": "SW",
-      "icon": "https://api.weather.gov/icons/land/day/few?size=medium",
-      "shortForecast": "Sunny",
-      "detailedForecast": "Sunny, with a high near 76. Southwest wind 0 to 10 mph."
-  */
-
-  var ForecastPeriod = function ForecastPeriod(data) {
-    _classCallCheck(this, ForecastPeriod);
-
-    this.number = parseInt(data['number']);
-    this.name = data['name'];
-    this.startTime = toTime(data['startTime']);
-    this.endTime = toTime(data['endTime']);
-    this.isDaytime = data['isDaytime'];
-    this.temperature = toValueUnits(data['temperature'], data['temperatureUnit']);
-    this.temperatureTrend = data['temperatureTrend'];
-    this.windSpeed = data['windSpeed'];
-    this.windDirection = data['windDirection'];
-    this.icon = data['icon'];
-    this.shortForecast = data['shortForecast'];
-    this.detailedForecast = data['detailedForecast'];
-  };
-
-  /* @class Forecast
-   * @aka NOAA.Forecast
-   *
-   * Represents response from /gridpoints/{wfo}/{x},{y}/forecast endpoint.
-   * */
-
-  var Forecast =
-  /*#__PURE__*/
-  function (_Feature) {
-    _inherits(Forecast, _Feature);
-
-    function Forecast(data) {
-      var _this;
-
-      _classCallCheck(this, Forecast);
-
-      _this = _possibleConstructorReturn(this, _getPrototypeOf(Forecast).call(this, data));
-      _this.updated = toTime(_this.getProperty('updated'));
-      _this.units = _this.getProperty('units');
-      _this.forecastGenerator = _this.getProperty('forecastGenerator');
-      _this.generatedAt = toTime(_this.getProperty('generatedAt'));
-      _this.updateTime = toTime(_this.getProperty('updateTime'));
-      _this.validTimes = toValidTimePeriod(_this.getProperty('validTimes'));
-      _this.elevation = toValueUnits(_this.getProperty('elevation'));
-      _this.periods = [];
-
-      for (var i = 0; i < _this.getProperty('periods').length; i++) {
-        _this.periods.push(new ForecastPeriod(_this.getProperty('periods')[i]));
-      }
-
-      return _this;
-    }
-
-    return Forecast;
-  }(Feature);
-
-  /* class GridPoints implements /gridpoints interface
-   * */
-
-  var GridPoints =
-  /*#__PURE__*/
-  function (_Endpoint) {
-    _inherits(GridPoints, _Endpoint);
-
-    /**
-     * 
-     * @param {string} weatherForecastOffice
-     * @param {XY} xy
-     */
-    function GridPoints(weatherForecastOffice, xy) {
-      var _this;
-
-      _classCallCheck(this, GridPoints);
-
-      _this = _possibleConstructorReturn(this, _getPrototypeOf(GridPoints).call(this, '/gridpoints'));
-      _this.weatherForecastOffice = weatherForecastOffice;
-      _this.xy = xy;
-      return _this;
-    }
-
-    _createClass(GridPoints, [{
-      key: "get",
-      value: function get() {
-        return _get(_getPrototypeOf(GridPoints.prototype), "get", this).call(this, [this.weatherForecastOffice, this.xy], function (data) {
-          return new GridPoint(data);
-        });
-      }
-    }, {
-      key: "getForecast",
-      value: function getForecast(units) {
-        if (units === undefined) {
-          units = 'us';
-        }
-
-        return _get(_getPrototypeOf(GridPoints.prototype), "get", this).call(this, [this.weatherForecastOffice, this.xy, 'forecast'], {
-          'units': units
-        }, function (data) {
-          return new Forecast(data);
-        });
-      }
-    }, {
-      key: "getForecastHourly",
-      value: function getForecastHourly(units) {
-        if (units === undefined) {
-          units = 'us';
-        }
-
-        return _get(_getPrototypeOf(GridPoints.prototype), "get", this).call(this, [this.weatherForecastOffice, this.xy, 'forecast', 'hourly'], {
-          'units': units
-        }, function (data) {
-          return new Forecast(data);
-        });
-      }
-    }, {
-      key: "getStations",
-      value: function getStations() {
-        return _get(_getPrototypeOf(GridPoints.prototype), "get", this).call(this, [this.weatherForecastOffice, this.xy, 'stations'], function (data) {
-          return stationsToArray(data);
-        });
-      }
-    }]);
-
-    return GridPoints;
-  }(Endpoint); // @factory NOAA.gridPoints(weatherForecastOffice:string, x: number, y:number): GridPoints
-  // Creates an object representing /gridpoints endpoint
-
-  function toGridPoints(weatherForecastOffice, x, y) {
-    return new GridPoints(weatherForecastOffice, toXY(x, y));
-  }
-
   var ZoneForecastPeriod = function ZoneForecastPeriod(data) {
     _classCallCheck(this, ZoneForecastPeriod);
 
-    this.number = parseInt(data['number']);
-    this.name = data['name'];
-    this.detailedForecast = data['detailedForecast'];
+    this.number = parseInt(getValue('number', data));
+    this.name = getValue('name', data);
+    this.detailedForecast = getValue('detailedForecast', data);
   };
 
   /* @class ZoneForecast
@@ -7603,11 +7200,13 @@
   var ZoneForecast = function ZoneForecast(data) {
     _classCallCheck(this, ZoneForecast);
 
-    this.updated = toTime(data['updated']);
+    this.updated = toTime(getValue('updated', data));
     this.periods = [];
 
-    for (var i = 0; i < data['periods'].length; i++) {
-      this.periods.push(new ZoneForecastPeriod(data['periods'][i]));
+    if (data['periods']) {
+      for (var i = 0; i < data['periods'].length; i++) {
+        this.periods.push(new ZoneForecastPeriod(data['periods'][i]));
+      }
     }
   };
 
@@ -7846,33 +7445,36 @@
 
   var Zone =
   /*#__PURE__*/
-  function (_Feature) {
-    _inherits(Zone, _Feature);
-
+  function () {
     function Zone(data) {
-      var _this;
-
       _classCallCheck(this, Zone);
 
-      _this = _possibleConstructorReturn(this, _getPrototypeOf(Zone).call(this, data));
-      var i;
-      _this.id = _this.getProperty('id');
-      _this.type = _this.getProperty('type');
-      _this.name = _this.getProperty('name', true);
-      _this.state = _this.getProperty('state', true);
-      _this.forecastOffices = [];
+      if (typeof data === 'string') {
+        this.type = getUrlPart(data, -2);
+        this.id = getUrlPart(data, -1);
+      } else {
+        var i;
+        this.id = getFeatureProperty('id', data);
+        this.type = getFeatureProperty('type', data);
+        this.name = getFeatureProperty('name', data, true);
+        this.state = getFeatureProperty('state', data, true);
 
-      for (i = 0; _this.properties['forecastOffices'] && i < _this.properties['forecastOffices'].length; i++) {
-        _this.forecastOffices.push(getUrlParameter(_this.properties['forecastOffices'][i], -1));
+        if (data['geometry']) {
+          this.geometry = toGeometry(data['geometry']);
+        }
+
+        this.forecastOffices = [];
+
+        for (i = 0; data['properties']['forecastOffices'] && i < data['properties']['forecastOffices'].length; i++) {
+          this.forecastOffices.push(getUrlPart(data['properties']['forecastOffices'][i], -1));
+        }
+
+        this.timeZones = [];
+
+        for (i = 0; data['properties']['timeZone'] && i < data['properties']['timeZone'].length; i++) {
+          this.timeZones.push(data['properties']['timeZone'][i]);
+        }
       }
-
-      _this.timeZones = [];
-
-      for (i = 0; _this.properties['timeZone'] && i < _this.properties['timeZone'].length; i++) {
-        _this.timeZones.push(_this.properties['timeZone'][i]);
-      }
-
-      return _this;
     }
 
     _createClass(Zone, [{
@@ -7898,20 +7500,437 @@
     }]);
 
     return Zone;
-  }(Feature);
-  function toZone(type, id) {
-    return new Zone({
-      'type': 'Feature',
-      'properties': {
-        'id': id,
-        'type': type
-      }
-    });
-  }
+  }();
   function zonesToArray(data) {
     return featureCollectionToArray(data, function (feature) {
       return new Zone(feature);
     });
+  }
+
+  /* @class Office
+   * @aka NOAA.Office
+   *
+   * */
+
+  var Office =
+  /*#__PURE__*/
+  function () {
+    function Office(data) {
+      _classCallCheck(this, Office);
+
+      if (typeof data === 'string') {
+        this.id = data;
+      } else {
+        this.id = getValue('id', data);
+        this.name = getValue('name', data);
+        this.address = getValue('address', data);
+        this.telephone = getValue('telephone', data);
+        this.fax = getValue('faxNumber', data);
+        this.email = getValue('email', data);
+        this.url = getValue('sameAs', data);
+        this.nwsRegion = getValue('nwsRegion', data);
+        this.parentOrganization = getUrlPart(getValue('parentOrganization', data), -1);
+        this.responsibleCounties = this.getZones('responsibleCounties', data);
+        this.responsibleForecastZones = this.getZones('responsibleForecastZones', data);
+        this.responsibleFireZones = this.getZones('responsibleFireZones', data);
+        this.approvedObservationStations = this.getStations('approvedObservationStations', data);
+      }
+    }
+
+    _createClass(Office, [{
+      key: "getZones",
+      value: function getZones(key, data) {
+        var list = [];
+
+        if (data[key]) {
+          for (var i = 0; i < data[key].length; i++) {
+            list.push(new Zone(data[key][i]));
+          }
+        }
+
+        return list;
+      }
+    }, {
+      key: "getStations",
+      value: function getStations(key, data) {
+        var list = [];
+
+        if (data[key]) {
+          for (var i = 0; i < data[key].length; i++) {
+            list.push(new Station(getUrlPart(data[key][i], -1)));
+          }
+        }
+
+        return list;
+      }
+    }, {
+      key: "getAreaForecastDiscussion",
+      value: function getAreaForecastDiscussion() {
+        return toProducts().get({
+          'location': this.id,
+          'type': 'AFD'
+        });
+      }
+    }, {
+      key: "getProductTypes",
+      value: function getProductTypes() {
+        return toProducts().getLocationTypes(this.id);
+      }
+    }, {
+      key: "getProducts",
+      value: function getProducts(params) {
+        params['location'] = this.id;
+        return toProducts().get(params);
+      }
+    }]);
+
+    return Office;
+  }();
+
+  /* @class Point
+   * @aka NOAA.Point
+   *
+   * Represents response from /points endpoint.
+   * */
+
+  var RelativeLocation =
+  /*#__PURE__*/
+  function (_Feature) {
+    _inherits(RelativeLocation, _Feature);
+
+    function RelativeLocation(data) {
+      var _this;
+
+      _classCallCheck(this, RelativeLocation);
+
+      _this = _possibleConstructorReturn(this, _getPrototypeOf(RelativeLocation).call(this, data));
+      _this.city = getFeatureProperty('city', data);
+      _this.state = getFeatureProperty('state', data);
+      _this.distance = toValueUnits(getFeatureProperty('distance', data));
+      _this.bearing = toValueUnits(getFeatureProperty('bearing', data));
+      return _this;
+    }
+
+    return RelativeLocation;
+  }(Feature);
+
+  function toRelativeLocation(data) {
+    if (!data) {
+      return null;
+    }
+
+    return new RelativeLocation(data);
+  }
+
+  var millisecondsPerHour = 60 * 60 * 1000;
+  var ValidTimePeriod =
+  /*#__PURE__*/
+  function () {
+    function ValidTimePeriod(s) {
+      _classCallCheck(this, ValidTimePeriod);
+
+      var parts = s.split('/');
+
+      if (parts.length !== 2) {
+        throw new Error('Invalid valid time value (' + s + ')');
+      }
+
+      this.time = toTime(parts[0]);
+      this.hours = 0;
+      this.days = 0; //period parsing
+
+      var period = parts[1],
+          num = 0;
+
+      if (period[0] !== 'P') {
+        throw new Error('Invalid valid time period value (' + parts[1] + ')');
+      }
+
+      for (var i = 1; i < period.length; i++) {
+        if (period.charAt(i) >= '0' && period.charAt(i) <= '9') {
+          num = num * 10 + (period.charCodeAt(i) - '0'.charCodeAt(0));
+          continue;
+        }
+
+        if (period.charAt(i) === 'T') {
+          num = 0;
+          continue;
+        }
+
+        if (period.charAt(i) === 'D') {
+          this.days = num;
+          num = 0;
+          continue;
+        }
+
+        if (period.charAt(i) === 'H') {
+          this.hours = num;
+          num = 0;
+          continue;
+        }
+      }
+
+      if (this.days === 0 && this.hours === 0) {
+        throw new Error('Invalid valid time period (' + period + ')');
+      }
+
+      this.totalHours = this.days * 24 + this.hours;
+    }
+
+    _createClass(ValidTimePeriod, [{
+      key: "toArray",
+      value: function toArray() {
+        var times = [];
+
+        for (var i = 0; i < this.totalHours; i++) {
+          times.push(toTime(this.time.milliseconds + i * millisecondsPerHour));
+        }
+
+        return times;
+      }
+    }]);
+
+    return ValidTimePeriod;
+  }();
+  function toValidTimePeriod(a) {
+    return new ValidTimePeriod(a);
+  }
+
+  /* @class GridPoint
+   * @aka NOAA.GridPoint
+   *
+   * Represents response from /gridpoints endpoint.
+   * */
+
+  var GridPoint =
+  /*#__PURE__*/
+  function (_Feature) {
+    _inherits(GridPoint, _Feature);
+
+    function GridPoint(data) {
+      var _this;
+
+      _classCallCheck(this, GridPoint);
+
+      _this = _possibleConstructorReturn(this, _getPrototypeOf(GridPoint).call(this, data));
+      _this.xy = toXY(getFeatureProperty('gridX', data), getFeatureProperty('gridY', data));
+      _this.office = new Office(getFeatureProperty('gridId', data));
+      _this.elevation = toValueUnits(getFeatureProperty('elevation', data));
+      _this.updateTime = toTime(getFeatureProperty('updateTime', data));
+      _this.validTimes = toValidTimePeriod(getFeatureProperty('validTimes', data)).toArray();
+      _this.validTimesDict = {};
+
+      for (var i = 0; i < _this.validTimes.length; i++) {
+        _this.validTimesDict[_this.validTimes[i].milliseconds] = _this.validTimes[i].toString();
+      } // get forecast variables
+
+
+      _this.variables = {};
+
+      for (var _i = 0; _i < GridPoint.variables.length; _i++) {
+        _this.variables[GridPoint.variables[_i]] = _this.getVariable(GridPoint.variables[_i], data);
+      }
+
+      _this.weather = _this.getVariable('weather', data);
+      _this.hazards = _this.getVariable('hazards', data);
+      return _this;
+    }
+
+    _createClass(GridPoint, [{
+      key: "getVariable",
+      value: function getVariable(name, data) {
+        var variableData = getFeatureProperty(name, data),
+            units,
+            timeValueDict = {},
+            validTime,
+            valueTime,
+            variable = {};
+        variable.values = [];
+
+        if (variableData['sourceUnit']) {
+          variable['sourceUnit'] = variableData['sourceUnit'];
+        }
+
+        if (variableData['uom']) {
+          units = ValueUnits.parseUnit(variableData['uom']);
+        }
+
+        if (variableData['values'] && variableData['values'].length > 0) {
+          for (var i = 0; i < variableData['values'].length; i++) {
+            validTime = toValidTimePeriod(variableData['values'][i]['validTime']);
+
+            for (var hour = 0; hour < validTime.totalHours; hour++) {
+              //value can be null
+              if (variableData['values'][i]['value']) {
+                valueTime = validTime.time.milliseconds + hour * millisecondsPerHour; //if (!(valueTime in this.validTimesDict)) {
+                //    throw new Error(name + ' value time does not match gridpoint valid times');
+                //}
+
+                if (valueTime <= this.validTimes[this.validTimes.length - 1].milliseconds) {
+                  if (typeof variableData['values'][i]['value'] === 'number') {
+                    timeValueDict[valueTime] = toValueUnits(variableData['values'][i]['value'], units);
+                  } else {
+                    timeValueDict[valueTime] = variableData['values'][i]['value'];
+                  }
+                }
+              }
+            }
+          }
+
+          for (var _i2 = 0; _i2 < this.validTimes.length; _i2++) {
+            variable.values.push(timeValueDict[this.validTimes[_i2].milliseconds]);
+          }
+        }
+
+        return variable;
+      }
+    }]);
+
+    return GridPoint;
+  }(Feature);
+  GridPoint.variables = ['temperature', 'dewpoint', 'maxTemperature', 'minTemperature', 'relativeHumidity', 'apparentTemperature', 'heatIndex', 'windChill', 'skyCover', 'windDirection', 'windSpeed', 'windGust', 'probabilityOfPrecipitation', 'quantitativePrecipitation', 'iceAccumulation', 'snowfallAmount', 'snowLevel', 'ceilingHeight', 'visibility', 'transportWindSpeed', 'transportWindDirection', 'mixingHeight', 'hainesIndex', 'lightningActivityLevel', 'twentyFootWindSpeed', 'twentyFootWindDirection', 'waveHeight', 'wavePeriod', 'waveDirection', 'primarySwellHeight', 'primarySwellDirection', 'secondarySwellHeight', 'secondarySwellDirection', 'wavePeriod2', 'windWaveHeight', 'dispersionIndex', 'pressure', 'probabilityOfTropicalStormWinds', 'probabilityOfHurricaneWinds', 'potentialOf15mphWinds', 'potentialOf25mphWinds', 'potentialOf35mphWinds', 'potentialOf45mphWinds', 'potentialOf20mphWindGusts', 'potentialOf30mphWindGusts', 'potentialOf40mphWindGusts', 'potentialOf50mphWindGusts', 'potentialOf60mphWindGusts', 'grasslandFireDangerIndex', 'probabilityOfThunder', 'davisStabilityIndex', 'atmosphericDispersionIndex', 'lowVisibilityOccurrenceRiskIndex', 'stability', 'redFlagThreatIndex'];
+
+  /*
+      "number": 3,
+      "name": "Thursday",
+      "startTime": "2019-06-13T06:00:00-05:00",
+      "endTime": "2019-06-13T18:00:00-05:00",
+      "isDaytime": true,
+      "temperature": 76,
+      "temperatureUnit": "F",
+      "temperatureTrend": null,
+      "windSpeed": "0 to 10 mph",
+      "windDirection": "SW",
+      "icon": "https://api.weather.gov/icons/land/day/few?size=medium",
+      "shortForecast": "Sunny",
+      "detailedForecast": "Sunny, with a high near 76. Southwest wind 0 to 10 mph."
+  */
+
+  var ForecastPeriod = function ForecastPeriod(data) {
+    _classCallCheck(this, ForecastPeriod);
+
+    this.number = parseInt(getValue('number', data));
+    this.name = getValue('name', data);
+    this.startTime = toTime(getValue('startTime', data));
+    this.endTime = toTime(getValue('endTime', data));
+    this.isDaytime = getValue('isDaytime', data);
+    this.temperature = toValueUnits(getValue('temperature', data), getValue('temperatureUnit', data));
+    this.temperatureTrend = getValue('temperatureTrend', data);
+    this.windSpeed = getValue('windSpeed', data);
+    this.windDirection = getValue('windDirection', data);
+    this.icon = getValue('icon', data);
+    this.shortForecast = getValue('shortForecast', data);
+    this.detailedForecast = getValue('detailedForecast', data);
+  };
+
+  /* @class Forecast
+   * @aka NOAA.Forecast
+   *
+   * Represents response from /gridpoints/{wfo}/{x},{y}/forecast endpoint.
+   * */
+
+  var Forecast =
+  /*#__PURE__*/
+  function (_Feature) {
+    _inherits(Forecast, _Feature);
+
+    function Forecast(data) {
+      var _this;
+
+      _classCallCheck(this, Forecast);
+
+      _this = _possibleConstructorReturn(this, _getPrototypeOf(Forecast).call(this, data));
+      _this.updated = toTime(getFeatureProperty('updated', data));
+      _this.units = getFeatureProperty('units', data);
+      _this.forecastGenerator = getFeatureProperty('forecastGenerator', data);
+      _this.generatedAt = toTime(getFeatureProperty('generatedAt', data));
+      _this.updateTime = toTime(getFeatureProperty('updateTime', data));
+      _this.validTimes = toValidTimePeriod(getFeatureProperty('validTimes', data));
+      _this.elevation = toValueUnits(getFeatureProperty('elevation', data));
+      _this.periods = [];
+
+      for (var i = 0; i < getFeatureProperty('periods', data).length; i++) {
+        _this.periods.push(new ForecastPeriod(getFeatureProperty('periods', data)[i]));
+      }
+
+      return _this;
+    }
+
+    return Forecast;
+  }(Feature);
+
+  /* class GridPoints implements /gridpoints interface
+   * */
+
+  var GridPoints =
+  /*#__PURE__*/
+  function (_Endpoint) {
+    _inherits(GridPoints, _Endpoint);
+
+    /**
+     * 
+     * @param {string} weatherForecastOffice
+     * @param {XY} xy
+     */
+    function GridPoints(weatherForecastOffice, xy) {
+      var _this;
+
+      _classCallCheck(this, GridPoints);
+
+      _this = _possibleConstructorReturn(this, _getPrototypeOf(GridPoints).call(this, '/gridpoints'));
+      _this.weatherForecastOffice = weatherForecastOffice;
+      _this.xy = xy;
+      return _this;
+    }
+
+    _createClass(GridPoints, [{
+      key: "get",
+      value: function get() {
+        return _get(_getPrototypeOf(GridPoints.prototype), "get", this).call(this, [this.weatherForecastOffice, this.xy], function (data) {
+          return new GridPoint(data);
+        });
+      }
+    }, {
+      key: "getForecast",
+      value: function getForecast(units) {
+        if (units === undefined) {
+          units = 'us';
+        }
+
+        return _get(_getPrototypeOf(GridPoints.prototype), "get", this).call(this, [this.weatherForecastOffice, this.xy, 'forecast'], {
+          'units': units
+        }, function (data) {
+          return new Forecast(data);
+        });
+      }
+    }, {
+      key: "getForecastHourly",
+      value: function getForecastHourly(units) {
+        if (units === undefined) {
+          units = 'us';
+        }
+
+        return _get(_getPrototypeOf(GridPoints.prototype), "get", this).call(this, [this.weatherForecastOffice, this.xy, 'forecast', 'hourly'], {
+          'units': units
+        }, function (data) {
+          return new Forecast(data);
+        });
+      }
+    }, {
+      key: "getStations",
+      value: function getStations() {
+        return _get(_getPrototypeOf(GridPoints.prototype), "get", this).call(this, [this.weatherForecastOffice, this.xy, 'stations'], function (data) {
+          return stationsToArray(data);
+        });
+      }
+    }]);
+
+    return GridPoints;
+  }(Endpoint); // @factory NOAA.gridPoints(weatherForecastOffice:string, x: number, y:number): GridPoints
+  // Creates an object representing /gridpoints endpoint
+
+  function toGridPoints(weatherForecastOffice, x, y) {
+    return new GridPoints(weatherForecastOffice, toXY(x, y));
   }
 
   /* @class Alert
@@ -7920,54 +7939,41 @@
    * Represents response from /points endpoint.
    * */
 
-  var Alert =
-  /*#__PURE__*/
-  function (_Feature) {
-    _inherits(Alert, _Feature);
+  var Alert = function Alert(data) {
+    _classCallCheck(this, Alert);
 
-    function Alert(data) {
-      var _this;
+    this.id = getFeatureProperty('id', data);
+    this.areaDescription = getFeatureProperty('areaDesc', data);
+    this.geocode = getFeatureProperty('geocode', data);
+    this.affectedZones = [];
+    var affectedZones = getFeatureProperty('affectedZones', data),
+        i;
 
-      _classCallCheck(this, Alert);
-
-      _this = _possibleConstructorReturn(this, _getPrototypeOf(Alert).call(this, data));
-      _this.id = _this.getProperty('id');
-      _this.areaDescription = _this.getProperty('areaDesc');
-      _this.geocode = _this.getProperty('geocode');
-      _this.affectedZones = [];
-
-      var affectedZones = _this.getProperty('affectedZones'),
-          i;
-
-      for (i = 0; i < affectedZones.length; i++) {
-        _this.affectedZones.push(toZone(getUrlParameter(affectedZones[i], -2), getUrlParameter(affectedZones[i], -1)));
-      }
-
-      _this.references = _this.getProperty('references');
-      _this.sent = toTime(_this.getProperty('sent'));
-      _this.effective = toTime(_this.getProperty('effective'));
-      _this.onset = toTime(_this.getProperty('onset'));
-      _this.expires = toTime(_this.getProperty('expires'));
-      _this.ends = toTime(_this.getProperty('ends'));
-      _this.status = _this.getProperty('status');
-      _this.messageType = _this.getProperty('messageType');
-      _this.category = _this.getProperty('category');
-      _this.severity = _this.getProperty('severity');
-      _this.certainty = _this.getProperty('certainty');
-      _this.urgency = _this.getProperty('urgency');
-      _this.event = _this.getProperty('event');
-      _this.sender = _this.getProperty('sender');
-      _this.senderName = _this.getProperty('senderName');
-      _this.headline = _this.getProperty('headline');
-      _this.description = _this.getProperty('description');
-      _this.instruction = _this.getProperty('instruction');
-      _this.response = _this.getProperty('response');
-      _this.parameters = _this.getProperty('parameters');
-      return _this;
+    for (i = 0; i < affectedZones.length; i++) {
+      this.affectedZones.push(new Zone(affectedZones[i]));
     }
 
-    return Alert;
-  }(Feature);
+    this.references = getFeatureProperty('references', data);
+    this.sent = toTime(getFeatureProperty('sent', data));
+    this.effective = toTime(getFeatureProperty('effective', data));
+    this.onset = toTime(getFeatureProperty('onset', data));
+    this.expires = toTime(getFeatureProperty('expires', data));
+    this.ends = toTime(getFeatureProperty('ends', data));
+    this.status = getFeatureProperty('status', data);
+    this.messageType = getFeatureProperty('messageType', data);
+    this.category = getFeatureProperty('category', data);
+    this.severity = getFeatureProperty('severity', data);
+    this.certainty = getFeatureProperty('certainty', data);
+    this.urgency = getFeatureProperty('urgency', data);
+    this.event = getFeatureProperty('event', data);
+    this.sender = getFeatureProperty('sender', data);
+    this.senderName = getFeatureProperty('senderName', data);
+    this.headline = getFeatureProperty('headline', data);
+    this.description = getFeatureProperty('description', data);
+    this.instruction = getFeatureProperty('instruction', data);
+    this.response = getFeatureProperty('response', data);
+    this.parameters = getFeatureProperty('parameters', data);
+  };
 
   /* @class AlertCollection
    * @aka NOAA.AlertCollection
@@ -8254,15 +8260,15 @@
       _classCallCheck(this, Point);
 
       _this = _possibleConstructorReturn(this, _getPrototypeOf(Point).call(this, data));
-      _this.xy = toXY(_this.getProperty('gridX'), _this.getProperty('gridY'));
-      _this.office = new Office(_this.getProperty('cwa'));
-      _this.forecastZone = getUrlParameter(_this.getProperty('forecastZone'), -1);
-      _this.timeZone = _this.getProperty('timeZone');
-      _this.radarStation = _this.getProperty('radarStation');
-      _this.relativeLocation = toRelativeLocation(_this.getProperty('relativeLocation')); // optional properties
+      _this.xy = toXY(getFeatureProperty('gridX', data), getFeatureProperty('gridY', data));
+      _this.office = new Office(getFeatureProperty('cwa', data));
+      _this.forecastZone = getUrlPart(getFeatureProperty('forecastZone', data), -1);
+      _this.timeZone = getFeatureProperty('timeZone', data);
+      _this.radarStation = getFeatureProperty('radarStation', data);
+      _this.relativeLocation = toRelativeLocation(getFeatureProperty('relativeLocation', data)); // optional properties
 
-      _this.county = getUrlParameter(_this.getProperty('county', true), -1);
-      _this.fireWeatherZone = getUrlParameter(_this.getProperty('fireWeatherZone', true), -1);
+      _this.county = getUrlPart(getFeatureProperty('county', data, true), -1);
+      _this.fireWeatherZone = getUrlPart(getFeatureProperty('fireWeatherZone', data, true), -1);
       return _this;
     }
 
@@ -8445,7 +8451,7 @@
       key: "get",
       value: function get() {
         return _get(_getPrototypeOf(Offices.prototype), "get", this).call(this, [this.officeId], function (data) {
-          return data;
+          return new Office(data);
         });
       }
     }, {

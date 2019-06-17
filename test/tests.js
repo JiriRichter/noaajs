@@ -2,13 +2,15 @@ function testPoint() {
     var point = NOAA.latLon(39.7456, -97.0892);
 }
 
+function reject(error) {
+    console.log(error);
+}
+
 function testError() {
     var endpoint = new NOAA.Endpoint('/points');
     endpoint.get(['invalidURL']).then(function (data) {
         console.log(data);
-    }, function (error) {
-        console.log(error);
-    });
+    }, reject);
 }
 
 function testPoints() {
@@ -48,7 +50,6 @@ function testGridPoints(lat, lon) {
 function testTime() {
     NOAA.points([39.7456, -97.0892]).get().then(function (point) {
         point.getGridPoint().then(function (gridpoint) {
-            console.log(gridpoint.getProperty('updateTime'));
             console.log(gridpoint.updateTime);
             console.log(gridpoint.updateTime.toTimezone(point.timeZone));
         });
@@ -134,9 +135,7 @@ function testAlertsActiveCount() {
 function testAlertsZoneActive(zone) {
     NOAA.alerts().getZoneActive(zone).then(function (data) {
         console.log(data);
-    }, function (error) {
-        console.log(error);
-    });
+    }, reject);
 }
 
 function testAlertsRegionActive(region) {
@@ -193,9 +192,7 @@ function testStationsLatestObservation() {
         data.forEach(function (station) {
             station.getLatestObservations().then(function (data) {
                 console.log(data);
-            }, function (error) {
-                console.log(error);
-            });
+            }, reject);
         });
     });
 }
@@ -218,19 +215,19 @@ function testZones(area) {
 
         data[0].getZone().then(function (data) {
             console.log(data);
-        });
+        }, reject);
 
         for (let i = 0; i < data.length; i++) {
             if (data[i].type === NOAA.Zones.Types.fire) {
                 data[i].getZoneForecast().then(function (data) {
                     console.log(data);
-                });
+                }, reject);
                 data[i].getZoneStations().then(function (data) {
                     console.log(data);
-                });
+                }, reject);
                 data[i].getZoneObservations().then(function (data) {
                     console.log(data);
-                });
+                }, reject);
                 break;
             }
         }
@@ -243,60 +240,67 @@ function testZonesTypes() {
 
         data[0].getZone().then(function (data) {
             console.log(data);
-        });
+        }, reject);
 
         for (let i = 0; i < data.length; i++) {
             if (data[i].type === NOAA.Zones.Types.land) {
                 data[i].getZoneForecast().then(function (data) {
                     console.log(data);
-                });
+                }, reject);
                 data[i].getZoneStations().then(function (data) {
                     console.log(data);
-                });
+                }, reject);
                 data[i].getZoneObservations().then(function (data) {
                     console.log(data);
-                });
+                }, reject);
                 break;
             }
         }
     });
 }
 
+function testOffices(office) {
+    NOAA.offices(office).get().then(function (data) {
+        console.log(data);
+    });
+}
 
-testPoint();
-testError();
-testPoints();
-testPointsStations();
-//testGlossary();
-testGridPointsStations();
-testTime();
-testGridPointsForecast();
-testIcons();
-testProductsTypes();
-testGridPointsForecastHourly();
-testGridPoints(39.7456, -97.0892);
-testGridPoints(37.82627236942017, -122.41845649480823);
-testAlerts();
 
-testPointAlerts(39.7456, -97.0892);
-testPointAlerts(37.82627236942017, -122.41845649480823);
-//testAlertsPagionation();
-testAlertsTypes();
-testAlertsAlert();
-testAlertsActiveCount();
-testAlertsZoneActive('aaaa');
-testAlertsAreaActive(NOAA.StateAreaCodes.CA);
-testAlertsRegionActive(NOAA.RegionCodes.AL);
+//testPoint();
+//testError();
+//testPoints();
+//testPointsStations();
+////testGlossary();
+//testGridPointsStations();
+//testTime();
+//testGridPointsForecast();
+//testIcons();
+//testProductsTypes();
+//testGridPointsForecastHourly();
+//testGridPoints(39.7456, -97.0892);
+//testGridPoints(37.82627236942017, -122.41845649480823);
+//testAlerts();
 
-//testStationsRadar();
+//testPointAlerts(39.7456, -97.0892);
+//testPointAlerts(37.82627236942017, -122.41845649480823);
+////testAlertsPagionation();
+//testAlertsTypes();
+//testAlertsAlert();
+//testAlertsActiveCount();
+//testAlertsZoneActive('aaaa');
+//testAlertsAreaActive(NOAA.StateAreaCodes.CA);
+//testAlertsRegionActive(NOAA.RegionCodes.AL);
 
-testStations();
-testStationsArea();
-//testStationsObservations();
-testStationsLatestObservation();
+////testStationsRadar();
 
-testPointsDiscussion();
+//testStations();
+//testStationsArea();
+////testStationsObservations();
+//testStationsLatestObservation();
 
-testZones(NOAA.StateAreaCodes.WA);
-testZones(NOAA.StateAreaCodes.AL);
-testZonesTypes();
+//testPointsDiscussion();
+
+//testZones(NOAA.StateAreaCodes.WA);
+//testZones(NOAA.StateAreaCodes.AL);
+//testZonesTypes();
+testOffices('SEW');

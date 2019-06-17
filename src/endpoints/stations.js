@@ -1,5 +1,5 @@
 import { Endpoint } from './endpoint';
-import { validateParameter, toQueryParamValue } from '../utils/parameters';
+import { validateParameter, toQueryParamValue } from './parameters';
 import { StateAreaCodes, MarineAreaCodes } from '../utils/codes';
 import { Station, stationsToArray } from '../response/station';
 import { Observation, observationsToArray } from '../response/observation';

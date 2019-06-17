@@ -1,4 +1,5 @@
 import { Endpoint } from './endpoint';
+import { Office } from '../response/office';
 
 /* class Offices implements /alerts interface
  * */
@@ -10,7 +11,7 @@ export class Offices extends Endpoint {
 
     get() {
         return super.get([this.officeId], function (data) {
-            return data;
+            return new Office(data);
         });
     }
 

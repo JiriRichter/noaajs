@@ -3,6 +3,7 @@ import { toValueUnits } from './value-units';
 import { toTime } from '../utils/time';
 import { toValidTimePeriod } from './valid-time-period';
 import { ForecastPeriod } from './forecast-period';
+import { getFeatureProperty } from './utils';
 
 /* @class Forecast
  * @aka NOAA.Forecast
@@ -13,16 +14,16 @@ export class Forecast extends Feature {
     constructor(data) {
         super(data);
 
-        this.updated = toTime(this.getProperty('updated'));
-        this.units = this.getProperty('units');
-        this.forecastGenerator = this.getProperty('forecastGenerator');
-        this.generatedAt = toTime(this.getProperty('generatedAt'));
-        this.updateTime = toTime(this.getProperty('updateTime'));
-        this.validTimes = toValidTimePeriod(this.getProperty('validTimes'));
-        this.elevation = toValueUnits(this.getProperty('elevation'));
+        this.updated = toTime(getFeatureProperty('updated', data));
+        this.units = getFeatureProperty('units', data);
+        this.forecastGenerator = getFeatureProperty('forecastGenerator', data);
+        this.generatedAt = toTime(getFeatureProperty('generatedAt', data));
+        this.updateTime = toTime(getFeatureProperty('updateTime', data));
+        this.validTimes = toValidTimePeriod(getFeatureProperty('validTimes', data));
+        this.elevation = toValueUnits(getFeatureProperty('elevation', data));
         this.periods = [];
-        for (let i = 0; i < this.getProperty('periods').length; i++) {
-            this.periods.push(new ForecastPeriod(this.getProperty('periods')[i]));
+        for (let i = 0; i < getFeatureProperty('periods', data).length; i++) {
+            this.periods.push(new ForecastPeriod(getFeatureProperty('periods', data)[i]));
         }
     }
 }

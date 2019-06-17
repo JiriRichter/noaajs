@@ -1,32 +1,40 @@
-import { Feature } from './feature';
 import { featureCollectionToArray } from './feature-collection';
 import { toZones } from '../endpoints/zones';
-import { getUrlParameter } from '../utils/parameters';
+import { getUrlPart, getFeatureProperty } from './utils';
+import { toGeometry } from './geometry';
 
 /* @class Zone
  * @aka NOAA.Zone
  *
  * Represents response from /zones endpoint.
  * */
-export class Zone extends Feature {
+export class Zone {
     constructor(data) {
-        super(data);
-
-        let i;
-
-        this.id = this.getProperty('id');
-        this.type = this.getProperty('type');
-        this.name = this.getProperty('name', true);
-        this.state = this.getProperty('state', true);
-
-        this.forecastOffices = [];
-        for (i = 0; this.properties['forecastOffices'] && i < this.properties['forecastOffices'].length; i++) {
-            this.forecastOffices.push(getUrlParameter(this.properties['forecastOffices'][i], -1));
+        if (typeof data === 'string') {
+            this.type = getUrlPart(data, -2);
+            this.id = getUrlPart(data, -1);
         }
+        else {
+            let i;
 
-        this.timeZones = [];
-        for (i = 0; this.properties['timeZone'] && i < this.properties['timeZone'].length; i++) {
-            this.timeZones.push(this.properties['timeZone'][i]);
+            this.id = getFeatureProperty('id', data);
+            this.type = getFeatureProperty('type', data);
+            this.name = getFeatureProperty('name', data, true);
+            this.state = getFeatureProperty('state', data, true);
+
+            if (data['geometry']) {
+                this.geometry = toGeometry(data['geometry']);
+            }
+
+            this.forecastOffices = [];
+            for (i = 0; data['properties']['forecastOffices'] && i < data['properties']['forecastOffices'].length; i++) {
+                this.forecastOffices.push(getUrlPart(data['properties']['forecastOffices'][i], -1));
+            }
+
+            this.timeZones = [];
+            for (i = 0; data['properties']['timeZone'] && i < data['properties']['timeZone'].length; i++) {
+                this.timeZones.push(data['properties']['timeZone'][i]);
+            }
         }
     }
 
@@ -45,16 +53,6 @@ export class Zone extends Feature {
     getZoneObservations(start, end, limit) {
         return toZones().getZoneObservations(this.id, start, end, limit);
     }
-}
-
-export function toZone(type, id) {
-    return new Zone({
-        'type': 'Feature',
-        'properties': {
-            'id': id,
-            'type': type
-        }
-    });
 }
 
 export function zonesToArray(data) {

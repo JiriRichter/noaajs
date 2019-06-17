@@ -2,7 +2,7 @@ import { Feature } from './feature';
 import { featureCollectionToArray } from './feature-collection';
 import { toValueUnits } from './value-units';
 import { toStations } from '../endpoints/stations';
-import { getUrlParameter } from '../utils/parameters';
+import { getUrlPart, getFeatureProperty } from './utils';
 
 
 /* @class Station
@@ -11,16 +11,26 @@ import { getUrlParameter } from '../utils/parameters';
  * */
 export class Station extends Feature {
     constructor(data) {
-        super(data);
+        if (typeof data === 'string') {
+            super(undefined);
+            this.id = data;
+        }
+        else {
+            super(data);
 
-        this.elevation = toValueUnits(this.getProperty('elevation'));
-        this.id = this.getProperty('stationIdentifier');
-        this.name = this.getProperty('name');
-        this.timeZone = this.getProperty('timeZone');
+            this.elevation = toValueUnits(getFeatureProperty('elevation', data));
+            this.id = getFeatureProperty('stationIdentifier', data);
+            this.name = getFeatureProperty('name', data);
+            this.timeZone = getFeatureProperty('timeZone', data);
 
-        this.forecastZone = getUrlParameter(this.getProperty('forecast', true), -1);
-        this.county = getUrlParameter(this.getProperty('county', true), -1);
-        this.fireWeatherZone = getUrlParameter(this.getProperty('fireWeatherZone', true), -1);
+            this.forecastZone = getUrlPart(getFeatureProperty('forecast', data, true), -1);
+            this.county = getUrlPart(getFeatureProperty('county', data, true), -1);
+            this.fireWeatherZone = getUrlPart(getFeatureProperty('fireWeatherZone', data, true), -1);
+        }
+    }
+
+    get() {
+        return toStations().getStation(this.id );
     }
 
     getObservations(start, end) {
