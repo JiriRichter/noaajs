@@ -1,6 +1,7 @@
 import { stations } from './stations';
 import { toLatLon, LatLon } from '../utils/latlon';
 import { haversineDistance } from '../utils/distance';
+import { toValueUnits } from '../response/value-units';
 
 /**
  * Converts feature to latLon
@@ -25,7 +26,7 @@ export function findClosestStation(latlon) {
         }
     });
 
-    closestStation['distance'] = minDistance;
+    closestStation['distance'] = toValueUnits(minDistance, 'm');
 
     return closestStation;
 }

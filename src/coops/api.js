@@ -49,7 +49,7 @@ export class COOPSApi {
     }
 
     formatDate(date) {
-        return moment(date).format('yyyyMMdd HH:mm');
+        return moment(date).utc().format('YYYYMMDD HH:mm');
     }
 
     getLatest() {

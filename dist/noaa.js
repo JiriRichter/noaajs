@@ -1,5 +1,5 @@
 /* @preserve
- * NOAA 1.0.0+master.7a51ab0, a JS library for https://www.weather.gov/documentation/services-web-api.
+ * NOAA 1.0.0+master.1d0cbf3, a JS library for https://www.weather.gov/documentation/services-web-api.
  * (c) 2019-2020 Jiri Richter
  */
 
@@ -6076,7 +6076,12 @@
     }, {
       key: "toString",
       value: function toString() {
-        return new Date(this.milliseconds).toISOString();
+        return this.toDate().toISOString();
+      }
+    }, {
+      key: "toDate",
+      value: function toDate() {
+        return new Date(this.milliseconds);
       }
     }]);
 
@@ -7722,18 +7727,16 @@
       _this.office = new Office(getFeatureProperty('gridId', data));
       _this.elevation = toValueUnits(getFeatureProperty('elevation', data));
       _this.updateTime = toTime(getFeatureProperty('updateTime', data));
-      _this.validTimes = toValidTimePeriod(getFeatureProperty('validTimes', data)).toArray();
-      _this.validTimesDict = {};
-
-      for (var i = 0; i < _this.validTimes.length; i++) {
-        _this.validTimesDict[_this.validTimes[i].milliseconds] = _this.validTimes[i].toString();
-      } // get forecast variables
-
+      _this.validTimes = toValidTimePeriod(getFeatureProperty('validTimes', data)).toArray(); //this.validTimesDict = {};
+      //for (let i = 0; i < this.validTimes.length; i++) {
+      //    this.validTimesDict[this.validTimes[i].milliseconds] = this.validTimes[i].toString();
+      //}
+      // get forecast variables
 
       _this.variables = {};
 
-      for (var _i = 0; _i < GridPoint.variables.length; _i++) {
-        _this.variables[GridPoint.variables[_i]] = _this.getVariable(GridPoint.variables[_i], data);
+      for (var i = 0; i < GridPoint.variables.length; i++) {
+        _this.variables[GridPoint.variables[i]] = _this.getVariable(GridPoint.variables[i], data);
       }
 
       _this.weather = _this.getVariable('weather', data);
@@ -7782,8 +7785,8 @@
             }
           }
 
-          for (var _i2 = 0; _i2 < this.validTimes.length; _i2++) {
-            variable.values.push(timeValueDict[this.validTimes[_i2].milliseconds]);
+          for (var _i = 0; _i < this.validTimes.length; _i++) {
+            variable.values.push(timeValueDict[this.validTimes[_i].milliseconds]);
           }
         }
 
@@ -12259,7 +12262,7 @@
         closestStation = station['properties'];
       }
     });
-    closestStation['distance'] = minDistance;
+    closestStation['distance'] = toValueUnits(minDistance, 'm');
     return closestStation;
   }
 
@@ -12425,7 +12428,7 @@
     _createClass(COOPSApi, [{
       key: "formatDate",
       value: function formatDate(date) {
-        return moment(date).format('yyyyMMdd HH:mm');
+        return moment(date).utc().format('YYYYMMDD HH:mm');
       }
     }, {
       key: "getLatest",

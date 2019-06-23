@@ -22,7 +22,11 @@ export class Time {
     }
 
     toString() {
-        return (new Date(this.milliseconds)).toISOString()
+        return this.toDate().toISOString();
+    }
+
+    toDate() {
+        return new Date(this.milliseconds);
     }
 }
 

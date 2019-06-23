@@ -21,10 +21,10 @@ export class GridPoint extends Feature {
         this.elevation = toValueUnits(getFeatureProperty('elevation', data));
         this.updateTime = toTime(getFeatureProperty('updateTime', data));
         this.validTimes = toValidTimePeriod(getFeatureProperty('validTimes', data)).toArray();
-        this.validTimesDict = {};
-        for (let i = 0; i < this.validTimes.length; i++) {
-            this.validTimesDict[this.validTimes[i].milliseconds] = this.validTimes[i].toString();
-        }
+        //this.validTimesDict = {};
+        //for (let i = 0; i < this.validTimes.length; i++) {
+        //    this.validTimesDict[this.validTimes[i].milliseconds] = this.validTimes[i].toString();
+        //}
 
         // get forecast variables
         this.variables = {};
