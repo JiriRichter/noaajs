@@ -48,11 +48,14 @@ export class ValidTimePeriod {
     }
 
     toArray() {
-        let times = [];
-        for (let i = 0; i < this.totalHours; i++) {
-            times.push(toTime(this.time.milliseconds + (i * millisecondsPerHour)));
+        if (this._array) {
+            return this._array;
         }
-        return times;
+        this._array = [];
+        for (let i = 0; i < this.totalHours; i++) {
+            this._array.push(toTime(this.time.milliseconds + (i * millisecondsPerHour)));
+        }
+        return this._array;
     }
 }
 

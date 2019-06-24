@@ -1,5 +1,5 @@
 /* @preserve
- * NOAA 1.0.0+master.1d0cbf3, a JS library for https://www.weather.gov/documentation/services-web-api.
+ * NOAA 1.0.0+master.d0b4ae8, a JS library for https://www.weather.gov/documentation/services-web-api.
  * (c) 2019-2020 Jiri Richter
  */
 
@@ -7690,13 +7690,17 @@
     _createClass(ValidTimePeriod, [{
       key: "toArray",
       value: function toArray() {
-        var times = [];
-
-        for (var i = 0; i < this.totalHours; i++) {
-          times.push(toTime(this.time.milliseconds + i * millisecondsPerHour));
+        if (this._array) {
+          return this._array;
         }
 
-        return times;
+        this._array = [];
+
+        for (var i = 0; i < this.totalHours; i++) {
+          this._array.push(toTime(this.time.milliseconds + i * millisecondsPerHour));
+        }
+
+        return this._array;
       }
     }]);
 
@@ -7727,20 +7731,13 @@
       _this.office = new Office(getFeatureProperty('gridId', data));
       _this.elevation = toValueUnits(getFeatureProperty('elevation', data));
       _this.updateTime = toTime(getFeatureProperty('updateTime', data));
-      _this.validTimes = toValidTimePeriod(getFeatureProperty('validTimes', data)).toArray(); //this.validTimesDict = {};
-      //for (let i = 0; i < this.validTimes.length; i++) {
-      //    this.validTimesDict[this.validTimes[i].milliseconds] = this.validTimes[i].toString();
-      //}
-      // get forecast variables
-
-      _this.variables = {};
+      _this.validTimes = toValidTimePeriod(getFeatureProperty('validTimes', data));
+      _this.values = {};
 
       for (var i = 0; i < GridPoint.variables.length; i++) {
-        _this.variables[GridPoint.variables[i]] = _this.getVariable(GridPoint.variables[i], data);
+        _this.values[GridPoint.variables[i]] = _this.getVariable(GridPoint.variables[i], data);
       }
 
-      _this.weather = _this.getVariable('weather', data);
-      _this.hazards = _this.getVariable('hazards', data);
       return _this;
     }
 
@@ -7749,54 +7746,64 @@
       value: function getVariable(name, data) {
         var variableData = getFeatureProperty(name, data),
             units,
-            timeValueDict = {},
-            validTime,
-            valueTime,
-            variable = {};
-        variable.values = [];
-
-        if (variableData['sourceUnit']) {
-          variable['sourceUnit'] = variableData['sourceUnit'];
-        }
+            values,
+            item;
 
         if (variableData['uom']) {
           units = ValueUnits.parseUnit(variableData['uom']);
         }
 
         if (variableData['values'] && variableData['values'].length > 0) {
-          for (var i = 0; i < variableData['values'].length; i++) {
-            validTime = toValidTimePeriod(variableData['values'][i]['validTime']);
+          values = [];
 
-            for (var hour = 0; hour < validTime.totalHours; hour++) {
-              //value can be null
-              if (variableData['values'][i]['value']) {
-                valueTime = validTime.time.milliseconds + hour * millisecondsPerHour; //if (!(valueTime in this.validTimesDict)) {
-                //    throw new Error(name + ' value time does not match gridpoint valid times');
-                //}
-
-                if (valueTime <= this.validTimes[this.validTimes.length - 1].milliseconds) {
-                  if (typeof variableData['values'][i]['value'] === 'number') {
-                    timeValueDict[valueTime] = toValueUnits(variableData['values'][i]['value'], units);
-                  } else {
-                    timeValueDict[valueTime] = variableData['values'][i]['value'];
-                  }
-                }
-              }
-            }
+          if (variableData['sourceUnit']) {
+            values['sourceUnit'] = variableData['sourceUnit'];
           }
 
-          for (var _i = 0; _i < this.validTimes.length; _i++) {
-            variable.values.push(timeValueDict[this.validTimes[_i].milliseconds]);
+          for (var i = 0; i < variableData['values'].length; i++) {
+            //value can be null
+            if (variableData['values'][i]['value']) {
+              if (typeof variableData['values'][i]['value'] === 'number') {
+                item = toValueUnits(variableData['values'][i]['value'], units);
+              } else {
+                item = variableData['values'][i]['value'];
+              }
+
+              item['validTime'] = toValidTimePeriod(variableData['values'][i]['validTime']);
+              values.push(item);
+            }
           }
         }
 
-        return variable;
+        return values;
+      }
+    }, {
+      key: "mapToValidTimes",
+      value: function mapToValidTimes(variable) {
+        var timeValueDict = {},
+            validTime,
+            i,
+            hour;
+
+        if (variable in this.values) {
+          for (i = 0; i < this.values[variable].length; i++) {
+            validTime = this.values[variable][i].validTime;
+
+            for (hour = 0; hour < validTime.totalHours; hour++) {
+              timeValueDict[validTime.time.milliseconds + hour * millisecondsPerHour] = this.values[variable][i];
+            }
+          }
+
+          return this.validTimes.toArray().map(function (t) {
+            return timeValueDict[t.milliseconds];
+          });
+        }
       }
     }]);
 
     return GridPoint;
   }(Feature);
-  GridPoint.variables = ['temperature', 'dewpoint', 'maxTemperature', 'minTemperature', 'relativeHumidity', 'apparentTemperature', 'heatIndex', 'windChill', 'skyCover', 'windDirection', 'windSpeed', 'windGust', 'probabilityOfPrecipitation', 'quantitativePrecipitation', 'iceAccumulation', 'snowfallAmount', 'snowLevel', 'ceilingHeight', 'visibility', 'transportWindSpeed', 'transportWindDirection', 'mixingHeight', 'hainesIndex', 'lightningActivityLevel', 'twentyFootWindSpeed', 'twentyFootWindDirection', 'waveHeight', 'wavePeriod', 'waveDirection', 'primarySwellHeight', 'primarySwellDirection', 'secondarySwellHeight', 'secondarySwellDirection', 'wavePeriod2', 'windWaveHeight', 'dispersionIndex', 'pressure', 'probabilityOfTropicalStormWinds', 'probabilityOfHurricaneWinds', 'potentialOf15mphWinds', 'potentialOf25mphWinds', 'potentialOf35mphWinds', 'potentialOf45mphWinds', 'potentialOf20mphWindGusts', 'potentialOf30mphWindGusts', 'potentialOf40mphWindGusts', 'potentialOf50mphWindGusts', 'potentialOf60mphWindGusts', 'grasslandFireDangerIndex', 'probabilityOfThunder', 'davisStabilityIndex', 'atmosphericDispersionIndex', 'lowVisibilityOccurrenceRiskIndex', 'stability', 'redFlagThreatIndex'];
+  GridPoint.variables = ['temperature', 'dewpoint', 'maxTemperature', 'minTemperature', 'relativeHumidity', 'apparentTemperature', 'heatIndex', 'windChill', 'skyCover', 'windDirection', 'windSpeed', 'windGust', 'probabilityOfPrecipitation', 'quantitativePrecipitation', 'iceAccumulation', 'snowfallAmount', 'snowLevel', 'ceilingHeight', 'visibility', 'transportWindSpeed', 'transportWindDirection', 'mixingHeight', 'hainesIndex', 'lightningActivityLevel', 'twentyFootWindSpeed', 'twentyFootWindDirection', 'waveHeight', 'wavePeriod', 'waveDirection', 'primarySwellHeight', 'primarySwellDirection', 'secondarySwellHeight', 'secondarySwellDirection', 'wavePeriod2', 'windWaveHeight', 'dispersionIndex', 'pressure', 'probabilityOfTropicalStormWinds', 'probabilityOfHurricaneWinds', 'potentialOf15mphWinds', 'potentialOf25mphWinds', 'potentialOf35mphWinds', 'potentialOf45mphWinds', 'potentialOf20mphWindGusts', 'potentialOf30mphWindGusts', 'potentialOf40mphWindGusts', 'potentialOf50mphWindGusts', 'potentialOf60mphWindGusts', 'grasslandFireDangerIndex', 'probabilityOfThunder', 'davisStabilityIndex', 'atmosphericDispersionIndex', 'lowVisibilityOccurrenceRiskIndex', 'stability', 'redFlagThreatIndex', 'weather', 'hazards'];
 
   /*
       "number": 3,
@@ -12495,7 +12502,9 @@
               if (json['error']) {
                 reject(json['error']);
               } else {
-                resolve(self.parseResponse(json));
+                var data = self.parseResponse(json);
+                data['parameters'] = Object.assign({}, self.params);
+                resolve(data);
               }
             } else {
               reject(xhr);

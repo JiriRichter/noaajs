@@ -20,68 +20,63 @@ export class GridPoint extends Feature {
         this.office = new Office(getFeatureProperty('gridId', data));
         this.elevation = toValueUnits(getFeatureProperty('elevation', data));
         this.updateTime = toTime(getFeatureProperty('updateTime', data));
-        this.validTimes = toValidTimePeriod(getFeatureProperty('validTimes', data)).toArray();
-        //this.validTimesDict = {};
-        //for (let i = 0; i < this.validTimes.length; i++) {
-        //    this.validTimesDict[this.validTimes[i].milliseconds] = this.validTimes[i].toString();
-        //}
-
-        // get forecast variables
-        this.variables = {};
+        this.validTimes = toValidTimePeriod(getFeatureProperty('validTimes', data));
+        this.values = {};
         for (let i = 0; i < GridPoint.variables.length; i++) {
-            this.variables[GridPoint.variables[i]] = this.getVariable(GridPoint.variables[i], data);
+            this.values[GridPoint.variables[i]] = this.getVariable(GridPoint.variables[i], data);
         }
-
-        this.weather = this.getVariable('weather', data);
-        this.hazards = this.getVariable('hazards', data);
     }
 
     getVariable(name, data) {
         let variableData = getFeatureProperty(name, data),
             units,
-            timeValueDict = {},
-            validTime,
-            valueTime,
-            variable = {};
-
-        variable.values = [];
-
-        if (variableData['sourceUnit']) {
-            variable['sourceUnit'] = variableData['sourceUnit'];
-        }
+            values,
+            item;
 
         if (variableData['uom']) {
             units = ValueUnits.parseUnit(variableData['uom']);
         }
 
         if (variableData['values'] && variableData['values'].length > 0) {
-            for (let i = 0; i < variableData['values'].length; i++) {
-                validTime = toValidTimePeriod(variableData['values'][i]['validTime']);
+            values = [];
 
-                for (let hour = 0; hour < validTime.totalHours; hour++) {
-                    //value can be null
-                    if (variableData['values'][i]['value']) {
-                        valueTime = validTime.time.milliseconds + hour * millisecondsPerHour;
-                        //if (!(valueTime in this.validTimesDict)) {
-                        //    throw new Error(name + ' value time does not match gridpoint valid times');
-                        //}
-                        if (valueTime <= this.validTimes[this.validTimes.length - 1].milliseconds) {
-                            if (typeof variableData['values'][i]['value'] === 'number') {
-                                timeValueDict[valueTime] = toValueUnits(variableData['values'][i]['value'], units);
-                            }
-                            else {
-                                timeValueDict[valueTime] = variableData['values'][i]['value'];
-                            }
-                        }
+            if (variableData['sourceUnit']) {
+                values['sourceUnit'] = variableData['sourceUnit'];
+            }
+
+            for (let i = 0; i < variableData['values'].length; i++) {
+                //value can be null
+                if (variableData['values'][i]['value']) {
+                    if (typeof variableData['values'][i]['value'] === 'number') {
+                        item = toValueUnits(variableData['values'][i]['value'], units);
                     }
+                    else {
+                        item = variableData['values'][i]['value'];
+                    }
+                    item['validTime'] = toValidTimePeriod(variableData['values'][i]['validTime']);
+                    values.push(item);
                 }
             }
-
-            for (let i = 0; i < this.validTimes.length; i++) {
-                variable.values.push(timeValueDict[this.validTimes[i].milliseconds]);
-            }
         }
-        return variable;
+        return values;
+    }
+
+    mapToValidTimes(variable) {
+        let timeValueDict = {},
+            validTime,
+            i,
+            hour;
+
+        if (variable in this.values) {
+            for (i = 0; i < this.values[variable].length; i++) {
+                validTime = this.values[variable][i].validTime;
+
+                for (hour = 0; hour < validTime.totalHours; hour++) {
+                    timeValueDict[validTime.time.milliseconds + hour * millisecondsPerHour] = this.values[variable][i];
+                }
+            }
+            return this.validTimes.toArray().map(t => timeValueDict[t.milliseconds]);
+        }
     }
 }
 
@@ -140,5 +135,7 @@ GridPoint.variables = [
     'atmosphericDispersionIndex',
     'lowVisibilityOccurrenceRiskIndex',
     'stability',
-    'redFlagThreatIndex'
+    'redFlagThreatIndex',
+    'weather',
+    'hazards'
 ];

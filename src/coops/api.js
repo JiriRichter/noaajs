@@ -106,7 +106,9 @@ export class COOPSApi {
                         reject(json['error']);
                     }
                     else {
-                        resolve(self.parseResponse(json));
+                        let data = self.parseResponse(json);
+                        data['parameters'] = Object.assign({}, self.params);
+                        resolve(data);
                     }
                 } else {
                     reject(xhr);

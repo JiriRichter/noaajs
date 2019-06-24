@@ -43,6 +43,7 @@ function testGridPoints(lat, lon) {
     NOAA.points([lat, lon]).get().then(function (point) {
         point.getGridPoint().then(function (data) {
             console.log(data);
+            console.log(data.mapToValidTimes('temperature'));
         });
     });
 }
@@ -277,8 +278,8 @@ function testOffices(office) {
 //testIcons();
 //testProductsTypes();
 //testGridPointsForecastHourly();
-//testGridPoints(39.7456, -97.0892);
-//testGridPoints(37.82627236942017, -122.41845649480823);
+testGridPoints(39.7456, -97.0892);
+testGridPoints(37.82627236942017, -122.41845649480823);
 //testAlerts();
 
 //testPointAlerts(39.7456, -97.0892);
@@ -303,4 +304,4 @@ function testOffices(office) {
 //testZones(NOAA.StateAreaCodes.WA);
 //testZones(NOAA.StateAreaCodes.AL);
 //testZonesTypes();
-testOffices('SEW');
+//testOffices('SEW');
