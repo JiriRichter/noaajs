@@ -67,7 +67,7 @@ export class GridPoint extends Feature {
             i,
             hour;
 
-        if (variable in this.values) {
+        if (this.values[variable] && this.values[variable].length) {
             for (i = 0; i < this.values[variable].length; i++) {
                 validTime = this.values[variable][i].validTime;
 

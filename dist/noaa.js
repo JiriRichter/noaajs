@@ -1,5 +1,5 @@
 /* @preserve
- * NOAA 1.0.0+master.dfb4072, a JS library for https://www.weather.gov/documentation/services-web-api.
+ * NOAA 1.0.0+master.af617d9, a JS library for https://www.weather.gov/documentation/services-web-api.
  * (c) 2019-2020 Jiri Richter
  */
 
@@ -7785,7 +7785,7 @@
             i,
             hour;
 
-        if (variable in this.values) {
+        if (this.values[variable] && this.values[variable].length) {
           for (i = 0; i < this.values[variable].length; i++) {
             validTime = this.values[variable][i].validTime;
 
@@ -12233,16 +12233,14 @@
   var haversineDistance = function haversineDistance(latlng1, latlng2) {
     var R = 6378137; // m
 
-    var dLat = toRad(latlng2.lat - latlng1.lat);
-    var dLatSin = Math.sin(dLat / 2);
-    var dLon = toRad(latlng2.lon - latlng1.lon);
-    var dLonSin = Math.sin(dLon / 2);
-    var a = dLatSin * dLatSin + Math.cos(toRad(latlng1.lon)) * Math.cos(toRad(latlng2.lon)) * dLonSin * dLonSin;
-    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    var distance = R * c;
-    return distance;
+    var lat1 = toRad(latlng1.lat),
+        lat2 = toRad(latlng2.lat),
+        sinDLat = Math.sin(toRad(latlng2.lat - latlng1.lat) / 2),
+        sinDLon = Math.sin(toRad(latlng2.lon - latlng1.lon) / 2),
+        a = sinDLat * sinDLat + Math.cos(lat1) * Math.cos(lat2) * sinDLon * sinDLon,
+        c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
   };
-
   /**
    * Converts feature to latLon
    * @param {any} f
