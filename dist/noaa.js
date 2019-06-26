@@ -1,5 +1,5 @@
 /* @preserve
- * NOAA 1.0.0+master.d0b4ae8, a JS library for https://www.weather.gov/documentation/services-web-api.
+ * NOAA 1.0.0+master.dfb4072, a JS library for https://www.weather.gov/documentation/services-web-api.
  * (c) 2019-2020 Jiri Richter
  */
 
@@ -6412,7 +6412,7 @@
 
       switch (data['type']) {
         case 'Point':
-          this.latlon = toLatLon(data['coordinates'].reverse());
+          this.latlon = toLatLon(data['coordinates'][1], data['coordinates'][0]);
           break;
 
         case 'Polygon':
@@ -6456,7 +6456,7 @@
             i;
 
         for (i = 0; i < coordinates.length; i++) {
-          result.push(toLatLon(coordinates[i].reverse()));
+          result.push(toLatLon(coordinates[i][1], coordinates[i][0]));
         }
 
         return result;
@@ -8500,7 +8500,7 @@
     'features': [{
       'type': 'Feature',
       'properties': {
-        'Name': 'Port Allen, Hanapepe Bay',
+        'name': 'Port Allen, Hanapepe Bay',
         'id': 1611347
       },
       'geometry': {
@@ -8510,7 +8510,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Nawiliwili',
+        'name': 'Nawiliwili',
         'id': 1611400
       },
       'geometry': {
@@ -8520,7 +8520,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Honolulu',
+        'name': 'Honolulu',
         'id': 1612340
       },
       'geometry': {
@@ -8530,7 +8530,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Mokuoloe',
+        'name': 'Mokuoloe',
         'id': 1612480
       },
       'geometry': {
@@ -8540,7 +8540,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Kahului',
+        'name': 'Kahului',
         'id': 1615680
       },
       'geometry': {
@@ -8550,7 +8550,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Kawaihae',
+        'name': 'Kawaihae',
         'id': 1617433
       },
       'geometry': {
@@ -8560,7 +8560,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Hilo',
+        'name': 'Hilo',
         'id': 1617760
       },
       'geometry': {
@@ -8570,7 +8570,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Johnston Atoll',
+        'name': 'Johnston Atoll',
         'id': 1619000
       },
       'geometry': {
@@ -8580,7 +8580,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Sand Island, Midway Islands',
+        'name': 'Sand Island, Midway Islands',
         'id': 1619910
       },
       'geometry': {
@@ -8590,7 +8590,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Guam',
+        'name': 'Guam',
         'id': 1630000
       },
       'geometry': {
@@ -8600,7 +8600,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Pago Bay, Guam',
+        'name': 'Pago Bay, Guam',
         'id': 1631428
       },
       'geometry': {
@@ -8610,7 +8610,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Saipan',
+        'name': 'Saipan',
         'id': 1633227
       },
       'geometry': {
@@ -8620,7 +8620,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Fare Ute Point',
+        'name': 'Fare Ute Point',
         'id': 1732417
       },
       'geometry': {
@@ -8630,7 +8630,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Pago Pago',
+        'name': 'Pago Pago',
         'id': 1770000
       },
       'geometry': {
@@ -8640,7 +8640,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Kwajalein, Marshall Islands',
+        'name': 'Kwajalein, Marshall Islands',
         'id': 1820000
       },
       'geometry': {
@@ -8650,7 +8650,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'CHUUK, Moen Island',
+        'name': 'CHUUK, Moen Island',
         'id': 1840000
       },
       'geometry': {
@@ -8660,7 +8660,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Wake Island',
+        'name': 'Wake Island',
         'id': 1890000
       },
       'geometry': {
@@ -8670,7 +8670,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Bermuda Esso Pier',
+        'name': 'Bermuda Esso Pier',
         'id': 2695540
       },
       'geometry': {
@@ -8680,7 +8680,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Eastport',
+        'name': 'Eastport',
         'id': 8410140
       },
       'geometry': {
@@ -8690,7 +8690,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Cutler Naval Base',
+        'name': 'Cutler Naval Base',
         'id': 8411250
       },
       'geometry': {
@@ -8700,7 +8700,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Bar Harbor',
+        'name': 'Bar Harbor',
         'id': 8413320
       },
       'geometry': {
@@ -8710,7 +8710,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Bangor',
+        'name': 'Bangor',
         'id': 8414612
       },
       'geometry': {
@@ -8720,7 +8720,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Rockland',
+        'name': 'Rockland',
         'id': 8415490
       },
       'geometry': {
@@ -8730,7 +8730,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Gardiner',
+        'name': 'Gardiner',
         'id': 8417134
       },
       'geometry': {
@@ -8740,7 +8740,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Hunniwell Point',
+        'name': 'Hunniwell Point',
         'id': 8417177
       },
       'geometry': {
@@ -8750,7 +8750,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Richmond',
+        'name': 'Richmond',
         'id': 8417208
       },
       'geometry': {
@@ -8760,7 +8760,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Portland',
+        'name': 'Portland',
         'id': 8418150
       },
       'geometry': {
@@ -8770,7 +8770,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Wells',
+        'name': 'Wells',
         'id': 8419317
       },
       'geometry': {
@@ -8780,7 +8780,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Seavey Island',
+        'name': 'Seavey Island',
         'id': 8419870
       },
       'geometry': {
@@ -8790,7 +8790,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Fort Point',
+        'name': 'Fort Point',
         'id': 8423898
       },
       'geometry': {
@@ -8800,7 +8800,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Boston',
+        'name': 'Boston',
         'id': 8443970
       },
       'geometry': {
@@ -8810,7 +8810,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Buzzards Bay',
+        'name': 'Buzzards Bay',
         'id': 8447270
       },
       'geometry': {
@@ -8820,7 +8820,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Fall River',
+        'name': 'Fall River',
         'id': 8447386
       },
       'geometry': {
@@ -8830,7 +8830,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Woods Hole',
+        'name': 'Woods Hole',
         'id': 8447930
       },
       'geometry': {
@@ -8840,7 +8840,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Edgartown',
+        'name': 'Edgartown',
         'id': 8448558
       },
       'geometry': {
@@ -8850,7 +8850,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Menemsha Harbor, MA',
+        'name': 'Menemsha Harbor, MA',
         'id': 8448725
       },
       'geometry': {
@@ -8860,7 +8860,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Nantucket Island',
+        'name': 'Nantucket Island',
         'id': 8449130
       },
       'geometry': {
@@ -8870,7 +8870,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Newport',
+        'name': 'Newport',
         'id': 8452660
       },
       'geometry': {
@@ -8880,7 +8880,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Conimicut Light',
+        'name': 'Conimicut Light',
         'id': 8452944
       },
       'geometry': {
@@ -8890,7 +8890,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Providence',
+        'name': 'Providence',
         'id': 8454000
       },
       'geometry': {
@@ -8900,7 +8900,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Quonset Point',
+        'name': 'Quonset Point',
         'id': 8454049
       },
       'geometry': {
@@ -8910,7 +8910,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Block Island',
+        'name': 'Block Island',
         'id': 8459681
       },
       'geometry': {
@@ -8920,7 +8920,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'New London',
+        'name': 'New London',
         'id': 8461490
       },
       'geometry': {
@@ -8930,7 +8930,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'New Haven',
+        'name': 'New Haven',
         'id': 8465705
       },
       'geometry': {
@@ -8940,7 +8940,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Bridgeport',
+        'name': 'Bridgeport',
         'id': 8467150
       },
       'geometry': {
@@ -8950,7 +8950,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Montauk',
+        'name': 'Montauk',
         'id': 8510560
       },
       'geometry': {
@@ -8960,7 +8960,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Silver Eel Pond',
+        'name': 'Silver Eel Pond',
         'id': 8510719
       },
       'geometry': {
@@ -8970,7 +8970,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Mattituck Inlet',
+        'name': 'Mattituck Inlet',
         'id': 8512668
       },
       'geometry': {
@@ -8980,7 +8980,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'South Jamesport',
+        'name': 'South Jamesport',
         'id': 8512735
       },
       'geometry': {
@@ -8990,7 +8990,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Eatons Neck',
+        'name': 'Eatons Neck',
         'id': 8515786
       },
       'geometry': {
@@ -9000,7 +9000,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Kings Point',
+        'name': 'Kings Point',
         'id': 8516945
       },
       'geometry': {
@@ -9010,7 +9010,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Willets Point',
+        'name': 'Willets Point',
         'id': 8516990
       },
       'geometry': {
@@ -9020,7 +9020,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Horns Hook',
+        'name': 'Horns Hook',
         'id': 8518668
       },
       'geometry': {
@@ -9030,7 +9030,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'The Battery',
+        'name': 'The Battery',
         'id': 8518750
       },
       'geometry': {
@@ -9040,7 +9040,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Bergen Point West Reach',
+        'name': 'Bergen Point West Reach',
         'id': 8519483
       },
       'geometry': {
@@ -9050,7 +9050,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Port Elizabeth',
+        'name': 'Port Elizabeth',
         'id': 8530882
       },
       'geometry': {
@@ -9060,7 +9060,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Sandy Hook',
+        'name': 'Sandy Hook',
         'id': 8531680
       },
       'geometry': {
@@ -9070,7 +9070,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Atlantic City',
+        'name': 'Atlantic City',
         'id': 8534720
       },
       'geometry': {
@@ -9080,7 +9080,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Cape May',
+        'name': 'Cape May',
         'id': 8536110
       },
       'geometry': {
@@ -9090,7 +9090,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Ship John Shoal',
+        'name': 'Ship John Shoal',
         'id': 8537121
       },
       'geometry': {
@@ -9100,7 +9100,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Tacony-Palmyra Bridge',
+        'name': 'Tacony-Palmyra Bridge',
         'id': 8538886
       },
       'geometry': {
@@ -9110,7 +9110,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Burlington, Delaware River',
+        'name': 'Burlington, Delaware River',
         'id': 8539094
       },
       'geometry': {
@@ -9120,7 +9120,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Marcus Hook',
+        'name': 'Marcus Hook',
         'id': 8540433
       },
       'geometry': {
@@ -9130,7 +9130,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Philadelphia',
+        'name': 'Philadelphia',
         'id': 8545240
       },
       'geometry': {
@@ -9140,7 +9140,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Philadelphia, Municipal Pier 11, Pa.',
+        'name': 'Philadelphia, Municipal Pier 11, Pa.',
         'id': 8545530
       },
       'geometry': {
@@ -9150,7 +9150,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Newbold',
+        'name': 'Newbold',
         'id': 8548989
       },
       'geometry': {
@@ -9160,7 +9160,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Delaware City',
+        'name': 'Delaware City',
         'id': 8551762
       },
       'geometry': {
@@ -9170,7 +9170,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Reedy Point',
+        'name': 'Reedy Point',
         'id': 8551910
       },
       'geometry': {
@@ -9180,7 +9180,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Brandywine Shoal Light',
+        'name': 'Brandywine Shoal Light',
         'id': 8555889
       },
       'geometry': {
@@ -9190,7 +9190,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Lewes',
+        'name': 'Lewes',
         'id': 8557380
       },
       'geometry': {
@@ -9200,7 +9200,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Indian River Inlet (Coast Guard Station)',
+        'name': 'Indian River Inlet (Coast Guard Station)',
         'id': 8558690
       },
       'geometry': {
@@ -9210,7 +9210,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'OCEAN CITY (FISHING PIER)',
+        'name': 'OCEAN CITY (FISHING PIER)',
         'id': 8570280
       },
       'geometry': {
@@ -9220,7 +9220,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Ocean City Inlet',
+        'name': 'Ocean City Inlet',
         'id': 8570283
       },
       'geometry': {
@@ -9230,7 +9230,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Snow Hill',
+        'name': 'Snow Hill',
         'id': 8571359
       },
       'geometry': {
@@ -9240,7 +9240,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Bishops Head',
+        'name': 'Bishops Head',
         'id': 8571421
       },
       'geometry': {
@@ -9250,7 +9250,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Mc Creadys Creek',
+        'name': 'Mc Creadys Creek',
         'id': 8571559
       },
       'geometry': {
@@ -9260,7 +9260,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Beaverdam Creek',
+        'name': 'Beaverdam Creek',
         'id': 8571702
       },
       'geometry': {
@@ -9270,7 +9270,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Vienna',
+        'name': 'Vienna',
         'id': 8571773
       },
       'geometry': {
@@ -9280,7 +9280,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Cambridge',
+        'name': 'Cambridge',
         'id': 8571892
       },
       'geometry': {
@@ -9290,7 +9290,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Hillsboro',
+        'name': 'Hillsboro',
         'id': 8572669
       },
       'geometry': {
@@ -9300,7 +9300,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Crumpton',
+        'name': 'Crumpton',
         'id': 8573349
       },
       'geometry': {
@@ -9310,7 +9310,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Tolchester Beach',
+        'name': 'Tolchester Beach',
         'id': 8573364
       },
       'geometry': {
@@ -9320,7 +9320,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Chesapeake City',
+        'name': 'Chesapeake City',
         'id': 8573927
       },
       'geometry': {
@@ -9330,7 +9330,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Havre De Grace',
+        'name': 'Havre De Grace',
         'id': 8574070
       },
       'geometry': {
@@ -9340,7 +9340,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Baltimore',
+        'name': 'Baltimore',
         'id': 8574680
       },
       'geometry': {
@@ -9350,7 +9350,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Annapolis',
+        'name': 'Annapolis',
         'id': 8575512
       },
       'geometry': {
@@ -9360,7 +9360,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Solomons Island',
+        'name': 'Solomons Island',
         'id': 8577330
       },
       'geometry': {
@@ -9370,7 +9370,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Lower Marlboro',
+        'name': 'Lower Marlboro',
         'id': 8579542
       },
       'geometry': {
@@ -9380,7 +9380,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Washington',
+        'name': 'Washington',
         'id': 8594900
       },
       'geometry': {
@@ -9390,7 +9390,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Chincoteague Channel (south end)',
+        'name': 'Chincoteague Channel (south end)',
         'id': 8630308
       },
       'geometry': {
@@ -9400,7 +9400,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Wachapreague',
+        'name': 'Wachapreague',
         'id': 8631044
       },
       'geometry': {
@@ -9410,7 +9410,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Kiptopeke',
+        'name': 'Kiptopeke',
         'id': 8632200
       },
       'geometry': {
@@ -9420,7 +9420,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Rappahannock Light',
+        'name': 'Rappahannock Light',
         'id': 8632837
       },
       'geometry': {
@@ -9430,7 +9430,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Gaskins Point, Occohannock Creek',
+        'name': 'Gaskins Point, Occohannock Creek',
         'id': 8632869
       },
       'geometry': {
@@ -9440,7 +9440,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Tangier Island',
+        'name': 'Tangier Island',
         'id': 8633532
       },
       'geometry': {
@@ -9450,7 +9450,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Colonial Beach',
+        'name': 'Colonial Beach',
         'id': 8635150
       },
       'geometry': {
@@ -9460,7 +9460,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Rappahannock Bend',
+        'name': 'Rappahannock Bend',
         'id': 8635257
       },
       'geometry': {
@@ -9470,7 +9470,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Lewisetta',
+        'name': 'Lewisetta',
         'id': 8635750
       },
       'geometry': {
@@ -9480,7 +9480,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Wares Wharf',
+        'name': 'Wares Wharf',
         'id': 8635985
       },
       'geometry': {
@@ -9490,7 +9490,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Windmill Point',
+        'name': 'Windmill Point',
         'id': 8636580
       },
       'geometry': {
@@ -9500,7 +9500,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Lester Manor',
+        'name': 'Lester Manor',
         'id': 8636653
       },
       'geometry': {
@@ -9510,7 +9510,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Gloucester Point',
+        'name': 'Gloucester Point',
         'id': 8637624
       },
       'geometry': {
@@ -9520,7 +9520,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Yorktown USCG Training Center',
+        'name': 'Yorktown USCG Training Center',
         'id': 8637689
       },
       'geometry': {
@@ -9530,7 +9530,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Kingsmill',
+        'name': 'Kingsmill',
         'id': 8638424
       },
       'geometry': {
@@ -9540,7 +9540,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Scotland',
+        'name': 'Scotland',
         'id': 8638433
       },
       'geometry': {
@@ -9550,7 +9550,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Puddledock',
+        'name': 'Puddledock',
         'id': 8638489
       },
       'geometry': {
@@ -9560,7 +9560,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Richmond River Locks, James River',
+        'name': 'Richmond River Locks, James River',
         'id': 8638495
       },
       'geometry': {
@@ -9570,7 +9570,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Sewells Point',
+        'name': 'Sewells Point',
         'id': 8638610
       },
       'geometry': {
@@ -9580,7 +9580,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Portsmouth, Naval Shipyard',
+        'name': 'Portsmouth, Naval Shipyard',
         'id': 8638660
       },
       'geometry': {
@@ -9590,7 +9590,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Chesapeake Bay Bridge Tunnel',
+        'name': 'Chesapeake Bay Bridge Tunnel',
         'id': 8638863
       },
       'geometry': {
@@ -9600,7 +9600,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Rudee Inlet',
+        'name': 'Rudee Inlet',
         'id': 8639207
       },
       'geometry': {
@@ -9610,7 +9610,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Money Point',
+        'name': 'Money Point',
         'id': 8639348
       },
       'geometry': {
@@ -9620,7 +9620,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Duck',
+        'name': 'Duck',
         'id': 8651370
       },
       'geometry': {
@@ -9630,7 +9630,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Oregon Inlet Marina',
+        'name': 'Oregon Inlet Marina',
         'id': 8652587
       },
       'geometry': {
@@ -9640,7 +9640,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Cape Hatteras Fishing Pier',
+        'name': 'Cape Hatteras Fishing Pier',
         'id': 8654400
       },
       'geometry': {
@@ -9650,7 +9650,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Ocracoke, Ocracoke Island',
+        'name': 'Ocracoke, Ocracoke Island',
         'id': 8654792
       },
       'geometry': {
@@ -9660,7 +9660,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Sea Level',
+        'name': 'Sea Level',
         'id': 8655875
       },
       'geometry': {
@@ -9670,7 +9670,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Beaufort',
+        'name': 'Beaufort',
         'id': 8656483
       },
       'geometry': {
@@ -9680,7 +9680,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Wilmington',
+        'name': 'Wilmington',
         'id': 8658120
       },
       'geometry': {
@@ -9690,7 +9690,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Wrightsville Beach',
+        'name': 'Wrightsville Beach',
         'id': 8658163
       },
       'geometry': {
@@ -9700,7 +9700,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Southport',
+        'name': 'Southport',
         'id': 8659084
       },
       'geometry': {
@@ -9710,7 +9710,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Sunset Beach',
+        'name': 'Sunset Beach',
         'id': 8659897
       },
       'geometry': {
@@ -9720,7 +9720,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Springmaid Pier',
+        'name': 'Springmaid Pier',
         'id': 8661070
       },
       'geometry': {
@@ -9730,7 +9730,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Oyster Landing (North Inlet Estuary)',
+        'name': 'Oyster Landing (North Inlet Estuary)',
         'id': 8662245
       },
       'geometry': {
@@ -9740,7 +9740,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'General Dynamics Pier',
+        'name': 'General Dynamics Pier',
         'id': 8664022
       },
       'geometry': {
@@ -9750,7 +9750,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'South Capers Island',
+        'name': 'South Capers Island',
         'id': 8664941
       },
       'geometry': {
@@ -9760,7 +9760,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Charleston',
+        'name': 'Charleston',
         'id': 8665530
       },
       'geometry': {
@@ -9770,7 +9770,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Clarendon Plantation',
+        'name': 'Clarendon Plantation',
         'id': 8667633
       },
       'geometry': {
@@ -9780,7 +9780,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Fripps Inlet',
+        'name': 'Fripps Inlet',
         'id': 8668498
       },
       'geometry': {
@@ -9790,7 +9790,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Fort Pulaski',
+        'name': 'Fort Pulaski',
         'id': 8670870
       },
       'geometry': {
@@ -9800,7 +9800,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'St.Simons Island',
+        'name': 'St.Simons Island',
         'id': 8677344
       },
       'geometry': {
@@ -9810,7 +9810,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Kings Bay, Navy Base',
+        'name': 'Kings Bay, Navy Base',
         'id': 8679511
       },
       'geometry': {
@@ -9820,7 +9820,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Fernandina Beach',
+        'name': 'Fernandina Beach',
         'id': 8720030
       },
       'geometry': {
@@ -9830,7 +9830,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Edwards Creek',
+        'name': 'Edwards Creek',
         'id': 8720145
       },
       'geometry': {
@@ -9840,7 +9840,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Mayport Naval Sta., St Johns River',
+        'name': 'Mayport Naval Sta., St Johns River',
         'id': 8720211
       },
       'geometry': {
@@ -9850,7 +9850,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Mayport (Bar Pilots Dock)',
+        'name': 'Mayport (Bar Pilots Dock)',
         'id': 8720218
       },
       'geometry': {
@@ -9860,7 +9860,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Dame Point',
+        'name': 'Dame Point',
         'id': 8720219
       },
       'geometry': {
@@ -9870,7 +9870,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Mayport (Ferry Depot)',
+        'name': 'Mayport (Ferry Depot)',
         'id': 8720220
       },
       'geometry': {
@@ -9880,7 +9880,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Main Street Bridge, St Johns River',
+        'name': 'Main Street Bridge, St Johns River',
         'id': 8720226
       },
       'geometry': {
@@ -9890,7 +9890,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Longbranch',
+        'name': 'Longbranch',
         'id': 8720242
       },
       'geometry': {
@@ -9900,7 +9900,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'I-295 Bridge, St Johns River',
+        'name': 'I-295 Bridge, St Johns River',
         'id': 8720357
       },
       'geometry': {
@@ -9910,7 +9910,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Red Bay Point, St Johns River',
+        'name': 'Red Bay Point, St Johns River',
         'id': 8720503
       },
       'geometry': {
@@ -9920,7 +9920,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Vilano Beach ICWW',
+        'name': 'Vilano Beach ICWW',
         'id': 8720554
       },
       'geometry': {
@@ -9930,7 +9930,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'State Road 312, Matanzas River',
+        'name': 'State Road 312, Matanzas River',
         'id': 8720582
       },
       'geometry': {
@@ -9940,7 +9940,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'St. Augustine Beach',
+        'name': 'St. Augustine Beach',
         'id': 8720587
       },
       'geometry': {
@@ -9950,7 +9950,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Racy Point, St Johns River',
+        'name': 'Racy Point, St Johns River',
         'id': 8720625
       },
       'geometry': {
@@ -9960,7 +9960,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Crescent Beach, Matanzas River',
+        'name': 'Crescent Beach, Matanzas River',
         'id': 8720651
       },
       'geometry': {
@@ -9970,7 +9970,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Bings Landing, Matanzas River',
+        'name': 'Bings Landing, Matanzas River',
         'id': 8720757
       },
       'geometry': {
@@ -9980,7 +9980,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Buffalo Bluff, St Johns River',
+        'name': 'Buffalo Bluff, St Johns River',
         'id': 8720767
       },
       'geometry': {
@@ -9990,7 +9990,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Palatka, St Johns River',
+        'name': 'Palatka, St Johns River',
         'id': 8720774
       },
       'geometry': {
@@ -10000,7 +10000,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Welaka',
+        'name': 'Welaka',
         'id': 8720832
       },
       'geometry': {
@@ -10010,7 +10010,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Ponce De Leon Inlet South',
+        'name': 'Ponce De Leon Inlet South',
         'id': 8721147
       },
       'geometry': {
@@ -10020,7 +10020,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Trident Pier',
+        'name': 'Trident Pier',
         'id': 8721604
       },
       'geometry': {
@@ -10030,7 +10030,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'PGA BOULEVARD BRIDGE, PALM BEACH',
+        'name': 'PGA BOULEVARD BRIDGE, PALM BEACH',
         'id': 8722548
       },
       'geometry': {
@@ -10040,7 +10040,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Port of West Palm Beach',
+        'name': 'Port of West Palm Beach',
         'id': 8722588
       },
       'geometry': {
@@ -10050,7 +10050,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Lake Worth Pier',
+        'name': 'Lake Worth Pier',
         'id': 8722670
       },
       'geometry': {
@@ -10060,7 +10060,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Haulover Pier, N. Miami Beach',
+        'name': 'Haulover Pier, N. Miami Beach',
         'id': 8723080
       },
       'geometry': {
@@ -10070,7 +10070,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Miami Beach',
+        'name': 'Miami Beach',
         'id': 8723170
       },
       'geometry': {
@@ -10080,7 +10080,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'GOVERNMENT CUT, MIAMI HARBOR ENTRANCE',
+        'name': 'GOVERNMENT CUT, MIAMI HARBOR ENTRANCE',
         'id': 8723178
       },
       'geometry': {
@@ -10090,7 +10090,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Virginia Key',
+        'name': 'Virginia Key',
         'id': 8723214
       },
       'geometry': {
@@ -10100,7 +10100,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Key Colony Beach',
+        'name': 'Key Colony Beach',
         'id': 8723962
       },
       'geometry': {
@@ -10110,7 +10110,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Vaca Key',
+        'name': 'Vaca Key',
         'id': 8723970
       },
       'geometry': {
@@ -10120,7 +10120,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Key West',
+        'name': 'Key West',
         'id': 8724580
       },
       'geometry': {
@@ -10130,7 +10130,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Loggerhead Key',
+        'name': 'Loggerhead Key',
         'id': 8724698
       },
       'geometry': {
@@ -10140,7 +10140,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Naples',
+        'name': 'Naples',
         'id': 8725110
       },
       'geometry': {
@@ -10150,7 +10150,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Fort Myers',
+        'name': 'Fort Myers',
         'id': 8725520
       },
       'geometry': {
@@ -10160,7 +10160,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Port Manatee',
+        'name': 'Port Manatee',
         'id': 8726384
       },
       'geometry': {
@@ -10170,7 +10170,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'St. Petersburg',
+        'name': 'St. Petersburg',
         'id': 8726520
       },
       'geometry': {
@@ -10180,7 +10180,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Old Port Tampa',
+        'name': 'Old Port Tampa',
         'id': 8726607
       },
       'geometry': {
@@ -10190,7 +10190,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Mckay Bay Entrance',
+        'name': 'Mckay Bay Entrance',
         'id': 8726667
       },
       'geometry': {
@@ -10200,7 +10200,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Clearwater Beach',
+        'name': 'Clearwater Beach',
         'id': 8726724
       },
       'geometry': {
@@ -10210,7 +10210,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Johns Island, Chassahowitzka Bay',
+        'name': 'Johns Island, Chassahowitzka Bay',
         'id': 8727235
       },
       'geometry': {
@@ -10220,7 +10220,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Chassahowitzka, Chassahowitzka River',
+        'name': 'Chassahowitzka, Chassahowitzka River',
         'id': 8727246
       },
       'geometry': {
@@ -10230,7 +10230,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Mason Creek, Homosassa Bay',
+        'name': 'Mason Creek, Homosassa Bay',
         'id': 8727274
       },
       'geometry': {
@@ -10240,7 +10240,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Tuckers Island, Homosassa River',
+        'name': 'Tuckers Island, Homosassa River',
         'id': 8727277
       },
       'geometry': {
@@ -10250,7 +10250,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Halls River bridge, Homosassa River',
+        'name': 'Halls River bridge, Homosassa River',
         'id': 8727293
       },
       'geometry': {
@@ -10260,7 +10260,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Ozello, St. Martins River',
+        'name': 'Ozello, St. Martins River',
         'id': 8727306
       },
       'geometry': {
@@ -10270,7 +10270,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Ozello north, Crystal Bay',
+        'name': 'Ozello north, Crystal Bay',
         'id': 8727328
       },
       'geometry': {
@@ -10280,7 +10280,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Mangrove Point',
+        'name': 'Mangrove Point',
         'id': 8727333
       },
       'geometry': {
@@ -10290,7 +10290,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'WHITE CITY',
+        'name': 'WHITE CITY',
         'id': 8728853
       },
       'geometry': {
@@ -10300,7 +10300,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Dixie Bay, Salt River, Crystal Bay',
+        'name': 'Dixie Bay, Salt River, Crystal Bay',
         'id': 8727336
       },
       'geometry': {
@@ -10310,7 +10310,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Kings Bay',
+        'name': 'Kings Bay',
         'id': 8727343
       },
       'geometry': {
@@ -10320,7 +10320,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Twin Rivers Marina',
+        'name': 'Twin Rivers Marina',
         'id': 8727348
       },
       'geometry': {
@@ -10330,7 +10330,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Shell Island, north end',
+        'name': 'Shell Island, north end',
         'id': 8727359
       },
       'geometry': {
@@ -10340,7 +10340,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Cedar Key',
+        'name': 'Cedar Key',
         'id': 8727520
       },
       'geometry': {
@@ -10350,7 +10350,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'ST. MARKS RIVER ENTRANCE',
+        'name': 'ST. MARKS RIVER ENTRANCE',
         'id': 8728130
       },
       'geometry': {
@@ -10360,7 +10360,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Shell Point, Walker Creek',
+        'name': 'Shell Point, Walker Creek',
         'id': 8728229
       },
       'geometry': {
@@ -10370,7 +10370,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Turkey Point, St. James Island',
+        'name': 'Turkey Point, St. James Island',
         'id': 8728360
       },
       'geometry': {
@@ -10380,7 +10380,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Apalachicola',
+        'name': 'Apalachicola',
         'id': 8728690
       },
       'geometry': {
@@ -10390,7 +10390,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Panama City',
+        'name': 'Panama City',
         'id': 8729108
       },
       'geometry': {
@@ -10400,7 +10400,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Panama City Beach',
+        'name': 'Panama City Beach',
         'id': 8729210
       },
       'geometry': {
@@ -10410,7 +10410,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Valparaiso',
+        'name': 'Valparaiso',
         'id': 8729501
       },
       'geometry': {
@@ -10420,7 +10420,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Navarre Beach',
+        'name': 'Navarre Beach',
         'id': 8729678
       },
       'geometry': {
@@ -10430,7 +10430,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Pensacola',
+        'name': 'Pensacola',
         'id': 8729840
       },
       'geometry': {
@@ -10440,7 +10440,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Millview, Perdido Bay',
+        'name': 'Millview, Perdido Bay',
         'id': 8729905
       },
       'geometry': {
@@ -10450,7 +10450,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'ALABAMA POINT, PERDIDO PASS',
+        'name': 'ALABAMA POINT, PERDIDO PASS',
         'id': 8730667
       },
       'geometry': {
@@ -10460,7 +10460,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Dauphin Island',
+        'name': 'Dauphin Island',
         'id': 8735180
       },
       'geometry': {
@@ -10470,7 +10470,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Dauphin Island Hydro',
+        'name': 'Dauphin Island Hydro',
         'id': 8735181
       },
       'geometry': {
@@ -10480,7 +10480,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Mobile State Docks',
+        'name': 'Mobile State Docks',
         'id': 8737048
       },
       'geometry': {
@@ -10490,7 +10490,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Lower Bryant Landing',
+        'name': 'Lower Bryant Landing',
         'id': 8737373
       },
       'geometry': {
@@ -10500,7 +10500,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Pascagoula Point',
+        'name': 'Pascagoula Point',
         'id': 8741196
       },
       'geometry': {
@@ -10510,7 +10510,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Pascagoula NOAA Lab',
+        'name': 'Pascagoula NOAA Lab',
         'id': 8741533
       },
       'geometry': {
@@ -10520,7 +10520,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Horn Island',
+        'name': 'Horn Island',
         'id': 8742221
       },
       'geometry': {
@@ -10530,7 +10530,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Ocean Springs',
+        'name': 'Ocean Springs',
         'id': 8743281
       },
       'geometry': {
@@ -10540,7 +10540,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Biloxi',
+        'name': 'Biloxi',
         'id': 8744117
       },
       'geometry': {
@@ -10550,7 +10550,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Gulfport Harbor',
+        'name': 'Gulfport Harbor',
         'id': 8745557
       },
       'geometry': {
@@ -10560,7 +10560,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Bay Waveland Yacht Club',
+        'name': 'Bay Waveland Yacht Club',
         'id': 8747437
       },
       'geometry': {
@@ -10570,7 +10570,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Waveland',
+        'name': 'Waveland',
         'id': 8747766
       },
       'geometry': {
@@ -10580,7 +10580,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'South Pass',
+        'name': 'South Pass',
         'id': 8760551
       },
       'geometry': {
@@ -10590,7 +10590,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Pilots Station East, SW Pass',
+        'name': 'Pilots Station East, SW Pass',
         'id': 8760922
       },
       'geometry': {
@@ -10600,7 +10600,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'SW Pass',
+        'name': 'SW Pass',
         'id': 8760943
       },
       'geometry': {
@@ -10610,7 +10610,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Shell Beach',
+        'name': 'Shell Beach',
         'id': 8761305
       },
       'geometry': {
@@ -10620,7 +10620,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Grand Isle',
+        'name': 'Grand Isle',
         'id': 8761724
       },
       'geometry': {
@@ -10630,7 +10630,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'TEXACO DOCK, HACKBERRY BAY',
+        'name': 'TEXACO DOCK, HACKBERRY BAY',
         'id': 8761819
       },
       'geometry': {
@@ -10640,7 +10640,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'New Canal Station',
+        'name': 'New Canal Station',
         'id': 8761927
       },
       'geometry': {
@@ -10650,7 +10650,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Port Fourchon',
+        'name': 'Port Fourchon',
         'id': 8762075
       },
       'geometry': {
@@ -10660,7 +10660,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'East Bank 1, Norco, B. LaBranche',
+        'name': 'East Bank 1, Norco, B. LaBranche',
         'id': 8762372
       },
       'geometry': {
@@ -10670,7 +10670,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'West Bank 1, Bayou Gauche',
+        'name': 'West Bank 1, Bayou Gauche',
         'id': 8762482
       },
       'geometry': {
@@ -10680,7 +10680,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Stouts Pass at Six Mile Lake',
+        'name': 'Stouts Pass at Six Mile Lake',
         'id': 8764025
       },
       'geometry': {
@@ -10690,7 +10690,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Tesoro Marine Terminal',
+        'name': 'Tesoro Marine Terminal',
         'id': 8764044
       },
       'geometry': {
@@ -10700,7 +10700,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'LAWMA, Amerada Pass',
+        'name': 'LAWMA, Amerada Pass',
         'id': 8764227
       },
       'geometry': {
@@ -10710,7 +10710,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Cypremort Point',
+        'name': 'Cypremort Point',
         'id': 8765251
       },
       'geometry': {
@@ -10720,7 +10720,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Freshwater Canal Locks',
+        'name': 'Freshwater Canal Locks',
         'id': 8766072
       },
       'geometry': {
@@ -10730,7 +10730,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Lake Charles',
+        'name': 'Lake Charles',
         'id': 8767816
       },
       'geometry': {
@@ -10740,7 +10740,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Calcasieu Pass',
+        'name': 'Calcasieu Pass',
         'id': 8768094
       },
       'geometry': {
@@ -10750,7 +10750,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Port Arthur',
+        'name': 'Port Arthur',
         'id': 8770475
       },
       'geometry': {
@@ -10760,7 +10760,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Rainbow Bridge',
+        'name': 'Rainbow Bridge',
         'id': 8770520
       },
       'geometry': {
@@ -10770,7 +10770,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Mesquite Point',
+        'name': 'Mesquite Point',
         'id': 8770539
       },
       'geometry': {
@@ -10780,7 +10780,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Round Point',
+        'name': 'Round Point',
         'id': 8770559
       },
       'geometry': {
@@ -10790,7 +10790,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Sabine Pass North',
+        'name': 'Sabine Pass North',
         'id': 8770570
       },
       'geometry': {
@@ -10800,7 +10800,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Morgans Point',
+        'name': 'Morgans Point',
         'id': 8770613
       },
       'geometry': {
@@ -10810,7 +10810,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Lynchburg Landing',
+        'name': 'Lynchburg Landing',
         'id': 8770733
       },
       'geometry': {
@@ -10820,7 +10820,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Battleship Texas State Park',
+        'name': 'Battleship Texas State Park',
         'id': 8770743
       },
       'geometry': {
@@ -10830,7 +10830,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Manchester',
+        'name': 'Manchester',
         'id': 8770777
       },
       'geometry': {
@@ -10840,7 +10840,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Clear Lake',
+        'name': 'Clear Lake',
         'id': 8770933
       },
       'geometry': {
@@ -10850,7 +10850,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Rollover Pass',
+        'name': 'Rollover Pass',
         'id': 8770971
       },
       'geometry': {
@@ -10860,7 +10860,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Eagle Point',
+        'name': 'Eagle Point',
         'id': 8771013
       },
       'geometry': {
@@ -10870,7 +10870,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Port Bolivar',
+        'name': 'Port Bolivar',
         'id': 8771328
       },
       'geometry': {
@@ -10880,7 +10880,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Galveston Bay Entrance, North Jetty',
+        'name': 'Galveston Bay Entrance, North Jetty',
         'id': 8771341
       },
       'geometry': {
@@ -10890,7 +10890,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Galveston Pier 21',
+        'name': 'Galveston Pier 21',
         'id': 8771450
       },
       'geometry': {
@@ -10900,7 +10900,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Galveston Pleasure Pier',
+        'name': 'Galveston Pleasure Pier',
         'id': 8771510
       },
       'geometry': {
@@ -10910,7 +10910,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Freeport',
+        'name': 'Freeport',
         'id': 8772440
       },
       'geometry': {
@@ -10920,7 +10920,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'USCG Freeport',
+        'name': 'USCG Freeport',
         'id': 8772447
       },
       'geometry': {
@@ -10930,7 +10930,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Seadrift',
+        'name': 'Seadrift',
         'id': 8773037
       },
       'geometry': {
@@ -10940,7 +10940,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Port Lavaca',
+        'name': 'Port Lavaca',
         'id': 8773259
       },
       'geometry': {
@@ -10950,7 +10950,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Port O\'Connor',
+        'name': 'Port O\'Connor',
         'id': 8773701
       },
       'geometry': {
@@ -10960,7 +10960,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Copano Bay',
+        'name': 'Copano Bay',
         'id': 8774513
       },
       'geometry': {
@@ -10970,7 +10970,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Rockport',
+        'name': 'Rockport',
         'id': 8774770
       },
       'geometry': {
@@ -10980,7 +10980,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'White Point',
+        'name': 'White Point',
         'id': 8775188
       },
       'geometry': {
@@ -10990,7 +10990,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Port Aransas',
+        'name': 'Port Aransas',
         'id': 8775237
       },
       'geometry': {
@@ -11000,7 +11000,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Port Aransas (H. Caldwell Pier)',
+        'name': 'Port Aransas (H. Caldwell Pier)',
         'id': 8775270
       },
       'geometry': {
@@ -11010,7 +11010,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Port Ingleside, Corpus Christi Bay',
+        'name': 'Port Ingleside, Corpus Christi Bay',
         'id': 8775283
       },
       'geometry': {
@@ -11020,7 +11020,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Texas State Aquarium',
+        'name': 'Texas State Aquarium',
         'id': 8775296
       },
       'geometry': {
@@ -11030,7 +11030,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Naval Air Station',
+        'name': 'Naval Air Station',
         'id': 8775421
       },
       'geometry': {
@@ -11040,7 +11040,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Packery Channel',
+        'name': 'Packery Channel',
         'id': 8775792
       },
       'geometry': {
@@ -11050,7 +11050,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Corpus Christi',
+        'name': 'Corpus Christi',
         'id': 8775870
       },
       'geometry': {
@@ -11060,7 +11060,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'South Padre Island C.G Station',
+        'name': 'South Padre Island C.G Station',
         'id': 8779748
       },
       'geometry': {
@@ -11070,7 +11070,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'PADRE ISLAND (south end)',
+        'name': 'PADRE ISLAND (south end)',
         'id': 8779750
       },
       'geometry': {
@@ -11080,7 +11080,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Port Isabel',
+        'name': 'Port Isabel',
         'id': 8779770
       },
       'geometry': {
@@ -11090,7 +11090,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'San Diego',
+        'name': 'San Diego',
         'id': 9410170
       },
       'geometry': {
@@ -11100,7 +11100,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'La Jolla',
+        'name': 'La Jolla',
         'id': 9410230
       },
       'geometry': {
@@ -11110,7 +11110,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Newport Bay Entrance, Corona del Mar',
+        'name': 'Newport Bay Entrance, Corona del Mar',
         'id': 9410580
       },
       'geometry': {
@@ -11120,7 +11120,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Los Angeles',
+        'name': 'Los Angeles',
         'id': 9410660
       },
       'geometry': {
@@ -11130,7 +11130,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Long Beach, Terminal Island',
+        'name': 'Long Beach, Terminal Island',
         'id': 9410680
       },
       'geometry': {
@@ -11140,7 +11140,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Santa Monica',
+        'name': 'Santa Monica',
         'id': 9410840
       },
       'geometry': {
@@ -11150,7 +11150,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Santa Barbara',
+        'name': 'Santa Barbara',
         'id': 9411340
       },
       'geometry': {
@@ -11160,7 +11160,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Oil Platform Harvest',
+        'name': 'Oil Platform Harvest',
         'id': 9411406
       },
       'geometry': {
@@ -11170,7 +11170,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Port San Luis',
+        'name': 'Port San Luis',
         'id': 9412110
       },
       'geometry': {
@@ -11180,7 +11180,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Monterey',
+        'name': 'Monterey',
         'id': 9413450
       },
       'geometry': {
@@ -11190,7 +11190,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'San Francisco',
+        'name': 'San Francisco',
         'id': 9414290
       },
       'geometry': {
@@ -11200,7 +11200,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Rincon Point, Pier 22 1\/2',
+        'name': 'Rincon Point, Pier 22 1\/2',
         'id': 9414317
       },
       'geometry': {
@@ -11210,7 +11210,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Hunters Point',
+        'name': 'Hunters Point',
         'id': 9414358
       },
       'geometry': {
@@ -11220,7 +11220,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Oyster Point Marina',
+        'name': 'Oyster Point Marina',
         'id': 9414392
       },
       'geometry': {
@@ -11230,7 +11230,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'San Mateo Bridge',
+        'name': 'San Mateo Bridge',
         'id': 9414458
       },
       'geometry': {
@@ -11240,7 +11240,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Dumbarton Bridge',
+        'name': 'Dumbarton Bridge',
         'id': 9414509
       },
       'geometry': {
@@ -11250,7 +11250,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Redwood City',
+        'name': 'Redwood City',
         'id': 9414523
       },
       'geometry': {
@@ -11260,7 +11260,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Coyote Creek',
+        'name': 'Coyote Creek',
         'id': 9414575
       },
       'geometry': {
@@ -11270,7 +11270,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'San Leandro Marina',
+        'name': 'San Leandro Marina',
         'id': 9414688
       },
       'geometry': {
@@ -11280,7 +11280,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Alameda',
+        'name': 'Alameda',
         'id': 9414750
       },
       'geometry': {
@@ -11290,7 +11290,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Bradmoor Island',
+        'name': 'Bradmoor Island',
         'id': 9414811
       },
       'geometry': {
@@ -11300,7 +11300,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Richmond',
+        'name': 'Richmond',
         'id': 9414863
       },
       'geometry': {
@@ -11310,7 +11310,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Point Reyes',
+        'name': 'Point Reyes',
         'id': 9415020
       },
       'geometry': {
@@ -11320,7 +11320,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Port Chicago',
+        'name': 'Port Chicago',
         'id': 9415144
       },
       'geometry': {
@@ -11330,7 +11330,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Mare Island',
+        'name': 'Mare Island',
         'id': 9415218
       },
       'geometry': {
@@ -11340,7 +11340,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Arena Cove',
+        'name': 'Arena Cove',
         'id': 9416841
       },
       'geometry': {
@@ -11350,7 +11350,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'North Spit',
+        'name': 'North Spit',
         'id': 9418767
       },
       'geometry': {
@@ -11360,7 +11360,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Crescent City',
+        'name': 'Crescent City',
         'id': 9419750
       },
       'geometry': {
@@ -11370,7 +11370,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Port Orford',
+        'name': 'Port Orford',
         'id': 9431647
       },
       'geometry': {
@@ -11380,7 +11380,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Charleston',
+        'name': 'Charleston',
         'id': 9432780
       },
       'geometry': {
@@ -11390,7 +11390,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'South Beach',
+        'name': 'South Beach',
         'id': 9435380
       },
       'geometry': {
@@ -11400,7 +11400,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Depoe Bay',
+        'name': 'Depoe Bay',
         'id': 9435827
       },
       'geometry': {
@@ -11410,7 +11410,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Garibaldi',
+        'name': 'Garibaldi',
         'id': 9437540
       },
       'geometry': {
@@ -11420,7 +11420,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Astoria',
+        'name': 'Astoria',
         'id': 9439040
       },
       'geometry': {
@@ -11430,7 +11430,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Wauna',
+        'name': 'Wauna',
         'id': 9439099
       },
       'geometry': {
@@ -11440,7 +11440,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Rocky Point',
+        'name': 'Rocky Point',
         'id': 9439189
       },
       'geometry': {
@@ -11450,7 +11450,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Saint Helens',
+        'name': 'Saint Helens',
         'id': 9439201
       },
       'geometry': {
@@ -11460,7 +11460,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Portland Morrison Street Bridge',
+        'name': 'Portland Morrison Street Bridge',
         'id': 9439221
       },
       'geometry': {
@@ -11470,7 +11470,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Vancouver',
+        'name': 'Vancouver',
         'id': 9440083
       },
       'geometry': {
@@ -11480,7 +11480,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Longview',
+        'name': 'Longview',
         'id': 9440422
       },
       'geometry': {
@@ -11490,7 +11490,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Skamokawa',
+        'name': 'Skamokawa',
         'id': 9440569
       },
       'geometry': {
@@ -11500,7 +11500,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Nahcotta',
+        'name': 'Nahcotta',
         'id': 9440747
       },
       'geometry': {
@@ -11510,7 +11510,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'South Bend, Willapa River',
+        'name': 'South Bend, Willapa River',
         'id': 9440875
       },
       'geometry': {
@@ -11520,7 +11520,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Toke Point',
+        'name': 'Toke Point',
         'id': 9440910
       },
       'geometry': {
@@ -11530,7 +11530,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Westport',
+        'name': 'Westport',
         'id': 9441102
       },
       'geometry': {
@@ -11540,7 +11540,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Aberdeen',
+        'name': 'Aberdeen',
         'id': 9441187
       },
       'geometry': {
@@ -11550,7 +11550,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'La Push',
+        'name': 'La Push',
         'id': 9442396
       },
       'geometry': {
@@ -11560,7 +11560,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Neah Bay',
+        'name': 'Neah Bay',
         'id': 9443090
       },
       'geometry': {
@@ -11570,7 +11570,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Port Angeles',
+        'name': 'Port Angeles',
         'id': 9444090
       },
       'geometry': {
@@ -11580,7 +11580,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Port Townsend',
+        'name': 'Port Townsend',
         'id': 9444900
       },
       'geometry': {
@@ -11590,7 +11590,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Bangor',
+        'name': 'Bangor',
         'id': 9445133
       },
       'geometry': {
@@ -11600,7 +11600,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Tacoma',
+        'name': 'Tacoma',
         'id': 9446484
       },
       'geometry': {
@@ -11610,7 +11610,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Seattle',
+        'name': 'Seattle',
         'id': 9447130
       },
       'geometry': {
@@ -11620,7 +11620,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Cherry Point',
+        'name': 'Cherry Point',
         'id': 9449424
       },
       'geometry': {
@@ -11630,7 +11630,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Friday Harbor',
+        'name': 'Friday Harbor',
         'id': 9449880
       },
       'geometry': {
@@ -11640,7 +11640,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Ketchikan',
+        'name': 'Ketchikan',
         'id': 9450460
       },
       'geometry': {
@@ -11650,7 +11650,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Craig',
+        'name': 'Craig',
         'id': 9450551
       },
       'geometry': {
@@ -11660,7 +11660,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Big Salt Lake',
+        'name': 'Big Salt Lake',
         'id': 9450623
       },
       'geometry': {
@@ -11670,7 +11670,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Thoms Point',
+        'name': 'Thoms Point',
         'id': 9450970
       },
       'geometry': {
@@ -11680,7 +11680,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Port Alexander',
+        'name': 'Port Alexander',
         'id': 9451054
       },
       'geometry': {
@@ -11690,7 +11690,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Monte Carlo Island',
+        'name': 'Monte Carlo Island',
         'id': 9451247
       },
       'geometry': {
@@ -11700,7 +11700,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'The Summit',
+        'name': 'The Summit',
         'id': 9451349
       },
       'geometry': {
@@ -11710,7 +11710,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Turn Point',
+        'name': 'Turn Point',
         'id': 9451434
       },
       'geometry': {
@@ -11720,7 +11720,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Entrance Island',
+        'name': 'Entrance Island',
         'id': 9451438
       },
       'geometry': {
@@ -11730,7 +11730,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Sitka',
+        'name': 'Sitka',
         'id': 9451600
       },
       'geometry': {
@@ -11740,7 +11740,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Juneau',
+        'name': 'Juneau',
         'id': 9452210
       },
       'geometry': {
@@ -11750,7 +11750,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Skagway',
+        'name': 'Skagway',
         'id': 9452400
       },
       'geometry': {
@@ -11760,7 +11760,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Elfin Cove',
+        'name': 'Elfin Cove',
         'id': 9452634
       },
       'geometry': {
@@ -11770,7 +11770,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Yakutat',
+        'name': 'Yakutat',
         'id': 9453220
       },
       'geometry': {
@@ -11780,7 +11780,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Cordova',
+        'name': 'Cordova',
         'id': 9454050
       },
       'geometry': {
@@ -11790,7 +11790,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Valdez',
+        'name': 'Valdez',
         'id': 9454240
       },
       'geometry': {
@@ -11800,7 +11800,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Wooded Island',
+        'name': 'Wooded Island',
         'id': 9454562
       },
       'geometry': {
@@ -11810,7 +11810,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Whittier',
+        'name': 'Whittier',
         'id': 9454949
       },
       'geometry': {
@@ -11820,7 +11820,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Seward',
+        'name': 'Seward',
         'id': 9455090
       },
       'geometry': {
@@ -11830,7 +11830,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Seldovia',
+        'name': 'Seldovia',
         'id': 9455500
       },
       'geometry': {
@@ -11840,7 +11840,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Nikiski',
+        'name': 'Nikiski',
         'id': 9455760
       },
       'geometry': {
@@ -11850,7 +11850,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Anchorage',
+        'name': 'Anchorage',
         'id': 9455920
       },
       'geometry': {
@@ -11860,7 +11860,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Kodiak Island',
+        'name': 'Kodiak Island',
         'id': 9457292
       },
       'geometry': {
@@ -11870,7 +11870,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Alitak',
+        'name': 'Alitak',
         'id': 9457804
       },
       'geometry': {
@@ -11880,7 +11880,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Chirikof Island',
+        'name': 'Chirikof Island',
         'id': 9458293
       },
       'geometry': {
@@ -11890,7 +11890,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Mitrofania Island',
+        'name': 'Mitrofania Island',
         'id': 9459016
       },
       'geometry': {
@@ -11900,7 +11900,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Sand Point',
+        'name': 'Sand Point',
         'id': 9459450
       },
       'geometry': {
@@ -11910,7 +11910,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Dolgoi Harbor, Dolgoi Island',
+        'name': 'Dolgoi Harbor, Dolgoi Island',
         'id': 9459758
       },
       'geometry': {
@@ -11920,7 +11920,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'King Cove',
+        'name': 'King Cove',
         'id': 9459881
       },
       'geometry': {
@@ -11930,7 +11930,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Adak Island',
+        'name': 'Adak Island',
         'id': 9461380
       },
       'geometry': {
@@ -11940,7 +11940,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Atka',
+        'name': 'Atka',
         'id': 9461710
       },
       'geometry': {
@@ -11950,7 +11950,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Nikolski',
+        'name': 'Nikolski',
         'id': 9462450
       },
       'geometry': {
@@ -11960,7 +11960,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Unalaska',
+        'name': 'Unalaska',
         'id': 9462620
       },
       'geometry': {
@@ -11970,7 +11970,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Port Moller',
+        'name': 'Port Moller',
         'id': 9463502
       },
       'geometry': {
@@ -11980,7 +11980,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Village Cove, St. Paul Island',
+        'name': 'Village Cove, St. Paul Island',
         'id': 9464212
       },
       'geometry': {
@@ -11990,7 +11990,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Snag Point, Dillingham',
+        'name': 'Snag Point, Dillingham',
         'id': 9465374
       },
       'geometry': {
@@ -12000,7 +12000,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Nome, Norton Sound',
+        'name': 'Nome, Norton Sound',
         'id': 9468756
       },
       'geometry': {
@@ -12010,7 +12010,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Tin City, Bering Sea',
+        'name': 'Tin City, Bering Sea',
         'id': 9469439
       },
       'geometry': {
@@ -12020,7 +12020,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Shishmaref Inlet 2',
+        'name': 'Shishmaref Inlet 2',
         'id': 9469854
       },
       'geometry': {
@@ -12030,7 +12030,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Kotzebue',
+        'name': 'Kotzebue',
         'id': 9490424
       },
       'geometry': {
@@ -12040,7 +12040,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Red Dog Dock',
+        'name': 'Red Dog Dock',
         'id': 9491094
       },
       'geometry': {
@@ -12050,7 +12050,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Kivalina',
+        'name': 'Kivalina',
         'id': 9491253
       },
       'geometry': {
@@ -12060,7 +12060,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Prudhoe Bay',
+        'name': 'Prudhoe Bay',
         'id': 9497645
       },
       'geometry': {
@@ -12070,7 +12070,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Madero, Tampico Harbor, Mexico',
+        'name': 'Madero, Tampico Harbor, Mexico',
         'id': 9500966
       },
       'geometry': {
@@ -12080,7 +12080,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Settlement Point',
+        'name': 'Settlement Point',
         'id': 9710441
       },
       'geometry': {
@@ -12090,7 +12090,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Christiansted Harbor, St Croix',
+        'name': 'Christiansted Harbor, St Croix',
         'id': 9751364
       },
       'geometry': {
@@ -12100,7 +12100,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Lameshur Bay, St. Johns',
+        'name': 'Lameshur Bay, St. Johns',
         'id': 9751381
       },
       'geometry': {
@@ -12110,7 +12110,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Lime Tree Bay',
+        'name': 'Lime Tree Bay',
         'id': 9751401
       },
       'geometry': {
@@ -12120,7 +12120,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Charlotte Amalie',
+        'name': 'Charlotte Amalie',
         'id': 9751639
       },
       'geometry': {
@@ -12130,7 +12130,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Culebra',
+        'name': 'Culebra',
         'id': 9752235
       },
       'geometry': {
@@ -12140,7 +12140,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Vieques Island',
+        'name': 'Vieques Island',
         'id': 9752695
       },
       'geometry': {
@@ -12150,7 +12150,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'YABUCOA HARBOR',
+        'name': 'YABUCOA HARBOR',
         'id': 9754228
       },
       'geometry': {
@@ -12160,7 +12160,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'San Juan',
+        'name': 'San Juan',
         'id': 9755371
       },
       'geometry': {
@@ -12170,7 +12170,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Punta Guayanilla',
+        'name': 'Punta Guayanilla',
         'id': 9758053
       },
       'geometry': {
@@ -12180,7 +12180,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Magueyes Island',
+        'name': 'Magueyes Island',
         'id': 9759110
       },
       'geometry': {
@@ -12190,7 +12190,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Mayaguez',
+        'name': 'Mayaguez',
         'id': 9759394
       },
       'geometry': {
@@ -12200,7 +12200,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Aguadilla',
+        'name': 'Aguadilla',
         'id': 9759412
       },
       'geometry': {
@@ -12210,7 +12210,7 @@
     }, {
       'type': 'Feature',
       'properties': {
-        'Name': 'Mona Island',
+        'name': 'Mona Island',
         'id': 9759938
       },
       'geometry': {
@@ -12248,8 +12248,8 @@
    * @param {any} f
    */
 
-  var stationToLatLon = function stationToLatLon(f) {
-    return toLatLon(f['geometry']['coordinates'].reverse());
+  var getStationLatLon = function getStationLatLon(station) {
+    return toLatLon(station['geometry']['coordinates'][1], station['geometry']['coordinates'][0]);
   };
   /**
    * Finds closest tidal stations to a point
@@ -12260,13 +12260,16 @@
   function findClosestStation(latlon) {
     var minDistance = -1,
         distance,
-        closestStation;
+        closestStation,
+        stationLatLon;
     stations['features'].forEach(function (station) {
-      distance = haversineDistance(latlon, stationToLatLon(station));
+      stationLatLon = getStationLatLon(station);
+      distance = haversineDistance(latlon, stationLatLon);
 
       if (minDistance < 0 || distance < minDistance) {
         minDistance = distance;
         closestStation = station['properties'];
+        closestStation['latlon'] = stationLatLon;
       }
     });
     closestStation['distance'] = toValueUnits(minDistance, 'm');

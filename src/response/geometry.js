@@ -7,7 +7,7 @@ export class Geometry {
 
         switch (data['type']) {
             case 'Point':
-                this.latlon = toLatLon(data['coordinates'].reverse());
+                this.latlon = toLatLon(data['coordinates'][1], data['coordinates'][0]);
                 break;
             case 'Polygon':
                 this.rings = this.getPolygonRings(data['coordinates']);
@@ -39,7 +39,7 @@ export class Geometry {
         let result = [], i;
 
         for (i = 0; i < coordinates.length; i++) {
-            result.push(toLatLon(coordinates[i].reverse()));
+            result.push(toLatLon(coordinates[i][1], coordinates[i][0]));
         }
         return result;
     }
