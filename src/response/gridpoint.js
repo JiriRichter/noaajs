@@ -52,6 +52,15 @@ export class GridPoint extends Feature {
                     }
                     else {
                         item = variableData['values'][i]['value'];
+                        if (Array.isArray(item)) {
+                            item.forEach(v => {
+                                for (let key in v) {
+                                    if (v[key] && v[key]['unit'] && v[key]['value']) {
+                                        v[key] = toValueUnits(v[key]);
+                                    }
+                                }
+                            });
+                        }
                     }
                     item['validTime'] = toValidTimePeriod(variableData['values'][i]['validTime']);
                     values.push(item);

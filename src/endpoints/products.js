@@ -163,6 +163,17 @@ Products.toProductList = (data) => {
     data.forEach(function (product) {
         products.push(new Product(product));
     });
+
+    // newest first
+    products.sort((a, b) => {
+        if (a.issuanceTime.milliseconds == b.issuanceTime.milliseconds) {
+            return 0;
+        } else if (a.issuanceTime.milliseconds > b.issuanceTime.milliseconds) {
+            return 1;
+        }
+        return -a;
+    });
+
     return products;
 };
 

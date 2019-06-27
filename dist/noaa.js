@@ -1,5 +1,5 @@
 /* @preserve
- * NOAA 1.0.0+master.af617d9, a JS library for https://www.weather.gov/documentation/services-web-api.
+ * NOAA 1.0.0+master.778440e, a JS library for https://www.weather.gov/documentation/services-web-api.
  * (c) 2019-2020 Jiri Richter
  */
 
@@ -6838,6 +6838,16 @@
     var products = [];
     data.forEach(function (product) {
       products.push(new Product(product));
+    }); // newest first
+
+    products.sort(function (a, b) {
+      if (a.issuanceTime.milliseconds == b.issuanceTime.milliseconds) {
+        return 0;
+      } else if (a.issuanceTime.milliseconds > b.issuanceTime.milliseconds) {
+        return 1;
+      }
+
+      return -a;
     });
     return products;
   }; // @factory NOAA.glossary(): Products
@@ -6882,8 +6892,14 @@
   };
 
   function toValueUnits(a, b) {
-    if (_typeof(a) === 'object' && 'value' in a && 'unitCode' in a) {
-      return new ValueUnits(a['value'], ValueUnits.parseUnit(a['unitCode']));
+    if (_typeof(a) === 'object') {
+      if ('value' in a && 'unitCode' in a) {
+        return new ValueUnits(a['value'], ValueUnits.parseUnit(a['unitCode']));
+      }
+
+      if ('value' in a && 'unit' in a) {
+        return new ValueUnits(a['value'], ValueUnits.parseUnit(a['unit']));
+      }
     }
 
     return new ValueUnits(a, b);
@@ -7767,6 +7783,16 @@
                 item = toValueUnits(variableData['values'][i]['value'], units);
               } else {
                 item = variableData['values'][i]['value'];
+
+                if (Array.isArray(item)) {
+                  item.forEach(function (v) {
+                    for (var key in v) {
+                      if (v[key] && v[key]['unit'] && v[key]['value']) {
+                        v[key] = toValueUnits(v[key]);
+                      }
+                    }
+                  });
+                }
               }
 
               item['validTime'] = toValidTimePeriod(variableData['values'][i]['validTime']);

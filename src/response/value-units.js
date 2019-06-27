@@ -19,8 +19,13 @@ ValueUnits.parseUnit = function (s) {
 
 export function toValueUnits(a, b) {
 
-    if (typeof a === 'object' && 'value' in a && 'unitCode' in a) {
-        return new ValueUnits(a['value'], ValueUnits.parseUnit(a['unitCode']));
+    if (typeof a === 'object') {
+        if ('value' in a && 'unitCode' in a) {
+            return new ValueUnits(a['value'], ValueUnits.parseUnit(a['unitCode']));
+        }
+        if ('value' in a && 'unit' in a) {
+            return new ValueUnits(a['value'], ValueUnits.parseUnit(a['unit']));
+        }
     }
     return new ValueUnits(a, b);
 }
