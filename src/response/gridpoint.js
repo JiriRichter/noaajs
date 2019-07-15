@@ -46,7 +46,7 @@ export class GridPoint extends Feature {
 
             for (let i = 0; i < variableData['values'].length; i++) {
                 //value can be null
-                if (variableData['values'][i]['value']) {
+                if (variableData['values'][i]['value'] !== null) {
                     if (typeof variableData['values'][i]['value'] === 'number') {
                         item = toValueUnits(variableData['values'][i]['value'], units);
                     }
@@ -76,7 +76,7 @@ export class GridPoint extends Feature {
             i,
             hour;
 
-        if (this.values[variable] && this.values[variable].length) {
+        if (this.values[variable] !== undefined && this.values[variable].length) {
             for (i = 0; i < this.values[variable].length; i++) {
                 validTime = this.values[variable][i].validTime;
 

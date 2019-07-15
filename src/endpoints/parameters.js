@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { LatLon, toLatLon } from '../utils/latlon';
 
 /**
@@ -17,11 +18,15 @@ export function validateParameter(name, value, validateOptions) {
     }
     else {
         if (validateOptions['type']) {
-            if (validateOptions['type'] === 'Date' && !(value instanceof Date)) {
-                throw new Error('Invalid ' + name + ' parameter type. Expected ' + validateOptions['type'] + ', value: ' + value);
+            if (validateOptions['type'] === 'Date') {
+                if (!(value instanceof Date)) {
+                    throw new Error('Invalid ' + name + ' parameter type. Expected ' + validateOptions['type'] + ', value: ' + value);
+                }
             }
-            else if (validateOptions['type'] === 'LatLon' && !(value instanceof LatLon)) {
-                throw new Error('Invalid ' + name + ' parameter type. Expected ' + validateOptions['type'] + ', value: ' + value);
+            else if (validateOptions['type'] === 'LatLon') {
+                if (!(value instanceof LatLon)) {
+                    throw new Error('Invalid ' + name + ' parameter type. Expected ' + validateOptions['type'] + ', value: ' + value);
+                }
             }
             else if (typeof value !== validateOptions['type']) {
                 throw new Error('Invalid ' + name + ' parameter type. Expected ' + validateOptions['type'] + ', value: ' + value);
@@ -35,7 +40,7 @@ export function validateParameter(name, value, validateOptions) {
 
 export function toQueryParamValue(value) {
     if (value instanceof Date) {
-        return value.toISOString();
+        return moment(value).format();
     }
 
     if (Array.isArray(value)) {
