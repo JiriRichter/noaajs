@@ -1,5 +1,5 @@
 /* @preserve
- * NOAA 1.0.0+master.778440e, a JS library for https://www.weather.gov/documentation/services-web-api.
+ * NOAA 1.0.0+master.be4f0fc, a JS library for https://www.weather.gov/documentation/services-web-api.
  * (c) 2019-2020 Jiri Richter
  */
 
@@ -212,7 +212,7 @@
 
   var moment = createCommonjsModule(function (module, exports) {
   (function (global, factory) {
-      module.exports = factory();
+       module.exports = factory() ;
   }(commonjsGlobal, (function () {
       var hookCallback;
 
@@ -4820,7 +4820,7 @@
   (function (root, factory) {
 
   	/*global define*/
-  	if (module.exports) {
+  	if ( module.exports) {
   		module.exports = factory(moment); // Node
   	} else {
   		factory(root.moment);                        // Browser
@@ -12688,6 +12688,7 @@
   exports.Alerts = Alerts;
   exports.Endpoint = Endpoint;
   exports.Glossary = Glossary;
+  exports.GridPoint = GridPoint;
   exports.Icons = Icons;
   exports.LatLon = LatLon;
   exports.MarineAreaCodes = MarineAreaCodes;
