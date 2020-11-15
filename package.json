@@ -10,17 +10,17 @@
   "scripts": {
     "build": "npm run rollup && npm run uglify",
     "rollup": "rollup -c build/rollup-config.js",
-    "uglify": "uglifyjs dist/noaa.js -c -m -o dist/noaa.min.js --source-map filename=dist/noaa.min.js.map --in-source-map dist/noaa.js.map --source-map-url noaa.js.map --comments"
+    "uglify": "uglifyjs dist/noaa.js -c -m -o dist/noaa.min.js --source-map filename=dist/noaa.min.js.map --comments"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@babel/core": "^7.4.5",
-    "@babel/plugin-proposal-class-properties": "^7.4.4",
-    "@babel/preset-env": "^7.4.5",
+    "@babel/core": "^7.12.3",
+    "@babel/plugin-proposal-class-properties": "^7.12.1",
+    "@babel/preset-env": "^7.12.1",
     "babel-core": "^6.26.3",
-    "babel-eslint": "^10.0.1",
+    "babel-eslint": "^10.1.0",
     "babel-loader": "^7.1.5",
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.7.0",
@@ -29,19 +29,19 @@
     "eslint": "^5.16.0",
     "eslint-config-google": "^0.13.0",
     "eslint-config-standard": "^12.0.0",
-    "eslint-loader": "^2.1.2",
-    "eslint-plugin-import": "^2.17.3",
-    "eslint-plugin-node": "^9.1.0",
-    "eslint-plugin-promise": "^4.1.1",
-    "eslint-plugin-react": "^7.13.0",
-    "eslint-plugin-standard": "^4.0.0",
+    "eslint-loader": "^2.2.1",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-node": "^9.2.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-react": "^7.21.5",
+    "eslint-plugin-standard": "^4.1.0",
     "git-rev-sync": "^1.12.0",
-    "rollup-plugin-babel": "^4.3.2",
-    "rollup-plugin-commonjs": "^10.0.0",
+    "rollup-plugin-babel": "^4.4.0",
+    "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-git-version": "^0.2.1",
     "rollup-plugin-json": "^4.0.0",
-    "rollup-plugin-node-resolve": "^5.0.1",
-    "uglify-js": "^3.6.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "uglify-js": "^3.11.6",
     "uglifyjs": "^2.4.11"
   },
   "eslintConfig": {
@@ -85,7 +85,7 @@
     }
   },
   "dependencies": {
-    "moment-timezone": "^0.5.25",
+    "moment-timezone": "^0.5.32",
     "rollup": "^2.33.2"
   }
 }
