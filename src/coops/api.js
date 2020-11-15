@@ -146,4 +146,4 @@ export class COOPSApi {
 }
 
 /** The API end point */
-COOPSApi.url = 'https://tidesandcurrents.noaa.gov/api/datagetter';
+COOPSApi.url = 'https://api.tidesandcurrents.noaa.gov/api/prod/datagetter';

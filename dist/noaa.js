@@ -1,13 +1,13 @@
 /* @preserve
- * NOAA 1.0.0+master.be4f0fc, a JS library for https://www.weather.gov/documentation/services-web-api.
+ * NOAA 1.0.0+master.0e3c068, a JS library for https://www.weather.gov/documentation/services-web-api.
  * (c) 2019-2020 Jiri Richter
  */
 
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
-  (global = global || self, factory(global.NOAA = {}));
-}(this, function (exports) { 'use strict';
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.NOAA = {}));
+}(this, (function (exports) { 'use strict';
 
   function _typeof(obj) {
     if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
@@ -6038,6 +6038,7 @@
   };
 
   var latest$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     version: version,
     zones: zones,
     links: links,
@@ -6595,10 +6596,14 @@
       }
     } else {
       if (validateOptions['type']) {
-        if (validateOptions['type'] === 'Date' && !(value instanceof Date)) {
-          throw new Error('Invalid ' + name + ' parameter type. Expected ' + validateOptions['type'] + ', value: ' + value);
-        } else if (validateOptions['type'] === 'LatLon' && !(value instanceof LatLon)) {
-          throw new Error('Invalid ' + name + ' parameter type. Expected ' + validateOptions['type'] + ', value: ' + value);
+        if (validateOptions['type'] === 'Date') {
+          if (!(value instanceof Date)) {
+            throw new Error('Invalid ' + name + ' parameter type. Expected ' + validateOptions['type'] + ', value: ' + value);
+          }
+        } else if (validateOptions['type'] === 'LatLon') {
+          if (!(value instanceof LatLon)) {
+            throw new Error('Invalid ' + name + ' parameter type. Expected ' + validateOptions['type'] + ', value: ' + value);
+          }
         } else if (_typeof(value) !== validateOptions['type']) {
           throw new Error('Invalid ' + name + ' parameter type. Expected ' + validateOptions['type'] + ', value: ' + value);
         }
@@ -6611,7 +6616,7 @@
   }
   function toQueryParamValue(value) {
     if (value instanceof Date) {
-      return value.toISOString();
+      return moment(value).format();
     }
 
     if (Array.isArray(value)) {
@@ -7778,7 +7783,7 @@
 
           for (var i = 0; i < variableData['values'].length; i++) {
             //value can be null
-            if (variableData['values'][i]['value']) {
+            if (variableData['values'][i]['value'] !== null) {
               if (typeof variableData['values'][i]['value'] === 'number') {
                 item = toValueUnits(variableData['values'][i]['value'], units);
               } else {
@@ -7811,7 +7816,7 @@
             i,
             hour;
 
-        if (this.values[variable] && this.values[variable].length) {
+        if (this.values[variable] !== undefined && this.values[variable].length) {
           for (i = 0; i < this.values[variable].length; i++) {
             validTime = this.values[variable][i].validTime;
 
@@ -12576,7 +12581,7 @@
   }();
   /** The API end point */
 
-  COOPSApi.url = 'https://tidesandcurrents.noaa.gov/api/datagetter';
+  COOPSApi.url = 'https://api.tidesandcurrents.noaa.gov/api/prod/datagetter';
 
   var Datums =
   /*#__PURE__*/
@@ -12726,5 +12731,5 @@
   // Always export us to window global (see #2364)
   window.NOAA = exports;
 
-}));
+})));
 //# sourceMappingURL=noaa.js.map
