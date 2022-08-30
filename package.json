@@ -85,7 +85,7 @@
     }
   },
   "dependencies": {
-    "moment-timezone": "^0.5.32",
+    "moment-timezone": "^0.5.35",
     "rollup": "^2.33.2"
   }
 }
