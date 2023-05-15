@@ -1,1 +1,0 @@
-{"version":3,"file":"index.js","sources":["src/error.js"],"sourcesContent":["class Error {\r\n    constructor() {\r\n    }\r\n}\r\n\r\nexport { Error };"],"names":[],"mappings":";;;;;;;;;;;IAAA,MAAM,KAAK,CAAC;IACZ,IAAI,WAAW,GAAG;IAClB,KAAK;IACL,CAAC;;;;;;;;;;;;;;;;;;;;;;;"}
