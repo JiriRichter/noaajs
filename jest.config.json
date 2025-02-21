@@ -1,0 +1,8 @@
+{
+    "verbose": true,
+    "testEnvironment": "jsdom",
+    "testEnvironmentOptions": {
+        "url": "https://noaa.js/"
+    },
+    "transform": {}
+}

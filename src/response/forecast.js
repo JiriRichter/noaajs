@@ -14,7 +14,6 @@ export class Forecast extends Feature {
     constructor(data) {
         super(data);
 
-        this.updated = toTime(getFeatureProperty('updated', data));
         this.units = getFeatureProperty('units', data);
         this.forecastGenerator = getFeatureProperty('forecastGenerator', data);
         this.generatedAt = toTime(getFeatureProperty('generatedAt', data));

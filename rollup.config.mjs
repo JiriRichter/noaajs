@@ -18,7 +18,8 @@ export default {
         resolve(),
         commonjs(),
         babel({
-            exclude: 'node_modules/**' // only transpile our source code
+            exclude: 'node_modules/**', // only transpile our source code
+            babelHelpers: 'bundled'
         }),
         json()
     ]
