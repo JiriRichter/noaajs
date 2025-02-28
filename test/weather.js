@@ -48,15 +48,6 @@ function testGridPoints(lat, lon) {
     });
 }
 
-function testTime() {
-    NOAA.points([39.7456, -97.0892]).get().then(function (point) {
-        point.getGridPoint().then(function (gridpoint) {
-            console.log(gridpoint.updateTime);
-            console.log(gridpoint.updateTime.toTimezone(point.timeZone));
-        });
-    });
-}
-
 function testGridPointsForecast() {
     NOAA.points([39.7456, -97.0892]).get().then(function (point) {
         point.getGridPointForecast().then(function (forecast) {

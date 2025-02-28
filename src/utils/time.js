@@ -1,6 +1,3 @@
-import moment from 'moment';
-import 'moment-timezone';
-
 export class Time {
     constructor(t) {
         if (t instanceof Date) {
@@ -15,10 +12,6 @@ export class Time {
         else {
             throw new Error('Invalid time argument (' + t + ')');
         }
-    }
-
-    toTimezone(timezone) {
-        return moment(this.milliseconds).tz(timezone).toDate();
     }
 
     toString() {

@@ -1,7 +1,7 @@
 {
   "name": "noaajs",
-  "version": "1.0.2",
-  "description": "",
+  "version": "1.0.4",
+  "description": "A JavaScript library for obtaining data from weather.gov and tidesandcurrents.noaa.gov public web services provided by NOAA",
   "main": "dist/noaa.js",
   "type": "module",
   "files": [
@@ -30,6 +30,5 @@
     "uglify-js": "^3.19.3"
   },
   "dependencies": {
-    "moment-timezone": "^0.5.47"
   }
 }
