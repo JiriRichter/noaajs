@@ -3,9 +3,10 @@ import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import babel from '@rollup/plugin-babel';
 import json from '@rollup/plugin-json';
+import typescript from '@rollup/plugin-typescript';
 
 export default {
-    input: 'src/index.js',
+    input: 'src/index.ts',
     output: [
         {
             file: "dist/noaa.js",
@@ -21,6 +22,7 @@ export default {
             exclude: 'node_modules/**', // only transpile our source code
             babelHelpers: 'bundled'
         }),
-        json()
+        json(),
+        typescript()
     ]
 };
