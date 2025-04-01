@@ -1,6 +1,6 @@
 {
   "name": "noaajs",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "A JavaScript library for obtaining data from weather.gov and tidesandcurrents.noaa.gov public web services provided by NOAA",
   "main": "dist/noaa.js",
   "type": "module",
