@@ -1,60 +1,28 @@
-import { Feature } from './feature';
-import { featureCollectionToArray } from './feature-collection';
-import { toStations } from '../endpoints/stations';
-import { getUrlPart, getFeatureProperty } from './utils';
-import { toValueUnits, ValueUnits } from '../../utils/value-units';
+import { getUrlPart, getProperty, getStringValue } from './utils';
+import { GeometryPoint } from './geometry-point';
+import { NumericValue } from './numeric-value';
 
-/* @class Station
- * @aka NOAA.Station
- *
- * */
-export class Station extends Feature {
+export class Station extends GeometryPoint {
     id: string;
-    elevation: ValueUnits;
-    name: any;
-    timeZone: any;
-    forecastZone: any;
-    county: any;
-    fireWeatherZone: any;
+    elevation: NumericValue;
+    name: string;
+    timeZone: string;
+    forecastZone: string;
+    county: string;
+    fireWeatherZone: string;
 
-    constructor(data) {
-        if (typeof data === 'string') {
-            super(undefined);
-            this.id = data;
-        }
-        else {
-            super(data);
+    constructor(data: any) {
+        super(data);
 
-            this.elevation = toValueUnits(getFeatureProperty('elevation', data));
-            this.id = getFeatureProperty('stationIdentifier', data);
-            this.name = getFeatureProperty('name', data);
-            this.timeZone = getFeatureProperty('timeZone', data);
+        const properties = getProperty('properties', data);
 
-            this.forecastZone = getUrlPart(getFeatureProperty('forecast', data, true), -1);
-            this.county = getUrlPart(getFeatureProperty('county', data, true), -1);
-            this.fireWeatherZone = getUrlPart(getFeatureProperty('fireWeatherZone', data, true), -1);
-        }
+        this.elevation = new NumericValue(getProperty('elevation', properties));
+        this.id = getStringValue('stationIdentifier', properties);
+        this.name = getStringValue('name', properties);
+        this.timeZone = getStringValue('timeZone', properties);
+
+        this.forecastZone = getUrlPart(getStringValue('forecast', properties, true), -1);
+        this.county = getUrlPart(getStringValue('county', properties, true), -1);
+        this.fireWeatherZone = getUrlPart(getStringValue('fireWeatherZone', properties, true), -1);
     }
-
-    get() {
-        return toStations().getStation(this.id );
-    }
-
-    getObservations(start, end) {
-        return toStations().getObservations(this.id, start, end);
-    }
-
-    getLatestObservations() {
-        return toStations().getLatestObservations(this.id);
-    }
-
-    getObservationsAtTime(time) {
-        return toStations().getObservationsAtTime(this.id, time);
-    }
-}
-
-export function stationsToArray(data) {
-    return featureCollectionToArray(data, function (feature) {
-        return new Station(feature);
-    });
 }

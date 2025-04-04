@@ -4,96 +4,6 @@
     (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.NOAA = {}));
 })(this, (function (exports) { 'use strict';
 
-    var Time = /** @class */ (function () {
-        function Time(t) {
-            if (t instanceof Date) {
-                this.milliseconds = t.getTime();
-            }
-            else if (typeof t === 'string') {
-                this.milliseconds = Date.parse(t);
-            }
-            else if (typeof t === 'number') {
-                this.milliseconds = t;
-            }
-            else {
-                throw new Error('Invalid time argument (' + t + ')');
-            }
-        }
-        Time.prototype.toString = function () {
-            return this.toDate().toISOString();
-        };
-        Time.prototype.toDate = function () {
-            return new Date(this.milliseconds);
-        };
-        return Time;
-    }());
-    function toTime(a) {
-        if (a === undefined || a === null) {
-            return a;
-        }
-        return new Time(a);
-    }
-
-    /* @class XY
-     * @aka NOAA.XY
-     *
-     * Represents a grid point with a certain X and Y.
-     *
-     * @example
-     *
-     * ```
-     * let xy = NOAA.xy(1,3);
-     * ```
-     */
-    var XY = /** @class */ (function () {
-        function XY(x, y) {
-            x = parseInt(x);
-            y = parseInt(y);
-            if (isNaN(x) || isNaN(y)) {
-                throw new Error('Invalid x, y values: (' + x + ', ' + y + ')');
-            }
-            // @property x: Number
-            // x grid coordinate
-            this.x = +x;
-            // @property y: Number
-            // y grid coordinate
-            this.y = +y;
-        }
-        XY.prototype.toString = function () {
-            return "".concat(this.x, ",").concat(this.y);
-        };
-        return XY;
-    }());
-    // @factory NOAA.xy(x: Number, y: Number): XY
-    // Creates an object representing a grid point with the given x and y coordinates.
-    // @alternative
-    // @factory NOAA.xy(coords: Array): XY
-    // Expects an array of the form `[Number, Number]` instead.
-    // @alternative
-    // @factory NOAA.latLon(coords: Object): XY
-    // Expects an plain object of the form `{x: Number, y: Number}` instead.
-    function toXY(a, b) {
-        if (a instanceof XY) {
-            return a;
-        }
-        if (Array.isArray(a) && typeof a[0] !== 'object') {
-            if (a.length === 2) {
-                return new XY(a[0], a[1]);
-            }
-            return null;
-        }
-        if (a === undefined || a === null) {
-            return a;
-        }
-        if (typeof a === 'object' && 'x' in a) {
-            return new XY(a.x, a.y);
-        }
-        if (b === undefined) {
-            return null;
-        }
-        return new XY(a, b);
-    }
-
     /*
      * State / marine area code
      * */
@@ -253,22 +163,8 @@
         return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
     };
 
-    /* @class Error
-     * @aka NOAA.Error
-     *
-     * Represents a API error response.
-     * */
     var ApiError = /** @class */ (function () {
         function ApiError(data) {
-            /*
-            correlationId: "f8f32885-c8f4-48e6-82be-ef6975c63884"
-            detail: "'/points/12' is not a valid resource path"
-            instance: "https://api.weather.gov/requests/f8f32885-c8f4-48e6-82be-ef6975c63884"
-            path: "/points/12"
-            status: 404
-            title: "Not Found"
-            type: "https://api.weather.gov/problems/NotFound"
-            */
             this.correlationId = data['correlationId'];
             this.detail = data['detail'];
             this.instance = data['instance'];
@@ -280,205 +176,55 @@
         return ApiError;
     }());
 
-    var Endpoint = /** @class */ (function () {
-        function Endpoint(path) {
-            this.path = path;
+    var ApiBase = /** @class */ (function () {
+        function ApiBase() {
         }
-        Endpoint.prototype.get = function (url, queryParameters) {
+        ApiBase.prototype.fetch = function (absoluteUrl) {
             return __awaiter(this, void 0, void 0, function () {
-                var response, _a;
+                var response, error, _a;
                 return __generator(this, function (_b) {
                     switch (_b.label) {
-                        case 0:
-                            if (typeof url === "object") {
-                                url = this.constructUrl(url, queryParameters);
-                            }
-                            return [4 /*yield*/, fetch(url, {
-                                    method: 'GET',
-                                    headers: {
-                                        'Accept': 'application/geo+json'
-                                    }
-                                })];
+                        case 0: return [4 /*yield*/, fetch(absoluteUrl, {
+                                method: 'GET',
+                                headers: {
+                                    'Accept': 'application/geo+json'
+                                }
+                            })];
                         case 1:
                             response = _b.sent();
                             if (!!response.ok) return [3 /*break*/, 3];
                             _a = ApiError.bind;
                             return [4 /*yield*/, response.json()];
-                        case 2: return [2 /*return*/, new (_a.apply(ApiError, [void 0, _b.sent()]))()];
+                        case 2:
+                            error = new (_a.apply(ApiError, [void 0, _b.sent()]))();
+                            throw new Error(error.detail);
                         case 3: return [4 /*yield*/, response.json()];
                         case 4: return [2 /*return*/, _b.sent()];
                     }
                 });
             });
         };
-        Endpoint.prototype.constructUrl = function (urlParameters, queryParameters) {
-            var url = Endpoint.url;
-            if (this.path[0] !== '/') {
-                url += '/';
-            }
-            url += this.path;
-            if (urlParameters && Array.isArray(urlParameters)) {
-                var first_1 = (url.slice(-1) === '/');
-                urlParameters.forEach(function (value) {
-                    url += (first_1 ? '' : '/') + encodeURIComponent(value.toString());
-                    first_1 = false;
+        ApiBase.prototype.get = function (relativeUrl) {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    return [2 /*return*/, this.fetch("".concat(ApiBase.base_url, "/").concat(relativeUrl))];
                 });
-            }
-            if (queryParameters && queryParameters instanceof Object) {
-                var first_2 = true;
-                url += '?';
-                Object.keys(queryParameters).forEach(function (key) {
-                    url += (first_2 ? '' : '&') + key + '=' + encodeURIComponent(queryParameters[key]);
-                    first_2 = false;
+            });
+        };
+        ApiBase.prototype.getNext = function (page) {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    return [2 /*return*/, this.fetch(page.nextPageUrl)];
                 });
-            }
-            return url;
+            });
         };
         /** The API end point */
-        Endpoint.url = 'https://api.weather.gov';
-        return Endpoint;
-    }());
-
-    function toLatLon(lat, lon) {
-        return { lat: lat, lon: lon };
-    }
-
-    var Geometry = /** @class */ (function () {
-        function Geometry(data) {
-            this.type = data['type'];
-            switch (data['type']) {
-                case 'Point':
-                    this.latlon = toLatLon(data['coordinates'][1], data['coordinates'][0]);
-                    break;
-                case 'Polygon':
-                    this.rings = this.getPolygonRings(data['coordinates']);
-                    break;
-                case 'MultiPolygon':
-                    this.polygons = [];
-                    for (var i = 0; i < data['coordinates'].length; i++) {
-                        this.polygons.push(this.getPolygonRings(data['coordinates'][i]));
-                    }
-                    break;
-                default:
-                    throw new Error('Invalid geometry - (' + data['type'] + ') is not valid geometry');
-            }
-        }
-        Geometry.prototype.getPolygonRings = function (coordinates) {
-            var rings = [];
-            for (var i = 0; i < coordinates.length; i++) {
-                rings.push(this.convertCoordinates(coordinates[i]));
-            }
-            return rings;
-        };
-        /**
-         *
-         * @param {[]} latlons
-         */
-        Geometry.prototype.convertCoordinates = function (coordinates) {
-            var result = [], i;
-            for (i = 0; i < coordinates.length; i++) {
-                result.push(toLatLon(coordinates[i][1], coordinates[i][0]));
-            }
-            return result;
-        };
-        return Geometry;
-    }());
-    function toGeometry(data) {
-        return new Geometry(data);
-    }
-
-    /* @class Feature
-     * @aka NOAA.Feature
-     *
-     * Represents base class for API GeoJSON responses.
-     * */
-    var Feature = /** @class */ (function () {
-        function Feature(data) {
-            if (data === undefined) {
-                return;
-            }
-            if (data['type'] === undefined || data['type'] !== 'Feature') {
-                throw new Error('Invalid data - Type property is missing or not "Feature"');
-            }
-            if (data['geometry'] && data['geometry']['type']) {
-                if (data['geometry']['type'] === 'GeometryCollection') {
-                    this.geometries = [];
-                    for (var i = 0; i < data['geometry']['geometries'].length; i++) {
-                        this.geometries.push(toGeometry(data['geometry']['geometries'][i]));
-                    }
-                }
-                else {
-                    this.geometry = toGeometry(data['geometry']);
-                }
-            }
-            else {
-                throw new Error('Invalid geometry data');
-            }
-        }
-        return Feature;
-    }());
-
-    /**
-     * Exctrats URL component
-     * @param {String} url
-     * @param {number} index
-     */
-    function getUrlPart(url, index) {
-        if (!url) {
-            return null;
-        }
-        var parts = url.split('/');
-        if (index < 0) {
-            return parts[parts.length + index];
-        }
-        return parts[index];
-    }
-    /**
-     * Gets value from dictionary object
-     * @param {string} key
-     * @param {object} data
-     * @param {boolean?} optional
-     */
-    function getValue(key, data, optional) {
-        if (optional === void 0) { optional = false; }
-        if (!optional && !(key in data)) {
-            throw new Error('Invalid property name: ' + key);
-        }
-        return data[key];
-    }
-    /**
-     * Gets feature property
-     * @param {string} key
-     * @param {object} data
-     * @param {boolean?} optional
-     */
-    function getFeatureProperty(key, data, optional) {
-        if (optional === void 0) { optional = false; }
-        return getValue(key, data['properties'], optional);
-    }
-
-    /* @class Product
-     * @aka NOAA.Product
-     *
-     * */
-    var Product = /** @class */ (function () {
-        function Product(data) {
-            this.id = getValue('id', data);
-            this.wmoCollectiveId = getValue('wmoCollectiveId', data);
-            this.issuingOffice = getValue('issuingOffice', data);
-            this.issuanceTime = toTime(getValue('issuanceTime', data));
-            this.productCode = getValue('productCode', data);
-            this.productName = getValue('productName', data);
-            this.productText = getValue('productText', data, true);
-        }
-        Product.prototype.getProductText = function () {
-            return toProducts().getProduct(this.id);
-        };
-        return Product;
+        ApiBase.base_url = 'https://api.weather.gov';
+        return ApiBase;
     }());
 
     // returns date formatted as YYYYMMDD HH:mm in UTC
-    function formatDate$1(date) {
+    function formatDate(date) {
         var year = date.getUTCFullYear();
         var month = date.getUTCMonth() + 1;
         var day = date.getUTCDate();
@@ -486,1061 +232,296 @@
         var minutes = date.getUTCMinutes();
         return "".concat(year).concat(month.toString().padStart(2, "0")).concat(day.toString().padStart(2, "0"), " ").concat(hours.toString().padStart(2, "0"), ":").concat(minutes.toString().padStart(2, "0"));
     }
-
-    /**
-     * Validates API parameter
-     * @param {string} name
-     * @param {any} value
-     * @param {object} validateOptions
-     */
-    function validateParameter(name, value, validateOptions) {
-        if (Array.isArray(value)) {
-            if (!validateOptions['allowArray']) {
-                throw new Error(name + ' parameter does not allow array of values');
-            }
-            for (var i = 0; i < value.length; i++) {
-                validateParameter(name, value[i], validateOptions);
-            }
+    function createQueryString(params) {
+        if (params) {
+            return Object.keys(params).map(function (key) { return key + '=' + encodeURIComponent(params[key]); }).join('&');
         }
-        else {
-            if (validateOptions['type']) {
-                if (validateOptions['type'] === 'Date') {
-                    if (!(value instanceof Date)) {
-                        throw new Error('Invalid ' + name + ' parameter type. Expected ' + validateOptions['type'] + ', value: ' + value);
-                    }
-                }
-                else if (validateOptions['type'] === 'LatLon') {
-                    if (!('lat' in value && 'lon' in value)) {
-                        throw new Error('Invalid ' + name + ' parameter type. Expected ' + validateOptions['type'] + ', value: ' + value);
-                    }
-                }
-                else if (typeof value !== validateOptions['type']) {
-                    throw new Error('Invalid ' + name + ' parameter type. Expected ' + validateOptions['type'] + ', value: ' + value);
-                }
-            }
-            if (validateOptions['allowedValues'] !== undefined && !(value in validateOptions['allowedValues'])) {
-                throw new Error('Invalid ' + name + ' parameter value does not match any allowed value; value: ' + value);
-            }
-        }
+        return '';
     }
-    function toQueryParamValue(value) {
-        if (value instanceof Date) {
-            return formatDate$1(value);
+    function appendQueryString(uri, params) {
+        var query = createQueryString(params);
+        if (query) {
+            return "".concat(uri, "?").concat(query);
         }
-        if (Array.isArray(value)) {
-            return value.join(',');
-        }
-        else {
-            return value.toString();
-        }
+        return uri;
     }
-    function toQueryParameters(params, parameterOptions) {
-        var queryParams = {}, exclusiveParam;
-        Object.keys(params).forEach(function (key) {
-            if (!(key in parameterOptions)) {
-                throw new Error('Invalid parameter (' + key + ')');
-            }
-            if (parameterOptions[key]['exclusive']) {
-                if (exclusiveParam !== undefined) {
-                    throw new Error(key + ' parameter cannot be used together with ' + exclusiveParam + ' parameter');
-                }
-                exclusiveParam = key;
-            }
-            if (parameterOptions[key]['type'] === 'LatLon') {
-                params[key] = params[key];
-            }
-            validateParameter(key, params[key], parameterOptions[key]);
-            if (parameterOptions[key]['query']) {
-                queryParams[parameterOptions[key]['query']] = toQueryParamValue(params[key]);
-            }
-            else {
-                queryParams[key] = toQueryParamValue(params[key]);
-            }
-        });
-        return queryParams;
+    function parseTime(s) {
+        //2019-06-20 03:30
+        //2019-06-22T23:58:22+00:00
+        return new Date(Date.parse(s.replace(' ', 'T') + ':00+00:00'));
     }
 
-    /* class Glossary implements /glossary interface
-     * */
-    var Products = /** @class */ (function (_super) {
-        __extends(Products, _super);
-        function Products() {
-            return _super.call(this, '/products') || this;
+    function getUrlPart(url, index) {
+        var parts = url.split('/');
+        {
+            return parts[parts.length + index];
         }
-        /**
-         * Returns a list of text products
-         * @param {object} params
-         */
-        Products.prototype.get = function (params) {
-            return __awaiter(this, void 0, void 0, function () {
-                var queryParams, data;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            queryParams = {};
-                            Object.keys(Products.parameters).forEach(function (key) {
-                                if (key in params) {
-                                    validateParameter(key, params[key], Products.parameters[key]);
-                                    queryParams[key] = toQueryParamValue(params[key]);
-                                }
-                            });
-                            return [4 /*yield*/, _super.prototype.get.call(this, queryParams)];
-                        case 1:
-                            data = _a.sent();
-                            return [2 /*return*/, Products.toProductList(data['@graph'])];
-                    }
-                });
-            });
-        };
-        /**
-         * Returns a specific text product
-         * @param {string} id
-         */
-        Products.prototype.getProduct = function (id) {
-            return __awaiter(this, void 0, void 0, function () {
-                var data;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, _super.prototype.get.call(this, [id])];
-                        case 1:
-                            data = _a.sent();
-                            return [2 /*return*/, new Product(data)];
-                    }
-                });
-            });
-        };
-        /**
-         * Returns a list of valid text product types and codes
-         */
-        Products.prototype.getTypes = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var data;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, _super.prototype.get.call(this, ['types'])];
-                        case 1:
-                            data = _a.sent();
-                            // return dictionary when typeId not specified
-                            return [2 /*return*/, Products.toProductDictionary(data)];
-                    }
-                });
-            });
-        };
-        /**
-         * Returns a list of valid text product types for a given issuance location
-         * @param {string} locationId
-         */
-        Products.prototype.getLocationTypes = function (locationId) {
-            return __awaiter(this, void 0, void 0, function () {
-                var data;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            if (!locationId) {
-                                throw new Error('Missing required locationId parameter');
-                            }
-                            return [4 /*yield*/, _super.prototype.get.call(this, ['locations', locationId, 'types'])];
-                        case 1:
-                            data = _a.sent();
-                            // return dictionary
-                            return [2 /*return*/, Products.toProductDictionary(data)];
-                    }
-                });
-            });
-        };
-        /**
-         * Returns a list of valid text product issuance locations
-         */
-        Products.prototype.getLocations = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var data;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, _super.prototype.get.call(this, ['locations'])];
-                        case 1:
-                            data = _a.sent();
-                            return [2 /*return*/, data['locations']];
-                    }
-                });
-            });
-        };
-        /**
-         * Returns a list of valid text product issuance locations for a given product type
-         * @param {string} typeId
-         */
-        Products.prototype.getTypeLocations = function (typeId) {
-            return __awaiter(this, void 0, void 0, function () {
-                var data;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            if (!typeId) {
-                                throw new Error('Missing required typeId parameter');
-                            }
-                            return [4 /*yield*/, _super.prototype.get.call(this, ['types', typeId, 'locations'])];
-                        case 1:
-                            data = _a.sent();
-                            return [2 /*return*/, data['locations']];
-                    }
-                });
-            });
-        };
-        /**
-         * Returns a list of text products of a given type
-         * @param {string} typeId
-         */
-        Products.prototype.getTypeProducts = function (typeId) {
-            return __awaiter(this, void 0, void 0, function () {
-                var data;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            if (!typeId) {
-                                throw new Error('Missing required typeId parameter');
-                            }
-                            return [4 /*yield*/, _super.prototype.get.call(this, ['types', typeId])];
-                        case 1:
-                            data = _a.sent();
-                            // returns array
-                            return [2 /*return*/, Products.toProductList(data['@graph'])];
-                    }
-                });
-            });
-        };
-        /**
-         * Returns a list of text products of a given type for a given issuance location
-         * @param {string} typeId
-         * @param {string} locationId
-         */
-        Products.prototype.getTypeAndLocationProducts = function (typeId, locationId) {
-            return __awaiter(this, void 0, void 0, function () {
-                var data;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            if (!typeId) {
-                                throw new Error('Missing required typeId parameter');
-                            }
-                            if (!locationId) {
-                                throw new Error('Missing required locationId parameter');
-                            }
-                            return [4 /*yield*/, _super.prototype.get.call(this, ['types', typeId, 'locations', locationId])];
-                        case 1:
-                            data = _a.sent();
-                            // returns array
-                            return [2 /*return*/, Products.toProductList(data['@graph'])];
-                    }
-                });
-            });
-        };
-        Products.parameters = {
-            'location': {
-                'type': 'string',
-                'allowArray': true
-            },
-            'start': {
-                'type': 'Date',
-                'allowArray': false
-            },
-            'end': {
-                'type': 'Date',
-                'allowArray': false
-            },
-            'office': {
-                'type': 'string',
-                'allowArray': true
-            },
-            'wmoid': {
-                'type': 'string',
-                'allowArray': true
-            },
-            'type': {
-                'type': 'string',
-                'allowArray': true
-            },
-            'limit': {
-                'type': 'number',
-                'allowArray': true
-            }
-        };
-        Products.toProductList = function (data) {
-            var products = [];
-            data.forEach(function (product) {
-                products.push(new Product(product));
-            });
-            // newest first
-            products.sort(function (a, b) {
-                if (a.issuanceTime.milliseconds == b.issuanceTime.milliseconds) {
-                    return 0;
-                }
-                else if (a.issuanceTime.milliseconds > b.issuanceTime.milliseconds) {
-                    return 1;
-                }
-                return -a;
-            });
-            return products;
-        };
-        Products.toProductDictionary = function (data) {
-            var products = {};
-            data['@graph'].forEach(function (product) {
-                products[product['productCode']] = product['productName'];
-            });
-            return products;
-        };
-        return Products;
-    }(Endpoint));
-    // @factory NOAA.glossary(): Products
-    // Creates a glossary term dictionary
-    function toProducts() {
-        return new Products();
+    }
+    function getProperty(key, data, optional) {
+        if (optional === void 0) { optional = false; }
+        if (!optional && !(key in data)) {
+            throw new Error('Invalid property name: ' + key);
+        }
+        return data[key];
+    }
+    function getStringValue(key, data, optional) {
+        if (optional === void 0) { optional = false; }
+        return getProperty(key, data, optional);
+    }
+    function getNumberValue(key, data, optional) {
+        if (optional === void 0) { optional = false; }
+        return getProperty(key, data, optional);
+    }
+    function getIntValue(key, data, optional) {
+        if (optional === void 0) { optional = false; }
+        return parseInt(getStringValue(key, data, optional));
+    }
+    function getBoolValue(key, data, optional) {
+        if (optional === void 0) { optional = false; }
+        return getStringValue(key, data, optional) === "true";
+    }
+    function parseDate(value) {
+        return new Date(Date.parse(value));
+    }
+    function getDateValue(key, data, optional) {
+        return parseDate(getStringValue(key, data));
+    }
+    function parseUnits(value) {
+        return value.split(':')[1];
     }
 
-    /**
-     *
-     * @param {object} data
-     * @param {function} callback
-     */
-    function featureCollectionToArray(data, callback) {
-        var array = [];
-        data['features'].forEach(function (feature, index) {
-            array.push(callback(feature, index));
-        });
-        return array;
-    }
-
-    /* @class ValueUnit
-     * @aka NOAA.ValueUnit
-     *
-     * Represents a class for value with units.
-     * */
-    var ValueUnits = /** @class */ (function () {
-        function ValueUnits(value, units) {
-            if (typeof value !== 'number') {
-                throw new Error('Value must be a number');
-            }
-            this.value = value;
-            this.unit = units;
+    var Zone = /** @class */ (function () {
+        function Zone(data) {
+            var properties = getProperty('properties', data);
+            this.id = getStringValue('id', properties);
+            this.type = getStringValue('type', properties);
+            this.name = getStringValue('name', properties, true);
+            this.state = getStringValue('state', properties, true);
         }
-        ValueUnits.parseUnit = function (s) {
-            return s.split(':')[1];
-        };
-        return ValueUnits;
+        return Zone;
     }());
-    function toValueUnits(a, b) {
-        if (typeof a === 'object') {
-            if ('value' in a && 'unitCode' in a) {
-                return new ValueUnits(a['value'], ValueUnits.parseUnit(a['unitCode']));
-            }
-            if ('value' in a && 'unit' in a) {
-                return new ValueUnits(a['value'], ValueUnits.parseUnit(a['unit']));
-            }
-        }
-        return new ValueUnits(a, b);
-    }
 
-    /* @class Observation
-     * @aka NOAA.Observation
-     *
-     * */
-    var Observation = /** @class */ (function (_super) {
-        __extends(Observation, _super);
-        function Observation(data) {
-            var _this = _super.call(this, data) || this;
-            _this.elevation = toValueUnits(getFeatureProperty('elevation', data));
-            _this.stationId = getUrlPart(getFeatureProperty('station', data, true), -1);
-            _this.timestamp = toTime(getFeatureProperty('timestamp', data));
-            _this.rawMessage = getFeatureProperty('rawMessage', data);
-            _this.textDescription = getFeatureProperty('textDescription', data);
-            _this.iconUrl = getFeatureProperty('icon', data);
-            _this.presentWeather = getFeatureProperty('presentWeather', data);
-            _this.values = {};
-            var values = [];
-            Object.keys(data['properties']).forEach(function (key) {
-                if (data['properties'][key] && data['properties'][key]['value'] && data['properties'][key]['unitCode']) {
-                    values[key] = toValueUnits(data['properties'][key]);
-                }
-            });
-            _this.values = values;
-            var cloudLayers = data['properties']['cloudLayers'];
-            if (cloudLayers) {
-                _this.cloudLayers = [];
-                for (var i = 0; i < cloudLayers.length; i++) {
-                    _this.cloudLayers.push({
-                        'base': (cloudLayers['value'] && cloudLayers['unitCode']) ? toValueUnits(cloudLayers['base']) : null,
-                        'amount': cloudLayers['amount']
-                    });
-                }
+    var Alert = /** @class */ (function () {
+        function Alert(data) {
+            var properties = getProperty('properties', data);
+            this.id = getStringValue('id', properties);
+            this.areaDescription = getStringValue('areaDesc', properties);
+            this.geocode = getStringValue('geocode', properties);
+            this.affectedZones = [];
+            var affectedZones = getStringValue('affectedZones', properties);
+            for (var i = 0; i < affectedZones.length; i++) {
+                this.affectedZones.push(new Zone(affectedZones[i]));
             }
+            this.references = getStringValue('references', properties);
+            this.sent = getDateValue('sent', properties);
+            this.effective = getDateValue('effective', properties);
+            this.onset = getDateValue('onset', properties);
+            this.expires = getDateValue('expires', properties);
+            this.ends = getDateValue('ends', properties);
+            this.status = getStringValue('status', properties);
+            this.messageType = getStringValue('messageType', properties);
+            this.category = getStringValue('category', properties);
+            this.severity = getStringValue('severity', properties);
+            this.certainty = getStringValue('certainty', properties);
+            this.urgency = getStringValue('urgency', properties);
+            this.event = getStringValue('event', properties);
+            this.sender = getStringValue('sender', properties);
+            this.senderName = getStringValue('senderName', properties);
+            this.headline = getStringValue('headline', properties);
+            this.description = getStringValue('description', properties);
+            this.instruction = getStringValue('instruction', properties);
+            this.response = getStringValue('response', properties);
+            this.parameters = getStringValue('parameters', properties);
+        }
+        return Alert;
+    }());
+
+    var Page = /** @class */ (function () {
+        function Page(data) {
+            this.title = getStringValue('title', data);
+            this.updated = getDateValue('updated', data);
+            this.nextPageUrl = getStringValue('next', getProperty('pagination', data));
+        }
+        return Page;
+    }());
+
+    var AlertPage = /** @class */ (function (_super) {
+        __extends(AlertPage, _super);
+        function AlertPage(data) {
+            var _this = _super.call(this, data) || this;
+            var features = getProperty('features', data);
+            _this.data = features.map(function (feature) { return new Alert(feature); });
             return _this;
         }
-        return Observation;
-    }(Feature));
-    function observationsToArray(data) {
-        return featureCollectionToArray(data, function (feature) {
-            return new Observation(feature);
-        });
-    }
+        return AlertPage;
+    }(Page));
 
-    /* class Stations implements /stations interface
-     * */
-    var Stations = /** @class */ (function (_super) {
-        __extends(Stations, _super);
-        function Stations() {
-            return _super.call(this, '/stations') || this;
+    var AlertStatus;
+    (function (AlertStatus) {
+        AlertStatus["actual"] = "actual";
+        AlertStatus["exercise"] = "exercise";
+        AlertStatus["system"] = "system";
+        AlertStatus["test"] = "test";
+        AlertStatus["draft"] = "draft";
+    })(AlertStatus || (AlertStatus = {}));
+    var AlertMessageType;
+    (function (AlertMessageType) {
+        AlertMessageType["alert"] = "alert";
+        AlertMessageType["update"] = "update";
+        AlertMessageType["cancel"] = "cancel";
+    })(AlertMessageType || (AlertMessageType = {}));
+    var AlertRegionType;
+    (function (AlertRegionType) {
+        AlertRegionType["land"] = "land";
+        AlertRegionType["marine"] = "marine";
+    })(AlertRegionType || (AlertRegionType = {}));
+    var AlertUrgency;
+    (function (AlertUrgency) {
+        AlertUrgency["unknown"] = "unknown";
+        AlertUrgency["past"] = "past";
+        AlertUrgency["future"] = "future";
+        AlertUrgency["expected"] = "expected";
+        AlertUrgency["immediate"] = "immediate";
+    })(AlertUrgency || (AlertUrgency = {}));
+    var AlertSeverity;
+    (function (AlertSeverity) {
+        AlertSeverity["unknown"] = "unknown";
+        AlertSeverity["minor"] = "minor";
+        AlertSeverity["moderate"] = "moderate";
+        AlertSeverity["severe"] = "severe";
+        AlertSeverity["extreme"] = "extreme";
+    })(AlertSeverity || (AlertSeverity = {}));
+    var AlertCertainty;
+    (function (AlertCertainty) {
+        AlertCertainty["unknown"] = "unknown";
+        AlertCertainty["unlikely"] = "unlikely";
+        AlertCertainty["possible"] = "possible";
+        AlertCertainty["likely"] = "likely";
+        AlertCertainty["observed"] = "observed";
+    })(AlertCertainty || (AlertCertainty = {}));
+    var AlertsApi = /** @class */ (function (_super) {
+        __extends(AlertsApi, _super);
+        function AlertsApi() {
+            return _super.call(this) || this;
         }
-        /**
-         * Returns a list of observation stations
-         * @param {string|[string]} id
-         * @param {string|[string]} state
-         * @param {number} limit
-         */
-        Stations.prototype.getStations = function (id, state, limit) {
-            return __awaiter(this, void 0, void 0, function () {
-                var queryParameters, data;
+        AlertsApi.prototype.getAll = function (startTime_1, endTime_1, status_1, messageType_1) {
+            return __awaiter(this, arguments, void 0, function (startTime, endTime, status, messageType, limit) {
+                var data;
+                if (limit === void 0) { limit = 500; }
                 return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            queryParameters = {};
-                            if (id) {
-                                validateParameter('id', id, {
-                                    'type': 'string',
-                                    'allowArray': true
-                                });
-                                queryParameters['id'] = toQueryParamValue(id);
-                            }
-                            if (state) {
-                                validateParameter('state', state, {
-                                    'type': 'string',
-                                    'allowArray': true,
-                                    'allowedValues': Object.assign({}, StateAreaCodes, MarineAreaCodes)
-                                });
-                                queryParameters['state'] = toQueryParamValue(state);
-                            }
-                            if (limit != undefined) {
-                                queryParameters['limit'] = limit;
-                            }
-                            return [4 /*yield*/, _super.prototype.get.call(this, queryParameters)];
-                        case 1:
-                            data = _a.sent();
-                            return [2 /*return*/, stationsToArray(data)];
-                    }
+                    data = _super.prototype.get.call(this, "alerts?".concat(this.getQueryString(startTime, endTime, status, messageType, limit)));
+                    return [2 /*return*/, new AlertPage(data)];
                 });
             });
         };
-        /**
-         * Returns a list of observation stations for an area
-         * @param {string|[string]} area
-         * @param {number?} limit
-         */
-        Stations.prototype.getAreaStations = function (area, limit) {
-            return __awaiter(this, void 0, void 0, function () {
-                var queryParameters, data;
+        AlertsApi.prototype.getActive = function (startTime_1, endTime_1, status_1, messageType_1) {
+            return __awaiter(this, arguments, void 0, function (startTime, endTime, status, messageType, limit) {
+                var data;
+                if (limit === void 0) { limit = 500; }
                 return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            queryParameters = {};
-                            validateParameter('area', area, {
-                                'type': 'string',
-                                'allowArray': true,
-                                'allowedValues': Object.assign({}, StateAreaCodes, MarineAreaCodes)
-                            });
-                            queryParameters['state'] = toQueryParamValue(area);
-                            if (limit != undefined) {
-                                queryParameters['limit'] = limit;
-                            }
-                            return [4 /*yield*/, _super.prototype.get.call(this, queryParameters)];
-                        case 1:
-                            data = _a.sent();
-                            return [2 /*return*/, stationsToArray(data)];
-                    }
+                    data = _super.prototype.get.call(this, "alerts/active?".concat(this.getQueryString(startTime, endTime, status, messageType, limit)));
+                    return [2 /*return*/, new AlertPage(data)];
                 });
             });
         };
-        /**
-         * Returns a list of radar stations
-         * NOTE: returns 500
-         * */
-        Stations.prototype.getRadarStations = function (id) {
-            return __awaiter(this, void 0, void 0, function () {
-                var pathParameters, data;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            pathParameters = ['radar'];
-                            if (id !== undefined) {
-                                pathParameters.push(id);
-                            }
-                            return [4 /*yield*/, _super.prototype.get.call(this, pathParameters)];
-                        case 1:
-                            data = _a.sent();
-                            return [2 /*return*/, data];
-                    }
-                });
-            });
-        };
-        Stations.prototype.getStation = function (id) {
+        AlertsApi.prototype.getNext = function (page) {
             return __awaiter(this, void 0, void 0, function () {
                 var data;
                 return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, _super.prototype.get.call(this, [id])];
-                        case 1:
-                            data = _a.sent();
-                            return [2 /*return*/, new Station(data)];
-                    }
+                    data = _super.prototype.getNext.call(this, page);
+                    return [2 /*return*/, new AlertPage(data)];
                 });
             });
         };
-        /**
-         * Returns a list of observations for a given station
-         * @param {string} id
-         * @param {Date?} start
-         * @param {Date?} end
-         * @param {number?} limit
-         */
-        Stations.prototype.getObservations = function (id_1) {
-            return __awaiter(this, arguments, void 0, function (id, start, end, limit) {
-                var queryParameters, data;
-                if (start === void 0) { start = undefined; }
-                if (end === void 0) { end = undefined; }
-                if (limit === void 0) { limit = undefined; }
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            queryParameters = {};
-                            validateParameter('id', id, {
-                                'type': 'string'
-                            });
-                            if (start) {
-                                validateParameter('start', start, {
-                                    'type': 'Date'
-                                });
-                                queryParameters['start'] = toQueryParamValue(start);
-                            }
-                            if (end) {
-                                validateParameter('end', end, {
-                                    'type': 'Date'
-                                });
-                                queryParameters['end'] = toQueryParamValue(end);
-                            }
-                            if (limit != undefined) {
-                                queryParameters['limit'] = limit;
-                            }
-                            return [4 /*yield*/, _super.prototype.get.call(this, [id, 'observations'], queryParameters)];
-                        case 1:
-                            data = _a.sent();
-                            return [2 /*return*/, observationsToArray(data).sort(function (a, b) {
-                                    if (a.timestamp.milliseconds == b.timestamp.milliseconds) {
-                                        return 0;
-                                    }
-                                    if (a.timestamp.milliseconds > b.timestamp.milliseconds) {
-                                        return 1;
-                                    }
-                                    return -1;
-                                })];
-                    }
-                });
-            });
+        AlertsApi.prototype.getQueryString = function (startTime, endTime, status, messageType, limit) {
+            var parameters = {};
+            if (startTime) {
+                parameters['startTime'] = startTime;
+            }
+            if (endTime) {
+                parameters['endTime'] = startTime;
+            }
+            if (status) {
+                parameters['status'] = status.join(',');
+            }
+            return createQueryString(parameters);
         };
-        Stations.prototype.getLatestObservations = function (id) {
-            return __awaiter(this, void 0, void 0, function () {
-                var data;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            validateParameter('id', id, {
-                                'type': 'string'
-                            });
-                            return [4 /*yield*/, _super.prototype.get.call(this, [id, 'observations', 'latest'])];
-                        case 1:
-                            data = _a.sent();
-                            return [2 /*return*/, new Observation(data)];
-                    }
-                });
-            });
-        };
-        Stations.prototype.getObservationsAtTime = function (id, time) {
-            return __awaiter(this, void 0, void 0, function () {
-                var data;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            validateParameter('id', id, {
-                                'type': 'string'
-                            });
-                            validateParameter('time', id, {
-                                'type': 'Date'
-                            });
-                            return [4 /*yield*/, _super.prototype.get.call(this, [id, 'observations', time.toISOString()])];
-                        case 1:
-                            data = _a.sent();
-                            return [2 /*return*/, new Observation(data)];
-                    }
-                });
-            });
-        };
-        return Stations;
-    }(Endpoint));
-    /* @factory NOAA.stations(): Object
-     *
-     */
-    function toStations() {
-        return new Stations();
-    }
+        return AlertsApi;
+    }(ApiBase));
 
-    /* @class Station
-     * @aka NOAA.Station
-     *
-     * */
+    var GlossaryApi = /** @class */ (function (_super) {
+        __extends(GlossaryApi, _super);
+        function GlossaryApi() {
+            return _super.call(this) || this;
+        }
+        GlossaryApi.prototype.getGlossary = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var data;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, _super.prototype.get.call(this, "glossary")];
+                        case 1:
+                            data = _a.sent();
+                            return [2 /*return*/, data['glossary'].reduce(function (glossary, term) { return glossary[term['term']] = term['definition']; }, {})];
+                    }
+                });
+            });
+        };
+        return GlossaryApi;
+    }(ApiBase));
+
+    var Geometry = /** @class */ (function () {
+        function Geometry(data) {
+            this.type = getStringValue('type', data);
+        }
+        return Geometry;
+    }());
+
+    var GeometryPoint = /** @class */ (function (_super) {
+        __extends(GeometryPoint, _super);
+        function GeometryPoint(data) {
+            var _this = _super.call(this, data) || this;
+            var coordinates = getProperty('coordinates', data);
+            _this.latitude = coordinates[1];
+            _this.longitude = coordinates[0];
+            return _this;
+        }
+        return GeometryPoint;
+    }(Geometry));
+
+    var NumericValue = /** @class */ (function () {
+        function NumericValue(data) {
+            this.value = getNumberValue('value', data);
+            this.unit = parseUnits(getStringValue('unitCode', data));
+        }
+        return NumericValue;
+    }());
+
     var Station = /** @class */ (function (_super) {
         __extends(Station, _super);
         function Station(data) {
-            var _this = this;
-            if (typeof data === 'string') {
-                _this = _super.call(this, undefined) || this;
-                _this.id = data;
-            }
-            else {
-                _this = _super.call(this, data) || this;
-                _this.elevation = toValueUnits(getFeatureProperty('elevation', data));
-                _this.id = getFeatureProperty('stationIdentifier', data);
-                _this.name = getFeatureProperty('name', data);
-                _this.timeZone = getFeatureProperty('timeZone', data);
-                _this.forecastZone = getUrlPart(getFeatureProperty('forecast', data, true), -1);
-                _this.county = getUrlPart(getFeatureProperty('county', data, true), -1);
-                _this.fireWeatherZone = getUrlPart(getFeatureProperty('fireWeatherZone', data, true), -1);
-            }
-            return _this;
-        }
-        Station.prototype.get = function () {
-            return toStations().getStation(this.id);
-        };
-        Station.prototype.getObservations = function (start, end) {
-            return toStations().getObservations(this.id, start, end);
-        };
-        Station.prototype.getLatestObservations = function () {
-            return toStations().getLatestObservations(this.id);
-        };
-        Station.prototype.getObservationsAtTime = function (time) {
-            return toStations().getObservationsAtTime(this.id, time);
-        };
-        return Station;
-    }(Feature));
-    function stationsToArray(data) {
-        return featureCollectionToArray(data, function (feature) {
-            return new Station(feature);
-        });
-    }
-
-    var ZoneForecastPeriod = /** @class */ (function () {
-        function ZoneForecastPeriod(data) {
-            this.number = parseInt(getValue('number', data));
-            this.name = getValue('name', data);
-            this.detailedForecast = getValue('detailedForecast', data);
-        }
-        return ZoneForecastPeriod;
-    }());
-
-    /* @class ZoneForecast
-     * @aka NOAA.ZoneForecast
-     *
-     * Represents response from /zones/{type}/{zoneId}/forecast endpoint.
-     * */
-    var ZoneForecast = /** @class */ (function () {
-        function ZoneForecast(data) {
-            this.updated = toTime(getValue('updated', data));
-            this.periods = [];
-            if (data['periods']) {
-                for (var i = 0; i < data['periods'].length; i++) {
-                    this.periods.push(new ZoneForecastPeriod(data['periods'][i]));
-                }
-            }
-        }
-        return ZoneForecast;
-    }());
-
-    /* class Zones implements /zones interface
-     * */
-    var Zones = /** @class */ (function (_super) {
-        __extends(Zones, _super);
-        function Zones() {
-            return _super.call(this, '/zones') || this;
-        }
-        /**
-         * Returns a list of zones
-         * @param {object} params
-         */
-        Zones.prototype.get = function (params, includeGeometry) {
-            return __awaiter(this, void 0, void 0, function () {
-                var queryParams, data;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            if (params) {
-                                queryParams = toQueryParameters(params, Zones.parameterOptions);
-                            }
-                            else {
-                                queryParams = {};
-                            }
-                            if (includeGeometry) {
-                                validateParameter('includeGeometry', includeGeometry, {
-                                    'type': 'boolean',
-                                    'allowArray': false
-                                });
-                                queryParams['include_geometry'] = includeGeometry;
-                            }
-                            return [4 /*yield*/, _super.prototype.get.call(this, queryParams)];
-                        case 1:
-                            data = _a.sent();
-                            return [2 /*return*/, zonesToArray(data)];
-                    }
-                });
-            });
-        };
-        /**
-         * Returns a list of zones of a given type
-         * @param {object} params
-         */
-        Zones.prototype.getTypeZones = function (type, params, includeGeometry) {
-            return __awaiter(this, void 0, void 0, function () {
-                var queryParams, data;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            if (params) {
-                                queryParams = toQueryParameters(params, Zones.parameterOptions);
-                                if (params['type']) {
-                                    throw new Error('type parameter is not allowed for this call');
-                                }
-                            }
-                            else {
-                                queryParams = {};
-                            }
-                            validateParameter('type', type, {
-                                'type': 'string',
-                                'allowedValues': Zones.Types
-                            });
-                            if (includeGeometry) {
-                                validateParameter('includeGeometry', includeGeometry, {
-                                    'type': 'boolean',
-                                    'allowArray': false
-                                });
-                                queryParams['include_geometry'] = includeGeometry;
-                            }
-                            return [4 /*yield*/, _super.prototype.get.call(this, [type], queryParams)];
-                        case 1:
-                            data = _a.sent();
-                            return [2 /*return*/, zonesToArray(data)];
-                    }
-                });
-            });
-        };
-        /**
-         * Returns metadata about a given zone
-         * @param {string} type
-         * @param {string} id
-         */
-        Zones.prototype.getZone = function (type, id) {
-            return __awaiter(this, void 0, void 0, function () {
-                var data;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            validateParameter('id', type, {
-                                'type': 'string'
-                            });
-                            validateParameter('type', type, {
-                                'type': 'string',
-                                'allowedValues': Zones.Types
-                            });
-                            return [4 /*yield*/, _super.prototype.get.call(this, [type, id])];
-                        case 1:
-                            data = _a.sent();
-                            return [2 /*return*/, new Zone(data)];
-                    }
-                });
-            });
-        };
-        /**
-         * Returns the current zone forecast for a given zone
-         * @param {string} type
-         * @param {string} id
-         */
-        Zones.prototype.getZoneForecast = function (type, id) {
-            return __awaiter(this, void 0, void 0, function () {
-                var data;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            validateParameter('id', type, {
-                                'type': 'string'
-                            });
-                            validateParameter('type', type, {
-                                'type': 'string',
-                                'allowedValues': Zones.Types
-                            });
-                            return [4 /*yield*/, _super.prototype.get.call(this, [type, id, 'forecast'])];
-                        case 1:
-                            data = _a.sent();
-                            return [2 /*return*/, new ZoneForecast(data)];
-                    }
-                });
-            });
-        };
-        /**
-         * Returns a list of observations for a given zone
-         * @param {string} type
-         * @param {string} id
-         * @param {Date?} start
-         * @param {Date?} end
-         * @param {number} limit
-         */
-        Zones.prototype.getZoneObservations = function (id, start, end, limit) {
-            return __awaiter(this, void 0, void 0, function () {
-                var queryParameters, data;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            queryParameters = {};
-                            validateParameter('id', id, {
-                                'type': 'string'
-                            });
-                            if (start) {
-                                validateParameter('start', start, {
-                                    'type': 'Date'
-                                });
-                                queryParameters['start'] = toQueryParamValue(start);
-                            }
-                            if (end) {
-                                validateParameter('end', end, {
-                                    'type': 'Date'
-                                });
-                                queryParameters['end'] = toQueryParamValue(end);
-                            }
-                            if (limit) {
-                                validateParameter('limit', limit, {
-                                    'type': 'number'
-                                });
-                                queryParameters['limit'] = limit;
-                            }
-                            return [4 /*yield*/, _super.prototype.get.call(this, ['forecast', id, 'observations'])];
-                        case 1:
-                            data = _a.sent();
-                            return [2 /*return*/, observationsToArray(data)];
-                    }
-                });
-            });
-        };
-        /**
-         * Returns a list of observation stations for a given zone
-         * @param {string} id
-         */
-        Zones.prototype.getZoneStations = function (id) {
-            return __awaiter(this, void 0, void 0, function () {
-                var data;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            validateParameter('id', id, {
-                                'type': 'string'
-                            });
-                            return [4 /*yield*/, _super.prototype.get.call(this, ['forecast', id, 'stations'])];
-                        case 1:
-                            data = _a.sent();
-                            return [2 /*return*/, stationsToArray(data)];
-                    }
-                });
-            });
-        };
-        Zones.Types = {
-            'land': 'land',
-            'marine': 'marine',
-            'forecast': 'forecast',
-            'public': 'public',
-            'coastal': 'coastal',
-            'offshore': 'offshore',
-            'fire': 'fire',
-            'county': 'county'
-        };
-        Zones.parameterOptions = {
-            'id': {
-                'type': 'string',
-                'allowArray': true,
-            },
-            'area': {
-                'type': 'string',
-                'allowArray': true,
-                'allowedValues': Object.assign({}, StateAreaCodes, MarineAreaCodes)
-            },
-            'region': {
-                'type': 'string',
-                'allowArray': true,
-                'allowedValues': RegionCodes
-            },
-            'type': {
-                'type': 'string',
-                'allowArray': true,
-                'allowedValues': Zones.Types
-            },
-            'point': {
-                'type': 'LatLon',
-                'allowArray': false
-            },
-            'effective': {
-                'type': 'Date',
-                'allowArray': false
-            }
-        };
-        return Zones;
-    }(Endpoint));
-    /* @factory NOAA.zones(): Object
-     *
-     */
-    function toZones() {
-        return new Zones();
-    }
-
-    /* @class Zone
-     * @aka NOAA.Zone
-     *
-     * Represents response from /zones endpoint.
-     * */
-    var Zone = /** @class */ (function () {
-        function Zone(data) {
-            if (typeof data === 'string') {
-                this.type = getUrlPart(data, -2);
-                this.id = getUrlPart(data, -1);
-            }
-            else {
-                var i = void 0;
-                this.id = getFeatureProperty('id', data);
-                this.type = getFeatureProperty('type', data);
-                this.name = getFeatureProperty('name', data, true);
-                this.state = getFeatureProperty('state', data, true);
-                if (data['geometry']) {
-                    this.geometry = toGeometry(data['geometry']);
-                }
-                this.forecastOffices = [];
-                for (i = 0; data['properties']['forecastOffices'] && i < data['properties']['forecastOffices'].length; i++) {
-                    this.forecastOffices.push(getUrlPart(data['properties']['forecastOffices'][i], -1));
-                }
-                this.timeZones = [];
-                for (i = 0; data['properties']['timeZone'] && i < data['properties']['timeZone'].length; i++) {
-                    this.timeZones.push(data['properties']['timeZone'][i]);
-                }
-            }
-        }
-        Zone.prototype.getZone = function () {
-            return toZones().getZone(this.type, this.id);
-        };
-        Zone.prototype.getZoneForecast = function () {
-            return toZones().getZoneForecast(this.type, this.id);
-        };
-        Zone.prototype.getZoneStations = function () {
-            return toZones().getZoneStations(this.id);
-        };
-        Zone.prototype.getZoneObservations = function (start, end, limit) {
-            return toZones().getZoneObservations(this.id, start, end, limit);
-        };
-        return Zone;
-    }());
-    function zonesToArray(data) {
-        return featureCollectionToArray(data, function (feature) {
-            return new Zone(feature);
-        });
-    }
-
-    /* @class Office
-     * @aka NOAA.Office
-     *
-     * */
-    var Office = /** @class */ (function () {
-        function Office(data) {
-            if (typeof data === 'string') {
-                this.id = data;
-            }
-            else {
-                this.id = getValue('id', data);
-                this.name = getValue('name', data);
-                this.address = getValue('address', data);
-                this.telephone = getValue('telephone', data);
-                this.fax = getValue('faxNumber', data);
-                this.email = getValue('email', data);
-                this.url = getValue('sameAs', data);
-                this.nwsRegion = getValue('nwsRegion', data);
-                this.parentOrganization = getUrlPart(getValue('parentOrganization', data), -1);
-                this.responsibleCounties = this.getZones('responsibleCounties', data);
-                this.responsibleForecastZones = this.getZones('responsibleForecastZones', data);
-                this.responsibleFireZones = this.getZones('responsibleFireZones', data);
-                this.approvedObservationStations = this.getStations('approvedObservationStations', data);
-            }
-        }
-        Office.prototype.getZones = function (key, data) {
-            var list = [];
-            if (data[key]) {
-                for (var i = 0; i < data[key].length; i++) {
-                    list.push(new Zone(data[key][i]));
-                }
-            }
-            return list;
-        };
-        Office.prototype.getStations = function (key, data) {
-            var list = [];
-            if (data[key]) {
-                for (var i = 0; i < data[key].length; i++) {
-                    list.push(new Station(getUrlPart(data[key][i], -1)));
-                }
-            }
-            return list;
-        };
-        Office.prototype.getAreaForecastDiscussion = function () {
-            return toProducts().get({
-                'location': this.id,
-                'type': 'AFD'
-            });
-        };
-        Office.prototype.getProductTypes = function () {
-            return toProducts().getLocationTypes(this.id);
-        };
-        Office.prototype.getProducts = function (params) {
-            params['location'] = this.id;
-            return toProducts().get(params);
-        };
-        return Office;
-    }());
-
-    /* @class Point
-     * @aka NOAA.Point
-     *
-     * Represents response from /points endpoint.
-     * */
-    var RelativeLocation = /** @class */ (function (_super) {
-        __extends(RelativeLocation, _super);
-        function RelativeLocation(data) {
             var _this = _super.call(this, data) || this;
-            _this.city = getFeatureProperty('city', data);
-            _this.state = getFeatureProperty('state', data);
-            _this.distance = toValueUnits(getFeatureProperty('distance', data));
-            _this.bearing = toValueUnits(getFeatureProperty('bearing', data));
+            var properties = getProperty('properties', data);
+            _this.elevation = new NumericValue(getProperty('elevation', properties));
+            _this.id = getStringValue('stationIdentifier', properties);
+            _this.name = getStringValue('name', properties);
+            _this.timeZone = getStringValue('timeZone', properties);
+            _this.forecastZone = getUrlPart(getStringValue('forecast', properties, true), -1);
+            _this.county = getUrlPart(getStringValue('county', properties, true), -1);
+            _this.fireWeatherZone = getUrlPart(getStringValue('fireWeatherZone', properties, true), -1);
             return _this;
         }
-        return RelativeLocation;
-    }(Feature));
-    function toRelativeLocation(data) {
-        if (!data) {
-            return null;
-        }
-        return new RelativeLocation(data);
-    }
+        return Station;
+    }(GeometryPoint));
 
-    var millisecondsPerHour = 60 * 60 * 1000;
+    var millisecondsPerHour = 3600000;
     var ValidTimePeriod = /** @class */ (function () {
         function ValidTimePeriod(s) {
             var parts = s.split('/');
             if (parts.length !== 2) {
                 throw new Error('Invalid valid time value (' + s + ')');
             }
-            this.time = toTime(parts[0]);
+            this.time = parseDate(parts[0]);
             this.hours = 0;
             this.days = 0;
             //period parsing
@@ -1579,40 +560,54 @@
             }
             this._array = [];
             for (var i = 0; i < this.totalHours; i++) {
-                this._array.push(toTime(this.time.milliseconds + (i * millisecondsPerHour)));
+                this._array.push(new Date(this.time.milliseconds + (i * millisecondsPerHour)));
             }
             return this._array;
         };
         return ValidTimePeriod;
     }());
-    function toValidTimePeriod(a) {
-        return new ValidTimePeriod(a);
-    }
 
-    /* @class GridPoint
-     * @aka NOAA.GridPoint
-     *
-     * Represents response from /gridpoints endpoint.
-     * */
+    var Coordinate = /** @class */ (function () {
+        function Coordinate(latitude, longitude) {
+            this.latitude = latitude;
+            this.longitude = longitude;
+        }
+        return Coordinate;
+    }());
+
+    var GeometryPolygon = /** @class */ (function (_super) {
+        __extends(GeometryPolygon, _super);
+        function GeometryPolygon(data) {
+            var _this = _super.call(this, data) || this;
+            var coordinates = getProperty('coordinates', data);
+            var ring0 = coordinates[0];
+            _this.path = ring0.map(function (point) { return new Coordinate(point[1], point[0]); });
+            return _this;
+        }
+        return GeometryPolygon;
+    }(Geometry));
+
     var GridPoint = /** @class */ (function (_super) {
         __extends(GridPoint, _super);
         function GridPoint(data) {
             var _this = _super.call(this, data) || this;
-            _this.xy = toXY(getFeatureProperty('gridX', data), getFeatureProperty('gridY', data));
-            _this.office = new Office(getFeatureProperty('gridId', data));
-            _this.elevation = toValueUnits(getFeatureProperty('elevation', data));
-            _this.updateTime = toTime(getFeatureProperty('updateTime', data));
-            _this.validTimes = toValidTimePeriod(getFeatureProperty('validTimes', data));
+            var properties = getProperty('properties', data);
+            _this.gridX = getNumberValue('gridX', properties);
+            _this.gridX = getNumberValue('gridY', properties);
+            _this.office = getStringValue('gridId', properties);
+            _this.elevation = new NumericValue(getProperty('elevation', properties));
+            _this.updateTime = getDateValue('updateTime', properties);
+            _this.validTimes = new ValidTimePeriod(getStringValue('validTimes', properties));
             _this.values = {};
             for (var i = 0; i < GridPoint.variables.length; i++) {
-                _this.values[GridPoint.variables[i]] = _this.getVariable(GridPoint.variables[i], data);
+                _this.values[GridPoint.variables[i]] = _this.getVariable(GridPoint.variables[i], properties);
             }
             return _this;
         }
         GridPoint.prototype.getVariable = function (name, data) {
-            var variableData = getFeatureProperty(name, data), units, values, item;
+            var variableData = getProperty(name, data), values, item;
             if (variableData['uom']) {
-                units = ValueUnits.parseUnit(variableData['uom']);
+                parseUnits(variableData['uom']);
             }
             if (variableData['values'] && variableData['values'].length > 0) {
                 values = [];
@@ -1623,7 +618,7 @@
                     //value can be null
                     if (variableData['values'][i]['value'] !== null) {
                         if (typeof variableData['values'][i]['value'] === 'number') {
-                            item = toValueUnits(variableData['values'][i]['value'], units);
+                            item = getNumberValue('value', variableData['values'][i]);
                         }
                         else {
                             item = variableData['values'][i]['value'];
@@ -1631,13 +626,13 @@
                                 item.forEach(function (v) {
                                     for (var key in v) {
                                         if (v[key] && v[key]['unit'] && v[key]['value']) {
-                                            v[key] = toValueUnits(v[key]);
+                                            v[key] = new NumericValue(v[key]);
                                         }
                                     }
                                 });
                             }
                         }
-                        item['validTime'] = toValidTimePeriod(variableData['values'][i]['validTime']);
+                        item['validTime'] = new ValidTimePeriod(variableData['values'][i]['validTime']);
                         values.push(item);
                     }
                 }
@@ -1657,66 +652,7 @@
             }
         };
         return GridPoint;
-    }(Feature));
-    GridPoint.variables = [
-        'temperature',
-        'dewpoint',
-        'maxTemperature',
-        'minTemperature',
-        'relativeHumidity',
-        'apparentTemperature',
-        'heatIndex',
-        'windChill',
-        'skyCover',
-        'windDirection',
-        'windSpeed',
-        'windGust',
-        'probabilityOfPrecipitation',
-        'quantitativePrecipitation',
-        'iceAccumulation',
-        'snowfallAmount',
-        'snowLevel',
-        'ceilingHeight',
-        'visibility',
-        'transportWindSpeed',
-        'transportWindDirection',
-        'mixingHeight',
-        'hainesIndex',
-        'lightningActivityLevel',
-        'twentyFootWindSpeed',
-        'twentyFootWindDirection',
-        'waveHeight',
-        'wavePeriod',
-        'waveDirection',
-        'primarySwellHeight',
-        'primarySwellDirection',
-        'secondarySwellHeight',
-        'secondarySwellDirection',
-        'wavePeriod2',
-        'windWaveHeight',
-        'dispersionIndex',
-        'pressure',
-        'probabilityOfTropicalStormWinds',
-        'probabilityOfHurricaneWinds',
-        'potentialOf15mphWinds',
-        'potentialOf25mphWinds',
-        'potentialOf35mphWinds',
-        'potentialOf45mphWinds',
-        'potentialOf20mphWindGusts',
-        'potentialOf30mphWindGusts',
-        'potentialOf40mphWindGusts',
-        'potentialOf50mphWindGusts',
-        'potentialOf60mphWindGusts',
-        'grasslandFireDangerIndex',
-        'probabilityOfThunder',
-        'davisStabilityIndex',
-        'atmosphericDispersionIndex',
-        'lowVisibilityOccurrenceRiskIndex',
-        'stability',
-        'redFlagThreatIndex',
-        'weather',
-        'hazards'
-    ];
+    }(GeometryPolygon));
 
     /*
         "number": 3,
@@ -1735,67 +671,54 @@
     */
     var ForecastPeriod = /** @class */ (function () {
         function ForecastPeriod(data) {
-            this.number = parseInt(getValue('number', data));
-            this.name = getValue('name', data);
-            this.startTime = toTime(getValue('startTime', data));
-            this.endTime = toTime(getValue('endTime', data));
-            this.isDaytime = getValue('isDaytime', data);
-            this.temperature = toValueUnits(getValue('temperature', data), getValue('temperatureUnit', data));
-            this.temperatureTrend = getValue('temperatureTrend', data);
-            this.windSpeed = getValue('windSpeed', data);
-            this.windDirection = getValue('windDirection', data);
-            this.icon = getValue('icon', data);
-            this.shortForecast = getValue('shortForecast', data);
-            this.detailedForecast = getValue('detailedForecast', data);
+            this.number = getIntValue('number', data);
+            this.name = getStringValue('name', data);
+            this.startTime = getDateValue('startTime', data);
+            this.endTime = getDateValue('endTime', data);
+            this.isDaytime = getBoolValue('isDaytime', data);
+            this.temperature = getNumberValue('temperature', data);
+            this.temperatureUnit = getStringValue('temperatureUnit', data);
+            this.temperatureTrend = getStringValue('temperatureTrend', data);
+            this.windSpeed = getStringValue('windSpeed', data);
+            this.windDirection = getStringValue('windDirection', data);
+            this.icon = getStringValue('icon', data);
+            this.shortForecast = getStringValue('shortForecast', data);
+            this.detailedForecast = getStringValue('detailedForecast', data);
         }
         return ForecastPeriod;
     }());
 
-    /* @class Forecast
-     * @aka NOAA.Forecast
-     *
-     * Represents response from /gridpoints/{wfo}/{x},{y}/forecast endpoint.
-     * */
-    var Forecast = /** @class */ (function (_super) {
-        __extends(Forecast, _super);
+    var Forecast = /** @class */ (function () {
         function Forecast(data) {
-            var _this = _super.call(this, data) || this;
-            _this.units = getFeatureProperty('units', data);
-            _this.forecastGenerator = getFeatureProperty('forecastGenerator', data);
-            _this.generatedAt = toTime(getFeatureProperty('generatedAt', data));
-            _this.updateTime = toTime(getFeatureProperty('updateTime', data));
-            _this.validTimes = toValidTimePeriod(getFeatureProperty('validTimes', data));
-            _this.elevation = toValueUnits(getFeatureProperty('elevation', data));
-            _this.periods = [];
-            for (var i = 0; i < getFeatureProperty('periods', data).length; i++) {
-                _this.periods.push(new ForecastPeriod(getFeatureProperty('periods', data)[i]));
-            }
-            return _this;
+            var properties = getProperty('properties', data);
+            this.units = getStringValue('units', properties);
+            this.forecastGenerator = getStringValue('forecastGenerator', properties);
+            this.generatedAt = getDateValue('generatedAt', properties);
+            this.updateTime = getDateValue('updateTime', properties);
+            this.validTimes = new ValidTimePeriod(getStringValue('validTimes', properties));
+            this.elevation = new NumericValue(getProperty('elevation', properties));
+            this.periods = getProperty('periods', properties).map(function (period) { return new ForecastPeriod(period); });
         }
         return Forecast;
-    }(Feature));
+    }());
 
-    /* class GridPoints implements /gridpoints interface
-     * */
-    var GridPoints = /** @class */ (function (_super) {
-        __extends(GridPoints, _super);
-        /**
-         *
-         * @param {string} weatherForecastOffice
-         * @param {XY} xy
-         */
-        function GridPoints(weatherForecastOffice, xy) {
-            var _this = _super.call(this, '/gridpoints') || this;
-            _this.weatherForecastOffice = weatherForecastOffice;
-            _this.xy = xy;
-            return _this;
+    var Units$1;
+    (function (Units) {
+        Units["metric"] = "si";
+        Units["us"] = "us";
+    })(Units$1 || (Units$1 = {}));
+
+    var GridPointsApi = /** @class */ (function (_super) {
+        __extends(GridPointsApi, _super);
+        function GridPointsApi() {
+            return _super.call(this) || this;
         }
-        GridPoints.prototype.get = function () {
+        GridPointsApi.prototype.getForecastData = function (officeId, x, y) {
             return __awaiter(this, void 0, void 0, function () {
                 var data;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, _super.prototype.get.call(this, [this.weatherForecastOffice, this.xy])];
+                        case 0: return [4 /*yield*/, _super.prototype.get.call(this, "gridpoint/".concat(officeId, "/").concat(x, ",").concat(y))];
                         case 1:
                             data = _a.sent();
                             return [2 /*return*/, new GridPoint(data)];
@@ -1803,16 +726,13 @@
                 });
             });
         };
-        GridPoints.prototype.getForecast = function (units) {
-            return __awaiter(this, void 0, void 0, function () {
+        GridPointsApi.prototype.getForecast = function (officeId_1, x_1, y_1) {
+            return __awaiter(this, arguments, void 0, function (officeId, x, y, units) {
                 var data;
+                if (units === void 0) { units = Units$1.us; }
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0:
-                            if (units === undefined) {
-                                units = 'us';
-                            }
-                            return [4 /*yield*/, _super.prototype.get.call(this, [this.weatherForecastOffice, this.xy, 'forecast'], { 'units': units })];
+                        case 0: return [4 /*yield*/, _super.prototype.get.call(this, "gridpoint/".concat(officeId, "/").concat(x, ",").concat(y, "/forecast"))];
                         case 1:
                             data = _a.sent();
                             return [2 /*return*/, new Forecast(data)];
@@ -1820,16 +740,13 @@
                 });
             });
         };
-        GridPoints.prototype.getForecastHourly = function (units) {
-            return __awaiter(this, void 0, void 0, function () {
+        GridPointsApi.prototype.getForecastHourly = function (officeId_1, x_1, y_1) {
+            return __awaiter(this, arguments, void 0, function (officeId, x, y, units) {
                 var data;
+                if (units === void 0) { units = Units$1.us; }
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0:
-                            if (units === undefined) {
-                                units = 'us';
-                            }
-                            return [4 /*yield*/, _super.prototype.get.call(this, [this.weatherForecastOffice, this.xy, 'forecast', 'hourly'], { 'units': units })];
+                        case 0: return [4 /*yield*/, _super.prototype.get.call(this, "gridpoint/".concat(officeId, "/").concat(x, ",").concat(y, "/forecast/hourly"))];
                         case 1:
                             data = _a.sent();
                             return [2 /*return*/, new Forecast(data)];
@@ -1837,428 +754,61 @@
                 });
             });
         };
-        GridPoints.prototype.getStations = function () {
+        GridPointsApi.prototype.getStations = function (officeId, x, y) {
             return __awaiter(this, void 0, void 0, function () {
                 var data;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, _super.prototype.get.call(this, [this.weatherForecastOffice, this.xy, 'stations'])];
+                        case 0: return [4 /*yield*/, _super.prototype.get.call(this, "gridpoint/".concat(officeId, "/").concat(x, ",").concat(y, "/stations"))];
                         case 1:
                             data = _a.sent();
-                            return [2 /*return*/, stationsToArray(data)];
+                            return [2 /*return*/, getProperty('features', data).map(function (feature) { return new Station(feature); })];
                     }
                 });
             });
         };
-        return GridPoints;
-    }(Endpoint));
-    // @factory NOAA.gridPoints(weatherForecastOffice:string, x: number, y:number): GridPoints
-    // Creates an object representing /gridpoints endpoint
-    function toGridPoints(weatherForecastOffice, x, y) {
-        return new GridPoints(weatherForecastOffice, toXY(x, y));
-    }
+        return GridPointsApi;
+    }(ApiBase));
 
-    /* @class Alert
-     * @aka NOAA.Alert
-     *
-     * Represents response from /points endpoint.
-     * */
-    var Alert = /** @class */ (function () {
-        function Alert(data) {
-            this.id = getFeatureProperty('id', data);
-            this.areaDescription = getFeatureProperty('areaDesc', data);
-            this.geocode = getFeatureProperty('geocode', data);
-            this.affectedZones = [];
-            var affectedZones = getFeatureProperty('affectedZones', data), i;
-            for (i = 0; i < affectedZones.length; i++) {
-                this.affectedZones.push(new Zone(affectedZones[i]));
-            }
-            this.references = getFeatureProperty('references', data);
-            this.sent = toTime(getFeatureProperty('sent', data));
-            this.effective = toTime(getFeatureProperty('effective', data));
-            this.onset = toTime(getFeatureProperty('onset', data));
-            this.expires = toTime(getFeatureProperty('expires', data));
-            this.ends = toTime(getFeatureProperty('ends', data));
-            this.status = getFeatureProperty('status', data);
-            this.messageType = getFeatureProperty('messageType', data);
-            this.category = getFeatureProperty('category', data);
-            this.severity = getFeatureProperty('severity', data);
-            this.certainty = getFeatureProperty('certainty', data);
-            this.urgency = getFeatureProperty('urgency', data);
-            this.event = getFeatureProperty('event', data);
-            this.sender = getFeatureProperty('sender', data);
-            this.senderName = getFeatureProperty('senderName', data);
-            this.headline = getFeatureProperty('headline', data);
-            this.description = getFeatureProperty('description', data);
-            this.instruction = getFeatureProperty('instruction', data);
-            this.response = getFeatureProperty('response', data);
-            this.parameters = getFeatureProperty('parameters', data);
+    var RelativeLocation = /** @class */ (function () {
+        function RelativeLocation(data) {
+            var properties = getProperty('properties', data);
+            this.city = getStringValue('city', properties);
+            this.state = getStringValue('state', properties);
+            this.distance = new NumericValue(getProperty('distance', properties));
+            this.bearing = new NumericValue(getProperty('bearing', properties));
         }
-        return Alert;
+        return RelativeLocation;
     }());
 
-    /* @class AlertCollection
-     * @aka NOAA.AlertCollection
-     *
-     * Represents response from /alerts endpoint.
-     * */
-    var AlertCollection = /** @class */ (function () {
-        function AlertCollection(data) {
-            this.title = data['title'];
-            this.updated = toTime(data['updated']);
-            this.alerts = [];
-            if (data['features']) {
-                for (var i = 0; i < data['features'].length; i++) {
-                    this.alerts.push(new Alert(data['features'][i]));
-                }
-            }
-            if (data['pagination']) {
-                this.next = data['pagination']['next'];
-                this.isComplete = false;
-            }
-            else {
-                this.isComplete = true;
-            }
-        }
-        AlertCollection.prototype.getNext = function () {
-            return toAlerts().getNext(this.next);
-        };
-        return AlertCollection;
-    }());
-
-    /* class Alerts implements /alerts interface
-     * */
-    var Alerts = /** @class */ (function (_super) {
-        __extends(Alerts, _super);
-        function Alerts() {
-            return _super.call(this, '/alerts') || this;
-        }
-        Alerts.prototype.get = function () {
-            return __awaiter(this, arguments, void 0, function (params) {
-                var data;
-                if (params === void 0) { params = {}; }
-                return __generator(this, function (_a) {
-                    data = _super.prototype.get.call(this, toQueryParameters(params, Alerts.parameterOptions));
-                    return [2 /*return*/, new AlertCollection(data)];
-                });
-            });
-        };
-        Alerts.prototype.getNext = function (url) {
-            return __awaiter(this, void 0, void 0, function () {
-                var data;
-                return __generator(this, function (_a) {
-                    data = _super.prototype.get.call(this, url);
-                    return [2 /*return*/, new AlertCollection(data)];
-                });
-            });
-        };
-        Alerts.prototype.getActive = function () {
-            return __awaiter(this, arguments, void 0, function (params) {
-                var data;
-                if (params === void 0) { params = {}; }
-                return __generator(this, function (_a) {
-                    data = _super.prototype.get.call(this, ['active'], toQueryParameters(params, Alerts.parameterOptions));
-                    return [2 /*return*/, new AlertCollection(data)];
-                });
-            });
-        };
-        Alerts.prototype.getTypes = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var data;
-                return __generator(this, function (_a) {
-                    data = _super.prototype.get.call(this, ['types']);
-                    return [2 /*return*/, data['eventTypes']];
-                });
-            });
-        };
-        Alerts.prototype.getAlert = function (id) {
-            return __awaiter(this, void 0, void 0, function () {
-                var data;
-                return __generator(this, function (_a) {
-                    data = _super.prototype.get.call(this, [id]);
-                    return [2 /*return*/, new Alert(data)];
-                });
-            });
-        };
-        Alerts.prototype.getActiveCount = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var data;
-                return __generator(this, function (_a) {
-                    data = _super.prototype.get.call(this, ['active', 'count']);
-                    return [2 /*return*/, data];
-                });
-            });
-        };
-        Alerts.prototype.getZoneActive = function (zoneId) {
-            return __awaiter(this, void 0, void 0, function () {
-                var data;
-                return __generator(this, function (_a) {
-                    data = _super.prototype.get.call(this, ['active', 'zone', zoneId]);
-                    return [2 /*return*/, new AlertCollection(data)];
-                });
-            });
-        };
-        Alerts.prototype.getAreaActive = function (area) {
-            return __awaiter(this, void 0, void 0, function () {
-                var data;
-                return __generator(this, function (_a) {
-                    if (area in MarineAreaCodes || area in StateAreaCodes) {
-                        data = _super.prototype.get.call(this, ['active', 'area', area]);
-                        return [2 /*return*/, new AlertCollection(data)];
-                    }
-                    else {
-                        throw new Error('Invalid area code (' + area + ')');
-                    }
-                });
-            });
-        };
-        Alerts.prototype.getRegionActive = function (region) {
-            return __awaiter(this, void 0, void 0, function () {
-                var data;
-                return __generator(this, function (_a) {
-                    if (region in RegionCodes) {
-                        data = _super.prototype.get.call(this, ['active', 'region', region]);
-                        return [2 /*return*/, new AlertCollection(data)];
-                    }
-                    else {
-                        throw new Error('Invalid region code (' + region + ')');
-                    }
-                });
-            });
-        };
-        Alerts.Status = {
-            'actual': 'actual',
-            'exercise': 'exercise',
-            'system': 'system',
-            'test': 'test',
-            'draft': 'draft'
-        };
-        Alerts.MessageType = {
-            'alert': 'alert',
-            'update': 'update',
-            'cancel': 'cancel'
-        };
-        Alerts.RegionType = {
-            'land': 'land',
-            'marine': 'marine'
-        };
-        Alerts.Urgency = {
-            'unknown': 'unknown',
-            'past': 'past',
-            'future': 'future',
-            'expected': 'expected',
-            'immediate': 'immediate'
-        };
-        Alerts.Severity = {
-            'unknown': 'unknown',
-            'minor': 'minor',
-            'moderate': 'moderate',
-            'severe': 'severe',
-            'extreme': 'extreme'
-        };
-        Alerts.Certainty = {
-            'unknown': 'unknown',
-            'unlikely': 'unlikely',
-            'possible': 'possible',
-            'likely': 'likely',
-            'observed': 'observed'
-        };
-        Alerts.parameterOptions = {
-            'active': {
-                'query': 'active',
-                'type': 'boolean'
-            },
-            'start': {
-                'query': 'start'
-            },
-            'end': {
-                'query': 'end'
-            },
-            'status': {
-                'query': 'status',
-                'allowArray': true,
-                'type': 'string',
-                'allowedValues': Alerts.Status
-            },
-            'messageType': {
-                'query': 'message_type',
-                'allowArray': true,
-                'type': 'string'
-            },
-            'event': {
-                'query': 'event',
-                'allowArray': true,
-                'type': 'string',
-                'allowedValues': Alerts.MessageType
-            },
-            'code': {
-                'query': 'code',
-                'allowArray': true,
-                'type': 'string'
-            },
-            'regionType': {
-                'query': 'region_type',
-                'allowArray': false,
-                'type': 'string',
-                'exclusive': true,
-                'allowedValues': Alerts.RegionType
-            },
-            'point': {
-                'type': 'LatLon',
-                'query': 'point',
-                'exclusive': true
-            },
-            'region': {
-                'query': 'region',
-                'allowArray': true,
-                'type': 'string',
-                'exclusive': true,
-                'allowedValues': RegionCodes
-            },
-            'area': {
-                'query': 'area',
-                'allowArray': true,
-                'type': 'string',
-                'exclusive': true,
-                'allowedValues': Object.assign({}, StateAreaCodes, MarineAreaCodes)
-            },
-            'zone': {
-                'query': 'zone',
-                'allowArray': true,
-                'type': 'string',
-                'exclusive': true
-            },
-            'urgency': {
-                'query': 'urgency',
-                'allowArray': true,
-                'type': 'string',
-                'allowedValues': Alerts.Urgency
-            },
-            'severity': {
-                'query': 'severity',
-                'allowArray': true,
-                'type': 'string',
-                'allowedValues': Alerts.Severity
-            },
-            'certainty': {
-                'query': 'certainty',
-                'allowArray': true,
-                'type': 'string',
-                'allowedValues': Alerts.Certainty
-            },
-            'limit': {
-                'query': 'limit',
-                'type': 'number'
-            },
-            'cursor': {
-                'query': 'cursor',
-                'type': 'string'
-            }
-        };
-        return Alerts;
-    }(Endpoint));
-    /* @factory NOAA.alerts(): Object
-     *
-     */
-    function toAlerts() {
-        return new Alerts();
-    }
-
-    /* @class Point
-     * @aka NOAA.Point
-     *
-     * Represents response from /points endpoint.
-     * */
-    var Point = /** @class */ (function (_super) {
-        __extends(Point, _super);
+    var Point = /** @class */ (function () {
         function Point(data) {
-            var _this = _super.call(this, data) || this;
-            _this.xy = toXY(getFeatureProperty('gridX', data), getFeatureProperty('gridY', data));
-            _this.office = new Office(getFeatureProperty('cwa', data));
-            _this.forecastZone = getUrlPart(getFeatureProperty('forecastZone', data), -1);
-            _this.timeZone = getFeatureProperty('timeZone', data);
-            _this.radarStation = getFeatureProperty('radarStation', data);
-            _this.relativeLocation = toRelativeLocation(getFeatureProperty('relativeLocation', data));
+            var properties = getProperty('properties', data);
+            this.gridX = getNumberValue('gridX', properties);
+            this.gridX = getNumberValue('gridY', properties);
+            this.office = getStringValue('gridId', properties);
+            this.forecastZone = getUrlPart(getStringValue('forecastZone', properties), -1);
+            this.timeZone = getStringValue('timeZone', properties);
+            this.radarStation = getStringValue('radarStation', properties);
+            this.relativeLocation = new RelativeLocation(getProperty('relativeLocation', properties));
             // optional properties
-            _this.county = getUrlPart(getFeatureProperty('county', data, true), -1);
-            _this.fireWeatherZone = getUrlPart(getFeatureProperty('fireWeatherZone', data, true), -1);
-            return _this;
+            this.county = getUrlPart(getStringValue('county', properties, true), -1);
+            this.fireWeatherZone = getUrlPart(getStringValue('fireWeatherZone', properties, true), -1);
         }
-        Point.prototype.getAlerts = function () {
-            return __awaiter(this, arguments, void 0, function (params) {
-                if (params === void 0) { params = {}; }
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            params['point'] = this.geometry.latlon;
-                            return [4 /*yield*/, toAlerts().get(params)];
-                        case 1: return [2 /*return*/, _a.sent()];
-                    }
-                });
-            });
-        };
-        Point.prototype.getGridPoint = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, toGridPoints(this.office.id, this.xy).get()];
-                        case 1: return [2 /*return*/, _a.sent()];
-                    }
-                });
-            });
-        };
-        Point.prototype.getGridPointForecast = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, toGridPoints(this.office.id, this.xy).getForecast()];
-                        case 1: return [2 /*return*/, _a.sent()];
-                    }
-                });
-            });
-        };
-        Point.prototype.getGridPointForecastHourly = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, toGridPoints(this.office.id, this.xy).getForecastHourly()];
-                        case 1: return [2 /*return*/, _a.sent()];
-                    }
-                });
-            });
-        };
-        Point.prototype.getGridPointStations = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, toGridPoints(this.office.id, this.xy).getStations()];
-                        case 1: return [2 /*return*/, _a.sent()];
-                    }
-                });
-            });
-        };
         return Point;
-    }(Feature));
+    }());
 
-    /* class Points implements /points interface
-     * */
-    var Points = /** @class */ (function (_super) {
-        __extends(Points, _super);
-        /**
-         *
-         * @param {LatLon} latlon
-         */
-        function Points(latlon) {
-            var _this = _super.call(this, '/points') || this;
-            _this.latlon = latlon;
-            return _this;
+    var PointsApi = /** @class */ (function (_super) {
+        __extends(PointsApi, _super);
+        function PointsApi() {
+            return _super.call(this) || this;
         }
-        Points.prototype.get = function () {
+        PointsApi.prototype.getPoint = function (latitude, longitude) {
             return __awaiter(this, void 0, void 0, function () {
                 var data;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, _super.prototype.get.call(this, [this.latlon])];
+                        case 0: return [4 /*yield*/, _super.prototype.get.call(this, "points/".concat(latitude, ",").concat(longitude))];
                         case 1:
                             data = _a.sent();
                             return [2 /*return*/, new Point(data)];
@@ -2266,154 +816,51 @@
                 });
             });
         };
-        Points.prototype.getStations = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var data;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, _super.prototype.get.call(this, [this.latlon, 'stations'])];
-                        case 1:
-                            data = _a.sent();
-                            return [2 /*return*/, stationsToArray(data)];
-                    }
-                });
-            });
-        };
-        return Points;
-    }(Endpoint));
-    // @factory NOAA.points(latlon: LatLon): Points
-    // Creates an object representing /points endpoint
-    // @alternative
-    // @factory NOAA.points(coords: Array): Points
-    // @alternative
-    // @factory NOAA.points(coords: Object): Points
-    function toPoints(a) {
-        return new Points(a);
-    }
+        return PointsApi;
+    }(ApiBase));
 
-    /* class Glossary implements /glossary interface
-     * */
-    var Glossary = /** @class */ (function (_super) {
-        __extends(Glossary, _super);
-        function Glossary() {
-            return _super.call(this, '/glossary') || this;
+    var ProductsApi = /** @class */ (function (_super) {
+        __extends(ProductsApi, _super);
+        function ProductsApi() {
+            return _super.call(this) || this;
         }
-        Glossary.prototype.get = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var data, terms;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, _super.prototype.get.call(this)];
-                        case 1:
-                            data = _a.sent();
-                            terms = {};
-                            data['glossary'].forEach(function (term) {
-                                terms[term['term']] = term['definition'];
-                            });
-                            return [2 /*return*/, terms];
-                    }
-                });
-            });
-        };
-        return Glossary;
-    }(Endpoint));
-    // @factory NOAA.glossary(): Object
-    // Creates a glossary term dictionary
-    function toGlossary() {
-        return new Glossary();
-    }
+        return ProductsApi;
+    }(ApiBase));
 
-    /* class Glossary implements /glossary interface
-     * */
-    var Icons = /** @class */ (function (_super) {
-        __extends(Icons, _super);
-        function Icons() {
-            return _super.call(this, '/icons') || this;
+    var StationsApi = /** @class */ (function (_super) {
+        __extends(StationsApi, _super);
+        function StationsApi() {
+            return _super.call(this) || this;
         }
-        Icons.prototype.get = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var data;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, _super.prototype.get.call(this)];
-                        case 1:
-                            data = _a.sent();
-                            return [2 /*return*/, data['icons']];
-                    }
-                });
-            });
-        };
-        return Icons;
-    }(Endpoint));
-    // @factory NOAA.glossary(): Object
-    // Creates a glossary term dictionary
-    function toIcons() {
-        return new Icons();
-    }
+        return StationsApi;
+    }(ApiBase));
 
-    /* class Offices implements /alerts interface
-     * */
-    var Offices = /** @class */ (function (_super) {
-        __extends(Offices, _super);
-        function Offices(officeId) {
-            var _this = _super.call(this, '/offices') || this;
-            _this.officeId = officeId;
-            return _this;
+    var ZonesApi = /** @class */ (function (_super) {
+        __extends(ZonesApi, _super);
+        function ZonesApi() {
+            return _super.call(this) || this;
         }
-        Offices.prototype.get = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var data;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, _super.prototype.get.call(this, [this.officeId])];
-                        case 1:
-                            data = _a.sent();
-                            return [2 /*return*/, new Office(data)];
-                    }
-                });
-            });
+        ZonesApi.Types = {
+            'land': 'land',
+            'marine': 'marine',
+            'forecast': 'forecast',
+            'public': 'public',
+            'coastal': 'coastal',
+            'offshore': 'offshore',
+            'fire': 'fire',
+            'county': 'county'
         };
-        Offices.prototype.getHeadlines = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var data;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, _super.prototype.get.call(this, [this.officeId, 'headlines'])];
-                        case 1:
-                            data = _a.sent();
-                            return [2 /*return*/, data];
-                    }
-                });
-            });
-        };
-        return Offices;
-    }(Endpoint));
-    /* @factory NOAA.offices(): Object
-     *
-     */
-    function toOffices(officeId) {
-        return new Offices(officeId);
-    }
+        return ZonesApi;
+    }(ApiBase));
 
     var Weather = {
-        Points: Points,
-        points: toPoints,
-        Glossary: Glossary,
-        glossary: toGlossary,
-        Icons: Icons,
-        icons: toIcons,
-        Products: Products,
-        products: toProducts,
-        Alerts: Alerts,
-        alerts: toAlerts,
-        Offices: Offices,
-        offices: toOffices,
-        Stations: Stations,
-        stations: toStations,
-        Zones: Zones,
-        zones: toZones,
-        Point: Point,
-        GridPoint: GridPoint,
+        points: new PointsApi(),
+        glossary: new GlossaryApi(),
+        products: new ProductsApi(),
+        alerts: new AlertsApi(),
+        stations: new StationsApi(),
+        zones: new ZonesApi(),
+        gridPoint: new GridPointsApi()
     };
 
     // https://tidesandcurrents.noaa.gov/api/
@@ -2454,12 +901,6 @@
         DataProduct["datums"] = "datums";
         DataProduct["currents"] = "currents"; //Currents data for currents stations.
     })(DataProduct || (DataProduct = {}));
-    // Example =  units=english
-    var Units;
-    (function (Units) {
-        Units["metric"] = "metric";
-        Units["english"] = "english";
-    })(Units || (Units = {}));
     // gmt, lst or lst_ldt.The time_zone can be specified with the "time_zone=" option parameter.
     // Example =  time_zone = gmt
     // Retrieve data with GMT date / times.
@@ -2485,37 +926,11 @@
         Format["xml"] = "xml";
         Format["csv"] = "csv"; //Comma Separated Values.This format is suitable for export to Microsoft Excel or other spreadsheet programs.This is also the most easily human - readable format.
     })(Format || (Format = {}));
-
-    // returns date formatted as YYYYMMDD HH:mm in UTC
-    function formatDate(date) {
-        var year = date.getUTCFullYear();
-        var month = date.getUTCMonth() + 1;
-        var day = date.getUTCDate();
-        var hours = date.getUTCHours();
-        var minutes = date.getUTCMinutes();
-        return "".concat(year).concat(month.toString().padStart(2, "0")).concat(day.toString().padStart(2, "0"), " ").concat(hours.toString().padStart(2, "0"), ":").concat(minutes.toString().padStart(2, "0"));
-    }
-    function createQueryString(params) {
-        if (params) {
-            return Object.keys(params).map(function (key) { return key + '=' + encodeURIComponent(params[key]); }).join('&');
-        }
-        return '';
-    }
-    function appendQueryString(uri, params) {
-        var query = createQueryString(params);
-        if (query) {
-            return "".concat(uri, "?").concat(query);
-        }
-        return uri;
-    }
-    function parseTime(s) {
-        //2019-06-20 03:30
-        //2019-06-22T23:58:22+00:00
-        return toTime(s.replace(' ', 'T') + ':00+00:00');
-    }
-    function parseFloatValue(value, units) {
-        return toValueUnits(parseFloat(value), units);
-    }
+    var Units;
+    (function (Units) {
+        Units["metric"] = "metric";
+        Units["english"] = "english"; // English units (fahrenheit, feet, knots appropriate for the data). Note!Visibility data is Nautical Miles (nm), Currents data is in knots.
+    })(Units || (Units = {}));
 
     var TidesAndCurrentsDataApi = /** @class */ (function () {
         function TidesAndCurrentsDataApi(stationId, product, datum, interval, units) {
@@ -2625,7 +1040,8 @@
             data['datums'].forEach(function (d) {
                 datums.push({
                     'name': d['n'],
-                    'value': parseFloatValue(d['v'], 'm')
+                    'value': parseFloat(d['v']),
+                    'unit': 'm'
                 });
             });
             return datums;
@@ -2646,7 +1062,7 @@
             data['predictions'].forEach(function (d) {
                 predictions.push({
                     'time': parseTime(d['t']),
-                    'value': parseFloatValue(d['v'], 'm'),
+                    'value': parseFloat(d['v']),
                     'type': d['type']
                 });
             });
@@ -2794,11 +1210,7 @@
     exports.RegionCodes = RegionCodes;
     exports.StateAreaCodes = StateAreaCodes;
     exports.TidesAndCurrents = TidesAndCurrents;
-    exports.Time = Time;
     exports.Weather = Weather;
-    exports.XY = XY;
-    exports.time = toTime;
-    exports.xy = toXY;
 
 }));
 //# sourceMappingURL=noaa.js.map

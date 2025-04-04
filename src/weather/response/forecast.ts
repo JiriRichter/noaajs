@@ -1,36 +1,27 @@
-import { Feature } from './feature';
-import { toValueUnits, ValueUnits } from '../../utils/value-units';
-import { toTime } from '../../utils/time';
-import { toValidTimePeriod, ValidTimePeriod } from './valid-time-period';
-import { ForecastPeriod } from './forecast-period';
-import { getFeatureProperty } from './utils';
+import { NumericValue } from "./numeric-value";
+import { ForecastPeriod } from "./forecast-period";
+import { ValidTimePeriod } from "./valid-time-period";
+import { getDateValue, getProperty, getStringValue } from "./utils";
 
-/* @class Forecast
- * @aka NOAA.Forecast
- *
- * Represents response from /gridpoints/{wfo}/{x},{y}/forecast endpoint.
- * */
-export class Forecast extends Feature {
+export class Forecast {
     units: any;
     forecastGenerator: any;
     generatedAt: any;
     updateTime: any;
     validTimes: ValidTimePeriod;
-    elevation: ValueUnits;
-    periods: ForecastPeriod[];
+    elevation: NumericValue;
+    periods: ForecastPeriod [];
 
-    constructor(data) {
-        super(data);
+    constructor(data: any) {
 
-        this.units = getFeatureProperty('units', data);
-        this.forecastGenerator = getFeatureProperty('forecastGenerator', data);
-        this.generatedAt = toTime(getFeatureProperty('generatedAt', data));
-        this.updateTime = toTime(getFeatureProperty('updateTime', data));
-        this.validTimes = toValidTimePeriod(getFeatureProperty('validTimes', data));
-        this.elevation = toValueUnits(getFeatureProperty('elevation', data));
-        this.periods = [];
-        for (let i = 0; i < getFeatureProperty('periods', data).length; i++) {
-            this.periods.push(new ForecastPeriod(getFeatureProperty('periods', data)[i]));
-        }
+        const properties = getProperty('properties', data);
+        
+        this.units = getStringValue('units', properties);
+        this.forecastGenerator = getStringValue('forecastGenerator', properties);
+        this.generatedAt = getDateValue('generatedAt', properties);
+        this.updateTime = getDateValue('updateTime', properties);
+        this.validTimes = new ValidTimePeriod(getStringValue('validTimes', properties));
+        this.elevation = new NumericValue(getProperty('elevation', properties));
+        this.periods = (getProperty('periods', properties) as any[]).map(period => new ForecastPeriod(period));
     }
 }

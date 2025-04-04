@@ -1,6 +1,6 @@
-import { toTime } from '../../utils/time';
+import { parseDate } from "./utils";
 
-export const millisecondsPerHour = 60 * 60 * 1000;
+export const millisecondsPerHour = 3600000;
 
 export class ValidTimePeriod {
     
@@ -10,13 +10,13 @@ export class ValidTimePeriod {
     totalHours: any;
     _array: any;
 
-    constructor(s) {
+    constructor(s: string) {
         let parts = s.split('/');
         if (parts.length !== 2) {
             throw new Error('Invalid valid time value (' + s + ')');
         } 
 
-        this.time = toTime(parts[0]);
+        this.time = parseDate(parts[0]);
         this.hours = 0;
         this.days = 0;
 
@@ -60,12 +60,8 @@ export class ValidTimePeriod {
         }
         this._array = [];
         for (let i = 0; i < this.totalHours; i++) {
-            this._array.push(toTime(this.time.milliseconds + (i * millisecondsPerHour)));
+            this._array.push(new Date(this.time.milliseconds + (i * millisecondsPerHour)));
         }
         return this._array;
     }
-}
-
-export function toValidTimePeriod(a) {
-    return new ValidTimePeriod(a);
 }

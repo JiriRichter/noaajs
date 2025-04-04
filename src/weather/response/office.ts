@@ -1,81 +1,41 @@
-import { getUrlPart, getValue } from './utils';
-import { toProducts } from '../endpoints/products';
-import { Zone } from './zone';
-import { Station } from './station';
+import { getProperty, getStringValue, getUrlPart } from "./utils";
 
-/* @class Office
- * @aka NOAA.Office
- *
- * */
 export class Office {
+
     id: string;
-    name: any;
+    name: string;
     address: any;
-    telephone: any;
-    fax: any;
-    email: any;
-    url: any;
-    nwsRegion: any;
-    parentOrganization: any;
-    responsibleCounties: any[];
-    responsibleForecastZones: any[];
-    responsibleFireZones: any[];
-    approvedObservationStations: any[];
+    telephone: string;
+    fax: string;
+    email: string;
+    url: string;
+    nwsRegion: string;
+    parentOrganization: string;
+    responsibleCounties: string[];
+    responsibleForecastZones: string[];
+    responsibleFireZones: string[];
+    approvedObservationStations: string[];
     
-    constructor(data) {
-        if (typeof data === 'string') {
-            this.id = data;
-        }
-        else {
-            this.id = getValue('id', data);
-            this.name = getValue('name', data);
-            this.address = getValue('address', data);
-            this.telephone = getValue('telephone', data);
-            this.fax = getValue('faxNumber', data);
-            this.email = getValue('email', data);
-            this.url = getValue('sameAs', data);
-            this.nwsRegion = getValue('nwsRegion', data);
-            this.parentOrganization = getUrlPart(getValue('parentOrganization', data), -1);
-            this.responsibleCounties = this.getZones('responsibleCounties', data);
-            this.responsibleForecastZones = this.getZones('responsibleForecastZones', data);
-            this.responsibleFireZones = this.getZones('responsibleFireZones', data);
-            this.approvedObservationStations = this.getStations('approvedObservationStations', data);
-        }
-    }
+    constructor(data: any) {
 
-    getZones(key, data) {
-        let list: any[] = [];
-        if (data[key]) {
-            for (let i = 0; i < data[key].length; i++) {
-                list.push(new Zone(data[key][i]));
-            }
-        }
-        return list;
-    }
+        this.id = getStringValue('id', data);
+        this.name = getStringValue('name', data);
+        this.address = getStringValue('address', data);
+        this.telephone = getStringValue('telephone', data);
+        this.fax = getStringValue('faxNumber', data);
+        this.email = getStringValue('email', data);
+        this.url = getStringValue('sameAs', data);
+        this.nwsRegion = getStringValue('nwsRegion', data);
+        this.parentOrganization = getUrlPart(getStringValue('parentOrganization', data), -1);
 
-    getStations(key, data) {
-        let list: any[] = [];
-        if (data[key]) {
-            for (let i = 0; i < data[key].length; i++) {
-                list.push(new Station(getUrlPart(data[key][i], -1)));
-            }
-        }
-        return list;
+        this.responsibleCounties = getValues('responsibleCounties', data);
+        this.responsibleForecastZones = getValues('responsibleForecastZones', data);
+        this.responsibleFireZones = getValues('responsibleFireZones', data);
+        this.approvedObservationStations = getValues('approvedObservationStations', data);
     }
+}
 
-    getAreaForecastDiscussion() {
-        return toProducts().get({
-            'location': this.id,
-            'type': 'AFD'
-        });
-    }
+function getValues(propertyName: string, data: any): string[] {
+    return (getProperty(propertyName, data) as string[]).map(x => getUrlPart(x, -1))
 
-    getProductTypes() {
-        return toProducts().getLocationTypes(this.id);
-    }
-
-    getProducts(params) {
-        params['location'] = this.id;
-        return toProducts().get(params);
-    }
 }

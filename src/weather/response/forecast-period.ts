@@ -1,6 +1,3 @@
-import { toTime } from '../../utils/time';
-import { toValueUnits, ValueUnits } from '../../utils/value-units';
-import { getValue } from './utils';
 
 /*
     "number": 3,
@@ -18,32 +15,36 @@ import { getValue } from './utils';
     "detailedForecast": "Sunny, with a high near 76. Southwest wind 0 to 10 mph."
 */
 
+import { getBoolValue, getDateValue, getIntValue, getNumberValue, getStringValue } from "./utils";
+
 export class ForecastPeriod {
     number: number;
     name: any;
     startTime: any;
     endTime: any;
     isDaytime: any;
-    temperature: ValueUnits;
+    temperature: number;
     temperatureTrend: any;
     windSpeed: any;
     windDirection: any;
     icon: any;
     shortForecast: any;
     detailedForecast: any;
+    temperatureUnit: string;
 
     constructor(data) {
-        this.number = parseInt(getValue('number', data));
-        this.name = getValue('name', data);
-        this.startTime = toTime(getValue('startTime', data));
-        this.endTime = toTime(getValue('endTime', data));
-        this.isDaytime = getValue('isDaytime', data);
-        this.temperature = toValueUnits(getValue('temperature', data), getValue('temperatureUnit', data));
-        this.temperatureTrend = getValue('temperatureTrend', data);
-        this.windSpeed = getValue('windSpeed', data);
-        this.windDirection = getValue('windDirection', data);
-        this.icon = getValue('icon', data);
-        this.shortForecast = getValue('shortForecast', data);
-        this.detailedForecast = getValue('detailedForecast', data);
+        this.number = getIntValue('number', data);
+        this.name = getStringValue('name', data);
+        this.startTime = getDateValue('startTime', data);
+        this.endTime = getDateValue('endTime', data);
+        this.isDaytime = getBoolValue('isDaytime', data);
+        this.temperature = getNumberValue('temperature', data);
+        this.temperatureUnit = getStringValue('temperatureUnit', data);
+        this.temperatureTrend = getStringValue('temperatureTrend', data);
+        this.windSpeed = getStringValue('windSpeed', data);
+        this.windDirection = getStringValue('windDirection', data);
+        this.icon = getStringValue('icon', data);
+        this.shortForecast = getStringValue('shortForecast', data);
+        this.detailedForecast = getStringValue('detailedForecast', data);
     }
 }

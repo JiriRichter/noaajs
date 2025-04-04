@@ -1,5 +1,4 @@
-import { toTime } from "../utils/time";
-import { toValueUnits } from "../utils/value-units";
+import { NumericValue } from "../weather/response/numeric-value";
 
 // returns date formatted as YYYYMMDD HH:mm in UTC
 export function formatDate(date) {
@@ -34,12 +33,8 @@ export function appendQueryString(uri: string, params) {
     return uri;
 }
 
-export function parseTime(s) {
+export function parseTime(s: string): Date  {
     //2019-06-20 03:30
     //2019-06-22T23:58:22+00:00
-    return toTime(s.replace(' ', 'T') + ':00+00:00');
-}
-
-export function parseFloatValue(value: string, units: string) {
-    return toValueUnits(parseFloat(value), units);
+    return new Date(Date.parse(s.replace(' ', 'T') + ':00+00:00'));
 }

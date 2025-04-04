@@ -37,12 +37,6 @@ export enum DataProduct {
     'currents' =  'currents' //Currents data for currents stations.
 };
 
-// Example =  units=english
-export enum Units {
-    'metric' =  'metric', //Metric(Celsius, meters, cm/ s) units
-    'english' =  'english', //English(fahrenheit, feet, knots) units
-};
-
 // gmt, lst or lst_ldt.The time_zone can be specified with the "time_zone=" option parameter.
 // Example =  time_zone = gmt
 // Retrieve data with GMT date / times.
@@ -68,3 +62,7 @@ export enum Format {
     'csv' =  'csv' //Comma Separated Values.This format is suitable for export to Microsoft Excel or other spreadsheet programs.This is also the most easily human - readable format.
 };
 
+export enum Units {
+    'metric' = 'metric', // Metric units (Celsius, meters, cm/s appropriate for the data). Note!Visibility data is kilometers (km), Currents data is in cm/s.
+    'english' = 'english' // English units (fahrenheit, feet, knots appropriate for the data). Note!Visibility data is Nautical Miles (nm), Currents data is in knots.
+}

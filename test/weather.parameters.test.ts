@@ -1,5 +1,5 @@
 import { expect, test } from '@jest/globals';
-import * as parameters from '../src/weather/endpoints/parameters';
+import * as parameters from '../src/weather/api/parameters';
 
 test('formatDate', () => {
 

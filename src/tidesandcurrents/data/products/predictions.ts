@@ -1,4 +1,4 @@
-import { parseFloatValue, parseTime } from '../../utils';
+import { parseTime } from '../../utils';
 import { TidesAndCurrentsDataApi } from '../api';
 import { DataProduct, Datum, Interval, Units } from '../const';
 
@@ -15,7 +15,7 @@ export class Predictions extends TidesAndCurrentsDataApi {
         data['predictions'].forEach(function (d) {
             predictions.push({
                 'time': parseTime(d['t']),
-                'value': parseFloatValue(d['v'], 'm'),
+                'value': parseFloat(d['v']),
                 'type': d['type']
             });
         });

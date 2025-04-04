@@ -1,18 +1,12 @@
-import { toTime } from '../../utils/time';
+import { getDateValue } from './utils';
 import { ZoneForecastPeriod } from './zone-forecast-period';
-import { getValue } from './utils';
 
-/* @class ZoneForecast
- * @aka NOAA.ZoneForecast
- *
- * Represents response from /zones/{type}/{zoneId}/forecast endpoint.
- * */
 export class ZoneForecast {
-    updated: any;
+    updated: Date;
     periods: any[];
     
-    constructor(data) {
-        this.updated = toTime(getValue('updated', data));
+    constructor(data: any) {
+        this.updated = getDateValue('updated', data);
         this.periods = [];
         if (data['periods']) {
             for (let i = 0; i < data['periods'].length; i++) {

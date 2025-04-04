@@ -1,5 +1,5 @@
 // returns date formatted as YYYYMMDD HH:mm in UTC
-export function formatDate(date) {
+export function formatDate(date: Date): string {
 
     const year = date.getUTCFullYear();
     const month = date.getUTCMonth() + 1;

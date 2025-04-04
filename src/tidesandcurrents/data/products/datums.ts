@@ -1,4 +1,3 @@
-import { parseFloatValue } from '../../utils';
 import { TidesAndCurrentsDataApi } from '../api';
 import { DataProduct, Units } from '../const';
 
@@ -13,7 +12,8 @@ export class Datums extends TidesAndCurrentsDataApi {
         data['datums'].forEach(function (d) {
             datums.push({
                 'name': d['n'],
-                'value': parseFloatValue(d['v'], 'm')
+                'value': parseFloat(d['v']),
+                'unit': 'm'
             });
         });
         return datums;

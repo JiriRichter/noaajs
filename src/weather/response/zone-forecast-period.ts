@@ -1,4 +1,4 @@
-import { getValue } from './utils';
+import { getIntValue, getStringValue } from './utils';
 
 export class ZoneForecastPeriod {
     
@@ -7,8 +7,8 @@ export class ZoneForecastPeriod {
     detailedForecast: any;
 
     constructor(data) {
-        this.number = parseInt(getValue('number', data));
-        this.name = getValue('name', data);
-        this.detailedForecast = getValue('detailedForecast', data);
+        this.number = getIntValue('number', data);
+        this.name = getStringValue('name', data);
+        this.detailedForecast = getStringValue('detailedForecast', data);
     }
 }

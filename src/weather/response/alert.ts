@@ -1,12 +1,6 @@
 import { Zone } from './zone';
-import { toTime } from '../../utils/time';
-import { getFeatureProperty } from './utils';
+import { getDateValue, getProperty, getStringValue } from './utils';
 
-/* @class Alert
- * @aka NOAA.Alert
- *
- * Represents response from /points endpoint.
- * */
 export class Alert {
     id: any;
     areaDescription: any;
@@ -33,40 +27,45 @@ export class Alert {
     response: any;
     parameters: any;
     
-    constructor(data) {
-        this.id = getFeatureProperty('id', data);
-        this.areaDescription = getFeatureProperty('areaDesc', data);
-        this.geocode = getFeatureProperty('geocode', data);
+    constructor(data: any) {
+
+        const properties = getProperty('properties', data);
+
+        this.id = getStringValue('id', properties);
+        this.areaDescription = getStringValue('areaDesc', properties);
+        this.geocode = getStringValue('geocode', properties);
 
         this.affectedZones = [];
-        let affectedZones = getFeatureProperty('affectedZones', data), i;
-        for (i = 0; i < affectedZones.length; i++) {
+        
+        let affectedZones = getStringValue('affectedZones', properties);
+
+        for (let i: number = 0; i < affectedZones.length; i++) {
             this.affectedZones.push(new Zone(affectedZones[i]));
         }
 
-        this.references = getFeatureProperty('references', data);
+        this.references = getStringValue('references', properties);
 
-        this.sent = toTime(getFeatureProperty('sent', data));
-        this.effective = toTime(getFeatureProperty('effective', data));
-        this.onset = toTime(getFeatureProperty('onset', data));
-        this.expires = toTime(getFeatureProperty('expires', data));
-        this.ends = toTime(getFeatureProperty('ends', data));
+        this.sent = getDateValue('sent', properties);
+        this.effective = getDateValue('effective', properties);
+        this.onset = getDateValue('onset', properties);
+        this.expires = getDateValue('expires', properties);
+        this.ends = getDateValue('ends', properties);
 
-        this.status = getFeatureProperty('status', data);
-        this.messageType = getFeatureProperty('messageType', data);
-        this.category = getFeatureProperty('category', data);
-        this.severity = getFeatureProperty('severity', data);
-        this.certainty = getFeatureProperty('certainty', data);
-        this.urgency = getFeatureProperty('urgency', data);
+        this.status = getStringValue('status', properties);
+        this.messageType = getStringValue('messageType', properties);
+        this.category = getStringValue('category', properties);
+        this.severity = getStringValue('severity', properties);
+        this.certainty = getStringValue('certainty', properties);
+        this.urgency = getStringValue('urgency', properties);
 
-        this.event = getFeatureProperty('event', data);
-        this.sender = getFeatureProperty('sender', data);
-        this.senderName = getFeatureProperty('senderName', data);
-        this.headline = getFeatureProperty('headline', data);
-        this.description = getFeatureProperty('description', data);
-        this.instruction = getFeatureProperty('instruction', data);
-        this.response = getFeatureProperty('response', data);
+        this.event = getStringValue('event', properties);
+        this.sender = getStringValue('sender', properties);
+        this.senderName = getStringValue('senderName', properties);
+        this.headline = getStringValue('headline', properties);
+        this.description = getStringValue('description', properties);
+        this.instruction = getStringValue('instruction', properties);
+        this.response = getStringValue('response', properties);
 
-        this.parameters = getFeatureProperty('parameters', data);
+        this.parameters = getStringValue('parameters', properties);
     }
 }

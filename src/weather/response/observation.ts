@@ -1,16 +1,9 @@
-import { Feature } from './feature';
-import { featureCollectionToArray } from './feature-collection';
-import { toValueUnits, ValueUnits } from '../../utils/value-units';
-import { toTime } from '../../utils/time';
-import { getUrlPart, getFeatureProperty } from './utils';
+import { NumericValue } from './numeric-value';
+import { getDateValue, getProperty, getStringValue, getUrlPart } from './utils';
 
-/* @class Observation
- * @aka NOAA.Observation
- *
- * */
-export class Observation extends Feature {
+export class Observation {
 
-    elevation: ValueUnits;
+    elevation: NumericValue;
     stationId: any;
     timestamp: any;
     rawMessage: any;
@@ -20,41 +13,17 @@ export class Observation extends Feature {
     values: {};
     cloudLayers: any[];
 
-    constructor(data) {
-        super(data);
+    constructor(data: any) {
 
-        this.elevation = toValueUnits(getFeatureProperty('elevation', data));
-        this.stationId = getUrlPart(getFeatureProperty('station', data, true), -1);
-        this.timestamp = toTime(getFeatureProperty('timestamp', data));
-        this.rawMessage = getFeatureProperty('rawMessage', data);
-        this.textDescription = getFeatureProperty('textDescription', data);
-        this.iconUrl = getFeatureProperty('icon', data);
-        this.presentWeather = getFeatureProperty('presentWeather', data);
+        const properties = getProperty('properties', data);
+
+        this.elevation = new NumericValue(getProperty('elevation', properties));
+        this.stationId = getUrlPart(getStringValue('station', properties, true), -1);
+        this.timestamp = getDateValue('timestamp', properties);
+        this.rawMessage = getStringValue('rawMessage', properties);
+        this.textDescription = getStringValue('textDescription', properties);
+        this.iconUrl = getStringValue('icon', properties);
+        this.presentWeather = getStringValue('presentWeather', properties);
         this.values = {};
-
-        let values = [];
-        Object.keys(data['properties']).forEach(function (key) {
-            if (data['properties'][key] && data['properties'][key]['value'] && data['properties'][key]['unitCode']) {
-                values[key] = toValueUnits(data['properties'][key]);
-            }
-        });
-        this.values = values;
-
-        let cloudLayers = data['properties']['cloudLayers'];
-        if (cloudLayers) {
-            this.cloudLayers = [];
-            for (let i = 0; i < cloudLayers.length; i++) {
-                this.cloudLayers.push({
-                    'base': (cloudLayers['value'] && cloudLayers['unitCode']) ? toValueUnits(cloudLayers['base']) : null,
-                    'amount': cloudLayers['amount']
-                });
-            }
-        }
     }
-}
-
-export function observationsToArray(data) {
-    return featureCollectionToArray(data, function (feature) {
-        return new Observation(feature);
-    });
 }

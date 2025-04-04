@@ -1,31 +1,21 @@
-import { toTime } from '../../utils/time';
-import { toProducts } from '../endpoints/products';
-import { getValue } from './utils';
+import { getDateValue, getStringValue } from "./utils";
 
-/* @class Product
- * @aka NOAA.Product
- *
- * */
 export class Product {
-    id: any;
-    wmoCollectiveId: any;
-    issuingOffice: any;
-    issuanceTime: any;
-    productCode: any;
-    productName: any;
-    productText: any;
+    public id: string;
+    public wmoCollectiveId: string;
+    public issuingOffice: string;
+    public issuanceTime: Date;
+    public productCode: string;
+    public productName: string;
+    public productText: string;
     
-    constructor(data) {
-        this.id = getValue('id', data);
-        this.wmoCollectiveId = getValue('wmoCollectiveId', data);
-        this.issuingOffice = getValue('issuingOffice', data);
-        this.issuanceTime = toTime(getValue('issuanceTime', data));
-        this.productCode = getValue('productCode', data);
-        this.productName = getValue('productName', data);
-        this.productText = getValue('productText', data, true);
-    }
-
-    getProductText() {
-        return toProducts().getProduct(this.id);
+    constructor(data: any) {
+        this.id = getStringValue('id', data);
+        this.wmoCollectiveId = getStringValue('wmoCollectiveId', data);
+        this.issuingOffice = getStringValue('issuingOffice', data);
+        this.issuanceTime = getDateValue('issuanceTime', data);
+        this.productCode = getStringValue('productCode', data);
+        this.productName = getStringValue('productName', data);
+        this.productText = getStringValue('productText', data, true);
     }
 }

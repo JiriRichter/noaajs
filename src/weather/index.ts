@@ -1,39 +1,17 @@
-import { Points, toPoints } from './endpoints';
-import { Glossary, toGlossary } from './endpoints';
-import { Icons, toIcons } from './endpoints';
-import { Products, toProducts } from './endpoints';
-import { Alerts, toAlerts } from './endpoints';
-import { Offices, toOffices } from './endpoints';
-import { Stations, toStations } from './endpoints';
-import { Zones, toZones } from './endpoints';
-import { GridPoint, Point } from './response';
+import { AlertsApi } from './api/alerts';
+import { GlossaryApi } from './api/glossary';
+import { GridPointsApi } from './api/gridpoints';
+import { PointsApi } from './api/points';
+import { ProductsApi } from './api/products';
+import { StationsApi } from './api/stations';
+import { ZonesApi } from './api/zones';
 
 export const Weather = {
-    Points: Points,
-    points: toPoints,
-    
-    Glossary: Glossary,
-    glossary: toGlossary,
-    
-    Icons: Icons,
-    icons: toIcons,
-    
-    Products: Products,
-    products: toProducts,
-    
-    Alerts: Alerts,
-    alerts: toAlerts,
-    
-    Offices: Offices,
-    offices: toOffices,
-    
-    Stations: Stations,
-    stations: toStations,
-    
-    Zones: Zones,
-    zones: toZones,
-    
-    Point: Point,
-    GridPoint: GridPoint,
-    
+    points: new PointsApi(),
+    glossary: new GlossaryApi(),
+    products: new ProductsApi(),
+    alerts: new AlertsApi(),
+    stations: new StationsApi(),
+    zones: new ZonesApi(),
+    gridPoint: new GridPointsApi()
 };
