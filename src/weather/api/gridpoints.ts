@@ -1,33 +1,38 @@
 import { ApiBase } from './base';
-import { Station } from '../response/station';
-import { GridPoint } from '../response/gridpoint';
-import { Forecast } from '../response/forecast';
-import { Units } from './types';
-import { getProperty } from '../response/utils';
+import { GridpointData } from '../data/gridpoint-data';
+import { GridpointForecast } from '../data/gridpoint-forecast';
+import { GridpointForecastUnits } from '../data/types';
+import { NWSForecastOfficeId } from '../data/office-id';
+import { ObservationStationPage } from '../data/observation-station-page';
 
-export class GridPointsApi extends ApiBase {
+export class GridpointsApi extends ApiBase {
 
     constructor() {
         super();
     }
 
-    async getForecastData(officeId: string, x: number, y: number): Promise<GridPoint> {
-        const data = await super.get(`gridpoint/${officeId}/${x},${y}`);
-        return new GridPoint(data);
+    async getData(officeId: NWSForecastOfficeId, x: number, y: number): Promise<GridpointData> {
+        const data = await super.get(`gridpoints/${officeId}/${x},${y}`);
+        return new GridpointData(data);
     }
 
-    async getForecast(officeId: string, x: number, y: number, units: Units = Units.us): Promise<Forecast> {
-        const data = await super.get(`gridpoint/${officeId}/${x},${y}/forecast`);
-        return new Forecast(data);
+    async getForecast(officeId: NWSForecastOfficeId, x: number, y: number, units: GridpointForecastUnits = GridpointForecastUnits.us): Promise<GridpointForecast> {
+        const data = await super.get(`gridpoints/${officeId}/${x},${y}/forecast`);
+        return new GridpointForecast(data);
     }
 
-    async getForecastHourly(officeId: string, x: number, y: number, units: Units = Units.us): Promise<Forecast> {
-        const data = await super.get(`gridpoint/${officeId}/${x},${y}/forecast/hourly`);
-        return new Forecast(data);
+    async getForecastHourly(officeId: NWSForecastOfficeId, x: number, y: number, units: GridpointForecastUnits = GridpointForecastUnits.us): Promise<GridpointForecast> {
+        const data = await super.get(`gridpoints/${officeId}/${x},${y}/forecast/hourly`);
+        return new GridpointForecast(data);
     }
 
-    async getStations(officeId: string, x: number, y: number): Promise<Station[]> {
-        const data = await super.get(`gridpoint/${officeId}/${x},${y}/stations`);
-        return (getProperty('features', data) as any[]).map(feature => new Station(feature));
+    async getStations(officeId: NWSForecastOfficeId, x: number, y: number): Promise<ObservationStationPage> {
+        const data = await super.get(`gridpoints/${officeId}/${x},${y}/stations`);
+        return new ObservationStationPage(data);
     }
+
+    async getStationsNext(page: ObservationStationPage): Promise<ObservationStationPage> {
+        const data = await super.getNext(page);
+        return new ObservationStationPage(data);
+    } 
 }

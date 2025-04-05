@@ -4,7 +4,7 @@
 
 import { expect, test } from '@jest/globals';
 import { AlertsApi } from '../src/weather/api/alerts';
-import { AlertPage } from '../src/weather/response/alert-page';
+import { AlertPage } from '../src/weather/data/alert-page';
 
 const timeout = 10000;
 

@@ -7,7 +7,7 @@ export class Product {
     public issuanceTime: Date;
     public productCode: string;
     public productName: string;
-    public productText: string;
+    public productText?: string;
     
     constructor(data: any) {
         this.id = getStringValue('id', data);
@@ -16,6 +16,9 @@ export class Product {
         this.issuanceTime = getDateValue('issuanceTime', data);
         this.productCode = getStringValue('productCode', data);
         this.productName = getStringValue('productName', data);
-        this.productText = getStringValue('productText', data, true);
+
+        if ('productText' in data) {
+            this.productText = getStringValue('productText', data);
+        }
     }
 }

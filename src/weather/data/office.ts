@@ -1,4 +1,4 @@
-import { getProperty, getStringValue, getUrlPart } from "./utils";
+import { getProperty, getStringValue, getStringValueFromUrl } from "./utils";
 
 export class Office {
 
@@ -26,7 +26,7 @@ export class Office {
         this.email = getStringValue('email', data);
         this.url = getStringValue('sameAs', data);
         this.nwsRegion = getStringValue('nwsRegion', data);
-        this.parentOrganization = getUrlPart(getStringValue('parentOrganization', data), -1);
+        this.parentOrganization = getStringValueFromUrl(getStringValue('parentOrganization', data));
 
         this.responsibleCounties = getValues('responsibleCounties', data);
         this.responsibleForecastZones = getValues('responsibleForecastZones', data);
@@ -36,6 +36,6 @@ export class Office {
 }
 
 function getValues(propertyName: string, data: any): string[] {
-    return (getProperty(propertyName, data) as string[]).map(x => getUrlPart(x, -1))
+    return (getProperty(propertyName, data) as string[]).map(x => getStringValueFromUrl(x))
 
 }

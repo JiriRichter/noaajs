@@ -11,7 +11,12 @@ export class GlossaryApi extends ApiBase {
         const data = await super.get("glossary");
 
         return data['glossary'].reduce(
-            (glossary: Glossary, term: any) => glossary[term['term']] = term['definition'],
+            (glossary: Glossary, term: any) => {
+                if (term['term'] && term['definition']) {
+                    glossary[term['term']] = term['definition']
+                }
+                return glossary;
+            },
             {});
     }
 }

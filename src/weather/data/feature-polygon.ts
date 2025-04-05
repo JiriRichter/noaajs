@@ -1,13 +1,15 @@
 import { Coordinate } from "./coordinate";
-import { Geometry } from "./geometry";
+import { Feature } from "./feature";
 import { getProperty } from "./utils";
 
-export class GeometryPolygon extends Geometry {
+export class FeaturePolygon extends Feature {
     public path: Coordinate[];
 
     constructor(data: any) {
         super(data)
-        const coordinates = getProperty('coordinates', data) as [number, number][][];
+
+        const geometry = getProperty('geometry', data);
+        const coordinates = getProperty('coordinates', geometry) as [number, number][][];
         const ring0 = coordinates[0];
 
         this.path = ring0.map((point) => new Coordinate(point[1], point[0]))

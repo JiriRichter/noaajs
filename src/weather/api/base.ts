@@ -1,5 +1,5 @@
-import { ApiError } from '../response/api-error';
-import { Page } from '../response/page';
+import { ApiError } from '../data/api-error';
+import { DataPage } from '../data/data-page';
 
 export class ApiBase {
 
@@ -31,7 +31,7 @@ export class ApiBase {
 
     }
 
-    protected async getNext(page: Page): Promise<any> {
+    protected async getNext(page: DataPage): Promise<any> {
 
         return this.fetch(page.nextPageUrl);
 

@@ -1,5 +1,5 @@
 import { ApiBase } from './base';
-import { Point } from '../response/point';
+import { Point } from '../data/point';
 
 export class PointsApi extends ApiBase {
 

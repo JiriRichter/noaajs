@@ -251,39 +251,46 @@
         return new Date(Date.parse(s.replace(' ', 'T') + ':00+00:00'));
     }
 
-    function getUrlPart(url, index) {
+    function getStringValueFromUrl(url) {
         var parts = url.split('/');
-        {
-            return parts[parts.length + index];
+        return parts[parts.length - 1];
+    }
+    function validateProperty(key, data) {
+        if (!(key in data)) {
+            throw new Error("Required property ".concat(key, " is not present in JSON data"));
         }
     }
-    function getProperty(key, data, optional) {
-        if (optional === void 0) { optional = false; }
-        if (!optional && !(key in data)) {
-            throw new Error('Invalid property name: ' + key);
-        }
+    function getProperty(key, data) {
+        if (data === void 0) { data = false; }
+        validateProperty(key, data);
         return data[key];
     }
-    function getStringValue(key, data, optional) {
-        if (optional === void 0) { optional = false; }
-        return getProperty(key, data, optional);
+    function getStringValue(key, data) {
+        if (data === void 0) { data = false; }
+        validateProperty(key, data);
+        return getProperty(key, data);
     }
-    function getNumberValue(key, data, optional) {
-        if (optional === void 0) { optional = false; }
-        return getProperty(key, data, optional);
+    function getFloatValue(key, data) {
+        if (data === void 0) { data = false; }
+        validateProperty(key, data);
+        return parseFloat(getStringValue(key, data));
     }
-    function getIntValue(key, data, optional) {
-        if (optional === void 0) { optional = false; }
-        return parseInt(getStringValue(key, data, optional));
+    function getIntValue(key, data) {
+        if (data === void 0) { data = false; }
+        validateProperty(key, data);
+        return parseInt(getStringValue(key, data));
     }
-    function getBoolValue(key, data, optional) {
-        if (optional === void 0) { optional = false; }
-        return getStringValue(key, data, optional) === "true";
+    function getBoolValue(key, data) {
+        if (data === void 0) { data = false; }
+        validateProperty(key, data);
+        return getProperty(key, data);
     }
     function parseDate(value) {
         return new Date(Date.parse(value));
     }
-    function getDateValue(key, data, optional) {
+    function getDateValue(key, data) {
+        if (data === void 0) { data = false; }
+        validateProperty(key, data);
         return parseDate(getStringValue(key, data));
     }
     function parseUnits(value) {
@@ -295,8 +302,12 @@
             var properties = getProperty('properties', data);
             this.id = getStringValue('id', properties);
             this.type = getStringValue('type', properties);
-            this.name = getStringValue('name', properties, true);
-            this.state = getStringValue('state', properties, true);
+            if ('name' in properties) {
+                this.name = getStringValue('name', properties);
+            }
+            if ('state' in properties) {
+                this.state = getStringValue('state', properties);
+            }
         }
         return Zone;
     }());
@@ -336,13 +347,26 @@
         return Alert;
     }());
 
-    var Page = /** @class */ (function () {
-        function Page(data) {
+    var DataPage = /** @class */ (function () {
+        function DataPage(data) {
             this.title = getStringValue('title', data);
             this.updated = getDateValue('updated', data);
-            this.nextPageUrl = getStringValue('next', getProperty('pagination', data));
+            var pagination = getProperty('pagination', data);
+            if ('next' in pagination) {
+                this.nextPageUrl = getStringValue('next', pagination);
+            }
         }
-        return Page;
+        Object.defineProperty(DataPage.prototype, "hasMoreData", {
+            get: function () {
+                if (this.nextPageUrl) {
+                    return true;
+                }
+                return false;
+            },
+            enumerable: false,
+            configurable: true
+        });
+        return DataPage;
     }());
 
     var AlertPage = /** @class */ (function (_super) {
@@ -354,7 +378,7 @@
             return _this;
         }
         return AlertPage;
-    }(Page));
+    }(DataPage));
 
     var AlertStatus;
     (function (AlertStatus) {
@@ -462,7 +486,12 @@
                         case 0: return [4 /*yield*/, _super.prototype.get.call(this, "glossary")];
                         case 1:
                             data = _a.sent();
-                            return [2 /*return*/, data['glossary'].reduce(function (glossary, term) { return glossary[term['term']] = term['definition']; }, {})];
+                            return [2 /*return*/, data['glossary'].reduce(function (glossary, term) {
+                                    if (term['term'] && term['definition']) {
+                                        glossary[term['term']] = term['definition'];
+                                    }
+                                    return glossary;
+                                }, {})];
                     }
                 });
             });
@@ -470,101 +499,72 @@
         return GlossaryApi;
     }(ApiBase));
 
-    var Geometry = /** @class */ (function () {
-        function Geometry(data) {
-            this.type = getStringValue('type', data);
-        }
-        return Geometry;
-    }());
-
-    var GeometryPoint = /** @class */ (function (_super) {
-        __extends(GeometryPoint, _super);
-        function GeometryPoint(data) {
-            var _this = _super.call(this, data) || this;
-            var coordinates = getProperty('coordinates', data);
-            _this.latitude = coordinates[1];
-            _this.longitude = coordinates[0];
-            return _this;
-        }
-        return GeometryPoint;
-    }(Geometry));
-
-    var NumericValue = /** @class */ (function () {
-        function NumericValue(data) {
-            this.value = getNumberValue('value', data);
-            this.unit = parseUnits(getStringValue('unitCode', data));
-        }
-        return NumericValue;
-    }());
-
-    var Station = /** @class */ (function (_super) {
-        __extends(Station, _super);
-        function Station(data) {
-            var _this = _super.call(this, data) || this;
-            var properties = getProperty('properties', data);
-            _this.elevation = new NumericValue(getProperty('elevation', properties));
-            _this.id = getStringValue('stationIdentifier', properties);
-            _this.name = getStringValue('name', properties);
-            _this.timeZone = getStringValue('timeZone', properties);
-            _this.forecastZone = getUrlPart(getStringValue('forecast', properties, true), -1);
-            _this.county = getUrlPart(getStringValue('county', properties, true), -1);
-            _this.fireWeatherZone = getUrlPart(getStringValue('fireWeatherZone', properties, true), -1);
-            return _this;
-        }
-        return Station;
-    }(GeometryPoint));
-
     var millisecondsPerHour = 3600000;
-    var ValidTimePeriod = /** @class */ (function () {
-        function ValidTimePeriod(s) {
+    var Interval$1 = /** @class */ (function () {
+        function Interval(s) {
             var parts = s.split('/');
             if (parts.length !== 2) {
-                throw new Error('Invalid valid time value (' + s + ')');
+                throw new Error('Invalid time duration value (' + s + ')');
             }
-            this.time = parseDate(parts[0]);
+            this.startTime = parseDate(parts[0]);
             this.hours = 0;
             this.days = 0;
-            //period parsing
-            var period = parts[1], num = 0;
-            if (period[0] !== 'P') {
-                throw new Error('Invalid valid time period value (' + parts[1] + ')');
+            //duration parsing
+            this.duration = parts[1];
+            var num = 0;
+            if (this.duration[0] !== 'P') {
+                throw new Error('Invalid time duration value (' + parts[1] + ')');
             }
-            for (var i = 1; i < period.length; i++) {
-                if (period.charAt(i) >= '0' && period.charAt(i) <= '9') {
-                    num = num * 10 + (period.charCodeAt(i) - '0'.charCodeAt(0));
+            for (var i = 1; i < this.duration.length; i++) {
+                if (this.duration.charAt(i) >= '0' && this.duration.charAt(i) <= '9') {
+                    num = num * 10 + (this.duration.charCodeAt(i) - '0'.charCodeAt(0));
                     continue;
                 }
-                if (period.charAt(i) === 'T') {
+                if (this.duration.charAt(i) === 'T') {
                     num = 0;
                     continue;
                 }
-                if (period.charAt(i) === 'D') {
+                if (this.duration.charAt(i) === 'D') {
                     this.days = num;
                     num = 0;
                     continue;
                 }
-                if (period.charAt(i) === 'H') {
+                if (this.duration.charAt(i) === 'H') {
                     this.hours = num;
                     num = 0;
                     continue;
                 }
             }
             if (this.days === 0 && this.hours === 0) {
-                throw new Error('Invalid valid time period (' + period + ')');
+                throw new Error('Invalid time duration (' + this.duration + ')');
             }
-            this.totalHours = this.days * 24 + this.hours;
+            this.totalHours = (this.days * 24) + this.hours;
         }
-        ValidTimePeriod.prototype.toArray = function () {
-            if (this._array) {
-                return this._array;
+        Interval.prototype.toDates = function () {
+            var dates = [this.startTime], startTime = this.startTime.getTime();
+            for (var i = 1; i < this.totalHours; i++) {
+                dates.push(new Date(startTime + (i * millisecondsPerHour)));
             }
-            this._array = [];
-            for (var i = 0; i < this.totalHours; i++) {
-                this._array.push(new Date(this.time.milliseconds + (i * millisecondsPerHour)));
-            }
-            return this._array;
+            return dates;
         };
-        return ValidTimePeriod;
+        return Interval;
+    }());
+
+    var QuantitativeValue = /** @class */ (function () {
+        function QuantitativeValue(data) {
+            this.value = getFloatValue('value', data);
+            this.unit = parseUnits(getStringValue('unitCode', data));
+            if ('minValue' in data) {
+                this.minValue = getFloatValue('minValue', data);
+            }
+            if ('maxValue' in data) {
+                this.minValue = getFloatValue('maxValue', data);
+            }
+            if ('qualityControl' in data) {
+                this.minValue = getFloatValue('qualityControl', data);
+            }
+        }
+        return QuantitativeValue;
     }());
 
     var Coordinate = /** @class */ (function () {
@@ -575,84 +575,301 @@
         return Coordinate;
     }());
 
-    var GeometryPolygon = /** @class */ (function (_super) {
-        __extends(GeometryPolygon, _super);
-        function GeometryPolygon(data) {
+    var Feature = /** @class */ (function () {
+        function Feature(data) {
+            this.type = getStringValue('type', data);
+        }
+        return Feature;
+    }());
+
+    var FeaturePolygon = /** @class */ (function (_super) {
+        __extends(FeaturePolygon, _super);
+        function FeaturePolygon(data) {
             var _this = _super.call(this, data) || this;
-            var coordinates = getProperty('coordinates', data);
+            var geometry = getProperty('geometry', data);
+            var coordinates = getProperty('coordinates', geometry);
             var ring0 = coordinates[0];
             _this.path = ring0.map(function (point) { return new Coordinate(point[1], point[0]); });
             return _this;
         }
-        return GeometryPolygon;
-    }(Geometry));
+        return FeaturePolygon;
+    }(Feature));
 
-    var GridPoint = /** @class */ (function (_super) {
-        __extends(GridPoint, _super);
-        function GridPoint(data) {
+    var GridpointVariable;
+    (function (GridpointVariable) {
+        GridpointVariable["temperature"] = "temperature";
+        GridpointVariable["dewpoint"] = "dewpoint";
+        GridpointVariable["maxTemperature"] = "maxTemperature";
+        GridpointVariable["minTemperature"] = "minTemperature";
+        GridpointVariable["relativeHumidity"] = "relativeHumidity";
+        GridpointVariable["apparentTemperature"] = "apparentTemperature";
+        GridpointVariable["heatIndex"] = "heatIndex";
+        GridpointVariable["windChill"] = "windChill";
+        GridpointVariable["wetBulbGlobeTemperature"] = "wetBulbGlobeTemperature";
+        GridpointVariable["skyCover"] = "skyCover";
+        GridpointVariable["windDirection"] = "windDirection";
+        GridpointVariable["windSpeed"] = "windSpeed";
+        GridpointVariable["windGust"] = "windGust";
+        GridpointVariable["weather"] = "weather";
+        GridpointVariable["hazards"] = "hazards";
+        GridpointVariable["probabilityOfPrecipitation"] = "probabilityOfPrecipitation";
+        GridpointVariable["quantitativePrecipitation"] = "quantitativePrecipitation";
+        GridpointVariable["iceAccumulation"] = "iceAccumulation";
+        GridpointVariable["snowfallAmount"] = "snowfallAmount";
+        GridpointVariable["snowLevel"] = "snowLevel";
+        GridpointVariable["ceilingHeight"] = "ceilingHeight";
+        GridpointVariable["visibility"] = "visibility";
+        GridpointVariable["transportWindSpeed"] = "transportWindSpeed";
+        GridpointVariable["transportWindDirection"] = "transportWindDirection";
+        GridpointVariable["mixingHeight"] = "mixingHeight";
+        GridpointVariable["hainesIndex"] = "hainesIndex";
+        GridpointVariable["lightningActivityLevel"] = "lightningActivityLevel";
+        GridpointVariable["twentyFootWindSpeed"] = "twentyFootWindSpeed";
+        GridpointVariable["twentyFootWindDirection"] = "twentyFootWindDirection";
+        GridpointVariable["waveHeight"] = "waveHeight";
+        GridpointVariable["wavePeriod"] = "wavePeriod";
+        GridpointVariable["waveDirection"] = "waveDirection";
+        GridpointVariable["primarySwellHeight"] = "primarySwellHeight";
+        GridpointVariable["primarySwellDirection"] = "primarySwellDirection";
+        GridpointVariable["secondarySwellHeight"] = "secondarySwellHeight";
+        GridpointVariable["secondarySwellDirection"] = "secondarySwellDirection";
+        GridpointVariable["wavePeriod2"] = "wavePeriod2";
+        GridpointVariable["windWaveHeight"] = "windWaveHeight";
+        GridpointVariable["dispersionIndex"] = "dispersionIndex";
+        GridpointVariable["pressure"] = "pressure";
+        GridpointVariable["probabilityOfTropicalStormWinds"] = "probabilityOfTropicalStormWinds";
+        GridpointVariable["probabilityOfHurricaneWinds"] = "probabilityOfHurricaneWinds";
+        GridpointVariable["potentialOf15mphWinds"] = "potentialOf15mphWinds";
+        GridpointVariable["potentialOf25mphWinds"] = "potentialOf25mphWinds";
+        GridpointVariable["potentialOf35mphWinds"] = "potentialOf35mphWinds";
+        GridpointVariable["potentialOf45mphWinds"] = "potentialOf45mphWinds";
+        GridpointVariable["potentialOf20mphWindGusts"] = "potentialOf20mphWindGusts";
+        GridpointVariable["potentialOf30mphWindGusts"] = "potentialOf30mphWindGusts";
+        GridpointVariable["potentialOf40mphWindGusts"] = "potentialOf40mphWindGusts";
+        GridpointVariable["potentialOf50mphWindGusts"] = "potentialOf50mphWindGusts";
+        GridpointVariable["potentialOf60mphWindGusts"] = "potentialOf60mphWindGusts";
+        GridpointVariable["grasslandFireDangerIndex"] = "grasslandFireDangerIndex";
+        GridpointVariable["probabilityOfThunder"] = "probabilityOfThunder";
+        GridpointVariable["davisStabilityIndex"] = "davisStabilityIndex";
+        GridpointVariable["atmosphericDispersionIndex"] = "atmosphericDispersionIndex";
+        GridpointVariable["lowVisibilityOccurrenceRiskIndex"] = "lowVisibilityOccurrenceRiskIndex";
+        GridpointVariable["stability"] = "stability";
+        GridpointVariable["redFlagThreatIndex"] = "redFlagThreatIndex";
+    })(GridpointVariable || (GridpointVariable = {}));
+
+    var IntervalValue = /** @class */ (function () {
+        function IntervalValue(data) {
+            this.value = getFloatValue('value', data);
+            this.validTime = new Interval$1(getStringValue('validTime', data));
+        }
+        return IntervalValue;
+    }());
+
+    var GridpointQuantitativeValue = /** @class */ (function () {
+        function GridpointQuantitativeValue(data) {
+            if ('uom' in data) {
+                this.unit = parseUnits(getStringValue('uom', data));
+            }
+            this.values = getProperty('values', data).map(function (x) { return new IntervalValue(x); });
+        }
+        return GridpointQuantitativeValue;
+    }());
+
+    var NWSForecastOfficeId;
+    (function (NWSForecastOfficeId) {
+        NWSForecastOfficeId["AKQ"] = "AKQ";
+        NWSForecastOfficeId["ALY"] = "ALY";
+        NWSForecastOfficeId["BGM"] = "BGM";
+        NWSForecastOfficeId["BOX"] = "BOX";
+        NWSForecastOfficeId["BTV"] = "BTV";
+        NWSForecastOfficeId["BUF"] = "BUF";
+        NWSForecastOfficeId["CAE"] = "CAE";
+        NWSForecastOfficeId["CAR"] = "CAR";
+        NWSForecastOfficeId["CHS"] = "CHS";
+        NWSForecastOfficeId["CLE"] = "CLE";
+        NWSForecastOfficeId["CTP"] = "CTP";
+        NWSForecastOfficeId["GSP"] = "GSP";
+        NWSForecastOfficeId["GYX"] = "GYX";
+        NWSForecastOfficeId["ILM"] = "ILM";
+        NWSForecastOfficeId["ILN"] = "ILN";
+        NWSForecastOfficeId["LWX"] = "LWX";
+        NWSForecastOfficeId["MHX"] = "MHX";
+        NWSForecastOfficeId["OKX"] = "OKX";
+        NWSForecastOfficeId["PBZ"] = "PBZ";
+        NWSForecastOfficeId["PHI"] = "PHI";
+        NWSForecastOfficeId["RAH"] = "RAH";
+        NWSForecastOfficeId["RLX"] = "RLX";
+        NWSForecastOfficeId["RNK"] = "RNK";
+        NWSForecastOfficeId["ABQ"] = "ABQ";
+        NWSForecastOfficeId["AMA"] = "AMA";
+        NWSForecastOfficeId["BMX"] = "BMX";
+        NWSForecastOfficeId["BRO"] = "BRO";
+        NWSForecastOfficeId["CRP"] = "CRP";
+        NWSForecastOfficeId["EPZ"] = "EPZ";
+        NWSForecastOfficeId["EWX"] = "EWX";
+        NWSForecastOfficeId["FFC"] = "FFC";
+        NWSForecastOfficeId["FWD"] = "FWD";
+        NWSForecastOfficeId["HGX"] = "HGX";
+        NWSForecastOfficeId["HUN"] = "HUN";
+        NWSForecastOfficeId["JAN"] = "JAN";
+        NWSForecastOfficeId["JAX"] = "JAX";
+        NWSForecastOfficeId["KEY"] = "KEY";
+        NWSForecastOfficeId["LCH"] = "LCH";
+        NWSForecastOfficeId["LIX"] = "LIX";
+        NWSForecastOfficeId["LUB"] = "LUB";
+        NWSForecastOfficeId["LZK"] = "LZK";
+        NWSForecastOfficeId["MAF"] = "MAF";
+        NWSForecastOfficeId["MEG"] = "MEG";
+        NWSForecastOfficeId["MFL"] = "MFL";
+        NWSForecastOfficeId["MLB"] = "MLB";
+        NWSForecastOfficeId["MOB"] = "MOB";
+        NWSForecastOfficeId["MRX"] = "MRX";
+        NWSForecastOfficeId["OHX"] = "OHX";
+        NWSForecastOfficeId["OUN"] = "OUN";
+        NWSForecastOfficeId["SHV"] = "SHV";
+        NWSForecastOfficeId["SJT"] = "SJT";
+        NWSForecastOfficeId["SJU"] = "SJU";
+        NWSForecastOfficeId["TAE"] = "TAE";
+        NWSForecastOfficeId["TBW"] = "TBW";
+        NWSForecastOfficeId["TSA"] = "TSA";
+        NWSForecastOfficeId["ABR"] = "ABR";
+        NWSForecastOfficeId["APX"] = "APX";
+        NWSForecastOfficeId["ARX"] = "ARX";
+        NWSForecastOfficeId["BIS"] = "BIS";
+        NWSForecastOfficeId["BOU"] = "BOU";
+        NWSForecastOfficeId["CYS"] = "CYS";
+        NWSForecastOfficeId["DDC"] = "DDC";
+        NWSForecastOfficeId["DLH"] = "DLH";
+        NWSForecastOfficeId["DMX"] = "DMX";
+        NWSForecastOfficeId["DTX"] = "DTX";
+        NWSForecastOfficeId["DVN"] = "DVN";
+        NWSForecastOfficeId["EAX"] = "EAX";
+        NWSForecastOfficeId["FGF"] = "FGF";
+        NWSForecastOfficeId["FSD"] = "FSD";
+        NWSForecastOfficeId["GID"] = "GID";
+        NWSForecastOfficeId["GJT"] = "GJT";
+        NWSForecastOfficeId["GLD"] = "GLD";
+        NWSForecastOfficeId["GRB"] = "GRB";
+        NWSForecastOfficeId["GRR"] = "GRR";
+        NWSForecastOfficeId["ICT"] = "ICT";
+        NWSForecastOfficeId["ILX"] = "ILX";
+        NWSForecastOfficeId["IND"] = "IND";
+        NWSForecastOfficeId["IWX"] = "IWX";
+        NWSForecastOfficeId["JKL"] = "JKL";
+        NWSForecastOfficeId["LBF"] = "LBF";
+        NWSForecastOfficeId["LMK"] = "LMK";
+        NWSForecastOfficeId["LOT"] = "LOT";
+        NWSForecastOfficeId["LSX"] = "LSX";
+        NWSForecastOfficeId["MKX"] = "MKX";
+        NWSForecastOfficeId["MPX"] = "MPX";
+        NWSForecastOfficeId["MQT"] = "MQT";
+        NWSForecastOfficeId["OAX"] = "OAX";
+        NWSForecastOfficeId["PAH"] = "PAH";
+        NWSForecastOfficeId["PUB"] = "PUB";
+        NWSForecastOfficeId["RIW"] = "RIW";
+        NWSForecastOfficeId["SGF"] = "SGF";
+        NWSForecastOfficeId["TOP"] = "TOP";
+        NWSForecastOfficeId["UNR"] = "UNR";
+        NWSForecastOfficeId["BOI"] = "BOI";
+        NWSForecastOfficeId["BYZ"] = "BYZ";
+        NWSForecastOfficeId["EKA"] = "EKA";
+        NWSForecastOfficeId["FGZ"] = "FGZ";
+        NWSForecastOfficeId["GGW"] = "GGW";
+        NWSForecastOfficeId["HNX"] = "HNX";
+        NWSForecastOfficeId["LKN"] = "LKN";
+        NWSForecastOfficeId["LOX"] = "LOX";
+        NWSForecastOfficeId["MFR"] = "MFR";
+        NWSForecastOfficeId["MSO"] = "MSO";
+        NWSForecastOfficeId["MTR"] = "MTR";
+        NWSForecastOfficeId["OTX"] = "OTX";
+        NWSForecastOfficeId["PDT"] = "PDT";
+        NWSForecastOfficeId["PIH"] = "PIH";
+        NWSForecastOfficeId["PQR"] = "PQR";
+        NWSForecastOfficeId["PSR"] = "PSR";
+        NWSForecastOfficeId["REV"] = "REV";
+        NWSForecastOfficeId["SEW"] = "SEW";
+        NWSForecastOfficeId["SGX"] = "SGX";
+        NWSForecastOfficeId["SLC"] = "SLC";
+        NWSForecastOfficeId["STO"] = "STO";
+        NWSForecastOfficeId["TFX"] = "TFX";
+        NWSForecastOfficeId["TWC"] = "TWC";
+        NWSForecastOfficeId["VEF"] = "VEF";
+        NWSForecastOfficeId["AER"] = "AER";
+        NWSForecastOfficeId["AFC"] = "AFC";
+        NWSForecastOfficeId["AFG"] = "AFG";
+        NWSForecastOfficeId["AJK"] = "AJK";
+        NWSForecastOfficeId["ALU"] = "ALU";
+        NWSForecastOfficeId["GUM"] = "GUM";
+        NWSForecastOfficeId["HPA"] = "HPA";
+        NWSForecastOfficeId["HFO"] = "HFO";
+        NWSForecastOfficeId["PPG"] = "PPG";
+        NWSForecastOfficeId["STU"] = "STU";
+        NWSForecastOfficeId["NH1"] = "NH1";
+        NWSForecastOfficeId["NH2"] = "NH2";
+        NWSForecastOfficeId["ONA"] = "ONA";
+        NWSForecastOfficeId["ONP"] = "ONP";
+    })(NWSForecastOfficeId || (NWSForecastOfficeId = {}));
+    function getOfficeIdValue(key, data) {
+        var value = getStringValue(key, data);
+        return NWSForecastOfficeId[value];
+    }
+
+    var GridpointData = /** @class */ (function (_super) {
+        __extends(GridpointData, _super);
+        function GridpointData(data) {
             var _this = _super.call(this, data) || this;
             var properties = getProperty('properties', data);
-            _this.gridX = getNumberValue('gridX', properties);
-            _this.gridX = getNumberValue('gridY', properties);
-            _this.office = getStringValue('gridId', properties);
-            _this.elevation = new NumericValue(getProperty('elevation', properties));
+            _this.gridX = getFloatValue('gridX', properties);
+            _this.gridY = getFloatValue('gridY', properties);
+            _this.office = getOfficeIdValue('gridId', properties);
+            _this.elevation = new QuantitativeValue(getProperty('elevation', properties));
             _this.updateTime = getDateValue('updateTime', properties);
-            _this.validTimes = new ValidTimePeriod(getStringValue('validTimes', properties));
+            _this.validTimes = new Interval$1(getStringValue('validTimes', properties));
             _this.values = {};
-            for (var i = 0; i < GridPoint.variables.length; i++) {
-                _this.values[GridPoint.variables[i]] = _this.getVariable(GridPoint.variables[i], properties);
-            }
+            Object.keys(GridpointVariable).forEach(function (key) {
+                if (key in properties) {
+                    _this.values[key] = new GridpointQuantitativeValue(properties[key]);
+                }
+            });
             return _this;
         }
-        GridPoint.prototype.getVariable = function (name, data) {
-            var variableData = getProperty(name, data), values, item;
-            if (variableData['uom']) {
-                parseUnits(variableData['uom']);
-            }
-            if (variableData['values'] && variableData['values'].length > 0) {
-                values = [];
-                if (variableData['sourceUnit']) {
-                    values['sourceUnit'] = variableData['sourceUnit'];
-                }
-                for (var i = 0; i < variableData['values'].length; i++) {
-                    //value can be null
-                    if (variableData['values'][i]['value'] !== null) {
-                        if (typeof variableData['values'][i]['value'] === 'number') {
-                            item = getNumberValue('value', variableData['values'][i]);
-                        }
-                        else {
-                            item = variableData['values'][i]['value'];
-                            if (Array.isArray(item)) {
-                                item.forEach(function (v) {
-                                    for (var key in v) {
-                                        if (v[key] && v[key]['unit'] && v[key]['value']) {
-                                            v[key] = new NumericValue(v[key]);
-                                        }
-                                    }
-                                });
-                            }
-                        }
-                        item['validTime'] = new ValidTimePeriod(variableData['values'][i]['validTime']);
-                        values.push(item);
-                    }
-                }
-            }
-            return values;
-        };
-        GridPoint.prototype.mapToValidTimes = function (variable) {
-            var timeValueDict = {}, validTime, i, hour;
-            if (this.values[variable] !== undefined && this.values[variable].length) {
-                for (i = 0; i < this.values[variable].length; i++) {
-                    validTime = this.values[variable][i].validTime;
-                    for (hour = 0; hour < validTime.totalHours; hour++) {
-                        timeValueDict[validTime.time.milliseconds + hour * millisecondsPerHour] = this.values[variable][i];
-                    }
-                }
-                return this.validTimes.toArray().map(function (t) { return timeValueDict[t.milliseconds]; });
-            }
-        };
-        return GridPoint;
-    }(GeometryPolygon));
+        return GridpointData;
+    }(FeaturePolygon));
+
+    var GridpointForecastUnits;
+    (function (GridpointForecastUnits) {
+        GridpointForecastUnits["metric"] = "si";
+        GridpointForecastUnits["us"] = "us";
+    })(GridpointForecastUnits || (GridpointForecastUnits = {}));
+    var TemperatureUnit;
+    (function (TemperatureUnit) {
+        TemperatureUnit["F"] = "F";
+        TemperatureUnit["C"] = "C";
+    })(TemperatureUnit || (TemperatureUnit = {}));
+    var TemperatureTrend;
+    (function (TemperatureTrend) {
+        TemperatureTrend["rising"] = "rising";
+        TemperatureTrend["falling"] = "falling";
+    })(TemperatureTrend || (TemperatureTrend = {}));
+    var WindDirection;
+    (function (WindDirection) {
+        WindDirection["N"] = "N";
+        WindDirection["NNE"] = "NNE";
+        WindDirection["NE"] = "NE";
+        WindDirection["ENE"] = "ENE";
+        WindDirection["E"] = "E";
+        WindDirection["ESE"] = "ESE";
+        WindDirection["SE"] = "SE";
+        WindDirection["SSE"] = "SSE";
+        WindDirection["S"] = "S";
+        WindDirection["SSW"] = "SSW";
+        WindDirection["SW"] = "SW";
+        WindDirection["WSW"] = "WSW";
+        WindDirection["W"] = "W";
+        WindDirection["WNW"] = "WNW";
+        WindDirection["NW"] = "NW";
+        WindDirection["NNW"] = "NNW";
+    })(WindDirection || (WindDirection = {}));
 
     /*
         "number": 3,
@@ -669,134 +886,205 @@
         "shortForecast": "Sunny",
         "detailedForecast": "Sunny, with a high near 76. Southwest wind 0 to 10 mph."
     */
-    var ForecastPeriod = /** @class */ (function () {
-        function ForecastPeriod(data) {
+    var GridpointForecastPeriod = /** @class */ (function () {
+        function GridpointForecastPeriod(data) {
             this.number = getIntValue('number', data);
-            this.name = getStringValue('name', data);
+            if ('name' in data) {
+                this.name = getStringValue('name', data);
+            }
             this.startTime = getDateValue('startTime', data);
             this.endTime = getDateValue('endTime', data);
             this.isDaytime = getBoolValue('isDaytime', data);
-            this.temperature = getNumberValue('temperature', data);
-            this.temperatureUnit = getStringValue('temperatureUnit', data);
-            this.temperatureTrend = getStringValue('temperatureTrend', data);
+            this.temperature = getFloatValue('temperature', data);
+            this.temperatureUnit = TemperatureUnit[getStringValue('temperatureUnit', data)];
+            this.temperatureTrend = TemperatureTrend[getStringValue('temperatureTrend', data)];
             this.windSpeed = getStringValue('windSpeed', data);
-            this.windDirection = getStringValue('windDirection', data);
-            this.icon = getStringValue('icon', data);
-            this.shortForecast = getStringValue('shortForecast', data);
-            this.detailedForecast = getStringValue('detailedForecast', data);
+            if ('windGust' in data) {
+                this.windGust = getStringValue('windGust', data);
+            }
+            this.windDirection = WindDirection[getStringValue('windDirection', data)];
+            if ('probabilityOfPrecipitation' in data) {
+                this.windGust = getStringValue('probabilityOfPrecipitation', data);
+            }
+            if ('dewpoint' in data) {
+                this.windGust = getStringValue('dewpoint', data);
+            }
+            if ('relativeHumidity' in data) {
+                this.windGust = getStringValue('relativeHumidity', data);
+            }
+            if ('icon' in data) {
+                this.icon = getStringValue('icon', data);
+            }
+            if ('shortForecast' in data) {
+                this.shortForecast = getStringValue('shortForecast', data);
+            }
+            if ('detailedForecast' in data) {
+                this.detailedForecast = getStringValue('detailedForecast', data);
+            }
         }
-        return ForecastPeriod;
+        return GridpointForecastPeriod;
     }());
 
-    var Forecast = /** @class */ (function () {
-        function Forecast(data) {
+    var GridpointForecast = /** @class */ (function (_super) {
+        __extends(GridpointForecast, _super);
+        function GridpointForecast(data) {
+            var _this = _super.call(this, data) || this;
             var properties = getProperty('properties', data);
-            this.units = getStringValue('units', properties);
-            this.forecastGenerator = getStringValue('forecastGenerator', properties);
-            this.generatedAt = getDateValue('generatedAt', properties);
-            this.updateTime = getDateValue('updateTime', properties);
-            this.validTimes = new ValidTimePeriod(getStringValue('validTimes', properties));
-            this.elevation = new NumericValue(getProperty('elevation', properties));
-            this.periods = getProperty('periods', properties).map(function (period) { return new ForecastPeriod(period); });
+            _this.units = GridpointForecastUnits[getStringValue('units', properties)];
+            if ('forecastGenerator' in properties) {
+                _this.forecastGenerator = getStringValue('forecastGenerator', properties);
+            }
+            _this.generatedAt = getDateValue('generatedAt', properties);
+            _this.updateTime = getDateValue('updateTime', properties);
+            _this.validTimes = new Interval$1(getStringValue('validTimes', properties));
+            _this.elevation = new QuantitativeValue(getProperty('elevation', properties));
+            _this.periods = getProperty('periods', properties).map(function (period) { return new GridpointForecastPeriod(period); });
+            return _this;
         }
-        return Forecast;
-    }());
+        return GridpointForecast;
+    }(FeaturePolygon));
 
-    var Units$1;
-    (function (Units) {
-        Units["metric"] = "si";
-        Units["us"] = "us";
-    })(Units$1 || (Units$1 = {}));
+    var FeaturePoint = /** @class */ (function (_super) {
+        __extends(FeaturePoint, _super);
+        function FeaturePoint(data) {
+            var _this = _super.call(this, data) || this;
+            var geometry = getProperty('geometry', data);
+            var coordinates = getProperty('coordinates', geometry);
+            _this.latitude = coordinates[1];
+            _this.longitude = coordinates[0];
+            return _this;
+        }
+        return FeaturePoint;
+    }(Feature));
 
-    var GridPointsApi = /** @class */ (function (_super) {
-        __extends(GridPointsApi, _super);
-        function GridPointsApi() {
+    var ObservationStation = /** @class */ (function (_super) {
+        __extends(ObservationStation, _super);
+        function ObservationStation(data) {
+            var _this = _super.call(this, data) || this;
+            var properties = getProperty('properties', data);
+            _this.elevation = new QuantitativeValue(getProperty('elevation', properties));
+            _this.id = getStringValue('stationIdentifier', properties);
+            _this.name = getStringValue('name', properties);
+            _this.timeZone = getStringValue('timeZone', properties);
+            if ('forecast' in properties) {
+                _this.forecastZone = getStringValueFromUrl(getStringValue('forecast', properties));
+            }
+            if ('county' in properties) {
+                _this.county = getStringValueFromUrl(getStringValue('county', properties));
+            }
+            if ('fireWeatherZone' in properties) {
+                _this.fireWeatherZone = getStringValueFromUrl(getStringValue('fireWeatherZone', properties));
+            }
+            return _this;
+        }
+        return ObservationStation;
+    }(FeaturePoint));
+
+    var ObservationStationPage = /** @class */ (function (_super) {
+        __extends(ObservationStationPage, _super);
+        function ObservationStationPage(data) {
+            var _this = _super.call(this, data) || this;
+            var features = getProperty('features', data);
+            _this.data = features.map(function (feature) { return new ObservationStation(feature); });
+            return _this;
+        }
+        return ObservationStationPage;
+    }(DataPage));
+
+    var GridpointsApi = /** @class */ (function (_super) {
+        __extends(GridpointsApi, _super);
+        function GridpointsApi() {
             return _super.call(this) || this;
         }
-        GridPointsApi.prototype.getForecastData = function (officeId, x, y) {
+        GridpointsApi.prototype.getData = function (officeId, x, y) {
             return __awaiter(this, void 0, void 0, function () {
                 var data;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, _super.prototype.get.call(this, "gridpoint/".concat(officeId, "/").concat(x, ",").concat(y))];
+                        case 0: return [4 /*yield*/, _super.prototype.get.call(this, "gridpoints/".concat(officeId, "/").concat(x, ",").concat(y))];
                         case 1:
                             data = _a.sent();
-                            return [2 /*return*/, new GridPoint(data)];
+                            return [2 /*return*/, new GridpointData(data)];
                     }
                 });
             });
         };
-        GridPointsApi.prototype.getForecast = function (officeId_1, x_1, y_1) {
+        GridpointsApi.prototype.getForecast = function (officeId_1, x_1, y_1) {
             return __awaiter(this, arguments, void 0, function (officeId, x, y, units) {
                 var data;
-                if (units === void 0) { units = Units$1.us; }
+                if (units === void 0) { units = GridpointForecastUnits.us; }
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, _super.prototype.get.call(this, "gridpoint/".concat(officeId, "/").concat(x, ",").concat(y, "/forecast"))];
+                        case 0: return [4 /*yield*/, _super.prototype.get.call(this, "gridpoints/".concat(officeId, "/").concat(x, ",").concat(y, "/forecast"))];
                         case 1:
                             data = _a.sent();
-                            return [2 /*return*/, new Forecast(data)];
+                            return [2 /*return*/, new GridpointForecast(data)];
                     }
                 });
             });
         };
-        GridPointsApi.prototype.getForecastHourly = function (officeId_1, x_1, y_1) {
+        GridpointsApi.prototype.getForecastHourly = function (officeId_1, x_1, y_1) {
             return __awaiter(this, arguments, void 0, function (officeId, x, y, units) {
                 var data;
-                if (units === void 0) { units = Units$1.us; }
+                if (units === void 0) { units = GridpointForecastUnits.us; }
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, _super.prototype.get.call(this, "gridpoint/".concat(officeId, "/").concat(x, ",").concat(y, "/forecast/hourly"))];
+                        case 0: return [4 /*yield*/, _super.prototype.get.call(this, "gridpoints/".concat(officeId, "/").concat(x, ",").concat(y, "/forecast/hourly"))];
                         case 1:
                             data = _a.sent();
-                            return [2 /*return*/, new Forecast(data)];
+                            return [2 /*return*/, new GridpointForecast(data)];
                     }
                 });
             });
         };
-        GridPointsApi.prototype.getStations = function (officeId, x, y) {
+        GridpointsApi.prototype.getStations = function (officeId, x, y) {
             return __awaiter(this, void 0, void 0, function () {
                 var data;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, _super.prototype.get.call(this, "gridpoint/".concat(officeId, "/").concat(x, ",").concat(y, "/stations"))];
+                        case 0: return [4 /*yield*/, _super.prototype.get.call(this, "gridpoints/".concat(officeId, "/").concat(x, ",").concat(y, "/stations"))];
                         case 1:
                             data = _a.sent();
-                            return [2 /*return*/, getProperty('features', data).map(function (feature) { return new Station(feature); })];
+                            return [2 /*return*/, new ObservationStationPage(data)];
                     }
                 });
             });
         };
-        return GridPointsApi;
+        return GridpointsApi;
     }(ApiBase));
 
-    var RelativeLocation = /** @class */ (function () {
+    var RelativeLocation = /** @class */ (function (_super) {
+        __extends(RelativeLocation, _super);
         function RelativeLocation(data) {
+            var _this = _super.call(this, data) || this;
             var properties = getProperty('properties', data);
-            this.city = getStringValue('city', properties);
-            this.state = getStringValue('state', properties);
-            this.distance = new NumericValue(getProperty('distance', properties));
-            this.bearing = new NumericValue(getProperty('bearing', properties));
+            _this.city = getStringValue('city', properties);
+            _this.state = getStringValue('state', properties);
+            _this.distance = new QuantitativeValue(getProperty('distance', properties));
+            _this.bearing = new QuantitativeValue(getProperty('bearing', properties));
+            return _this;
         }
         return RelativeLocation;
-    }());
+    }(FeaturePoint));
 
-    var Point = /** @class */ (function () {
+    var Point = /** @class */ (function (_super) {
+        __extends(Point, _super);
         function Point(data) {
+            var _this = _super.call(this, data) || this;
             var properties = getProperty('properties', data);
-            this.gridX = getNumberValue('gridX', properties);
-            this.gridX = getNumberValue('gridY', properties);
-            this.office = getStringValue('gridId', properties);
-            this.forecastZone = getUrlPart(getStringValue('forecastZone', properties), -1);
-            this.timeZone = getStringValue('timeZone', properties);
-            this.radarStation = getStringValue('radarStation', properties);
-            this.relativeLocation = new RelativeLocation(getProperty('relativeLocation', properties));
-            // optional properties
-            this.county = getUrlPart(getStringValue('county', properties, true), -1);
-            this.fireWeatherZone = getUrlPart(getStringValue('fireWeatherZone', properties, true), -1);
+            _this.gridX = getIntValue('gridX', properties);
+            _this.gridY = getIntValue('gridY', properties);
+            _this.office = getOfficeIdValue('gridId', properties);
+            _this.forecastZone = getStringValueFromUrl(getStringValue('forecastZone', properties));
+            _this.timeZone = getStringValue('timeZone', properties);
+            _this.radarStation = getStringValue('radarStation', properties);
+            _this.relativeLocation = new RelativeLocation(getProperty('relativeLocation', properties));
+            _this.county = getStringValueFromUrl(getStringValue('county', properties));
+            _this.fireWeatherZone = getStringValueFromUrl(getStringValue('fireWeatherZone', properties));
+            return _this;
         }
         return Point;
-    }());
+    }(FeaturePoint));
 
     var PointsApi = /** @class */ (function (_super) {
         __extends(PointsApi, _super);
@@ -860,7 +1148,8 @@
         alerts: new AlertsApi(),
         stations: new StationsApi(),
         zones: new ZonesApi(),
-        gridPoint: new GridPointsApi()
+        gridPoint: new GridpointsApi(),
+        NWSForecastOfficeId: NWSForecastOfficeId
     };
 
     // https://tidesandcurrents.noaa.gov/api/

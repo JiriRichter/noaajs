@@ -1,5 +1,5 @@
 import { ApiBase } from './base';
-import { Product } from '../response/product';
+import { Product } from '../data/product';
 
 export class ProductsApi extends ApiBase {
 

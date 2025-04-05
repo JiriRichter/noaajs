@@ -1,4 +1,4 @@
-import { NumericValue } from "../weather/response/numeric-value";
+import { QuantitativeValue } from "../weather/data/quantitative-value";
 
 // returns date formatted as YYYYMMDD HH:mm in UTC
 export function formatDate(date) {

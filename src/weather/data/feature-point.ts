@@ -1,13 +1,14 @@
-import { Geometry } from "./geometry";
+import { Feature } from "./feature";
 import { getProperty } from "./utils";
 
-export class GeometryPoint extends Geometry {
+export class FeaturePoint extends Feature {
     public longitude: number;
     public latitude: number;
 
     constructor(data: any) {
         super(data)
-        const coordinates = getProperty('coordinates', data) as [number, number];
+        const geometry = getProperty('geometry', data);
+        const coordinates = getProperty('coordinates', geometry) as [number, number];
         this.latitude = coordinates[1];
         this.longitude = coordinates[0];
     }

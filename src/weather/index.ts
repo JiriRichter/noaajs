@@ -1,10 +1,11 @@
 import { AlertsApi } from './api/alerts';
 import { GlossaryApi } from './api/glossary';
-import { GridPointsApi } from './api/gridpoints';
+import { GridpointsApi } from './api/gridpoints';
 import { PointsApi } from './api/points';
 import { ProductsApi } from './api/products';
 import { StationsApi } from './api/stations';
 import { ZonesApi } from './api/zones';
+import { NWSForecastOfficeId } from './data/office-id';
 
 export const Weather = {
     points: new PointsApi(),
@@ -13,5 +14,6 @@ export const Weather = {
     alerts: new AlertsApi(),
     stations: new StationsApi(),
     zones: new ZonesApi(),
-    gridPoint: new GridPointsApi()
+    gridPoint: new GridpointsApi(),
+    NWSForecastOfficeId: NWSForecastOfficeId
 };

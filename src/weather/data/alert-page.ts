@@ -1,8 +1,8 @@
 import { Alert } from "./alert";
-import { Page } from "./page";
+import { DataPage } from "./data-page";
 import { getProperty } from "./utils";
 
-export class AlertPage extends Page {
+export class AlertPage extends DataPage {
     data: Alert[];
 
     constructor(data: any) {

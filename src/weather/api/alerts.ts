@@ -1,8 +1,8 @@
 import { ApiBase } from './base';
 import { StateAreaCodes, MarineAreaCodes, RegionCodes } from '../../utils/codes';
-import { Alert } from '../response/alert';
+import { Alert } from '../data/alert';
 import { createQueryString } from '../../tidesandcurrents/utils';
-import { AlertPage } from '../response/alert-page';
+import { AlertPage } from '../data/alert-page';
 
 enum AlertStatus {
     'actual' = 'actual',
