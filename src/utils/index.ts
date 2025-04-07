@@ -1,1 +1,0 @@
-export { StateAreaCodes, MarineAreaCodes, RegionCodes } from './codes';

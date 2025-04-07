@@ -1,5 +1,5 @@
 import { Zone } from './zone';
-import { getDateValue, getProperty, getStringValue } from './utils';
+import { getDateValue, getProperty, getStringValue } from '../../utils/json';
 
 export class Alert {
     id: any;

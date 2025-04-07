@@ -1,7 +1,7 @@
 import { QuantitativeValue } from "./quantitative-value";
 import { GridpointForecastPeriod } from "./gridpoint-forecast-period";
 import { Interval } from "./interval";
-import { getDateValue, getProperty, getStringValue } from "./utils";
+import { getDateValue, getProperty, getStringValue } from "../../utils/json";
 import { GridpointForecastUnits } from "./types";
 import { FeaturePolygon } from "./feature-polygon";
 

@@ -1,5 +1,5 @@
 import { Feature } from "./feature";
-import { getProperty } from "./utils";
+import { getProperty } from "../../utils/json";
 
 export class FeaturePoint extends Feature {
     public longitude: number;

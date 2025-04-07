@@ -1,4 +1,4 @@
-import { appendQueryString } from "../utils";
+import { appendQueryString } from "../../utils/request";
 import { StationType } from "./station-type";
 
 export class TidesAndCurrentsMetadataApi {

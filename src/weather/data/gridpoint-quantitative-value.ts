@@ -1,5 +1,6 @@
 import { IntervalValue } from "./interval-value";
-import { getProperty, getStringValue, parseUnits } from "./utils";
+import { getProperty, getStringValue } from "../../utils/json";
+import { parseUnits } from "./utils";
 
 export class GridpointQuantitativeValue {
 

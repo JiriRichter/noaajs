@@ -1,4 +1,4 @@
-import { getStringValue } from "./utils";
+import { getStringValue } from "../../utils/json";
 
 export class Feature {
     public type?: string;

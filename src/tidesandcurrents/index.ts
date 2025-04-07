@@ -1,29 +1,20 @@
-import { Format, Datum, DataProduct, Units, Interval } from './data/const';
-
-import { Datums } from './data/products/datums';
-import { Predictions } from './data/products/predictions';
-import { Wind } from './data/products/wind';
+import { Datum, Units } from './data/types';
 import { TidesAndCurrentsMetadataApi } from './metadata/api';
 import { StationType } from './metadata/station-type';
+import { TideAndWaterLevelDataApi } from './data/tide-and-water-level-data-api';
+import { TidesAndCurrentsDateRange } from './data/data-range';
 
 export const TidesAndCurrents = {
-    Format: Format,
     Datum: Datum,
-    DataProduct: DataProduct,
     Units: Units,
-    Interval: Interval,
     StationType: StationType,
 
+    dateRange: TidesAndCurrentsDateRange,
+
     data: {
-        predictions: function (stationId, datum?) {
-            return new Predictions(stationId, datum);
-        },
-        datums: function (stationId) {
-            return new Datums(stationId);
-        },
-        wind: function (stationId, interval?) {
-            return new Wind(stationId, interval);
-        }
+
+        tidesAndWaterLevel: new TideAndWaterLevelDataApi
+
     },
 
     metadata: new TidesAndCurrentsMetadataApi()

@@ -1,4 +1,4 @@
-import { getDateValue, getStringValue } from "./utils";
+import { getDateValue, getStringValue } from "../../utils/json";
 
 export class Product {
     public id: string;

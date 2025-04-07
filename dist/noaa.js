@@ -4,91 +4,6 @@
     (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.NOAA = {}));
 })(this, (function (exports) { 'use strict';
 
-    /*
-     * State / marine area code
-     * */
-    var StateAreaCodes = {
-        'AL': 'AL',
-        'AK': 'AK',
-        'AS': 'AS',
-        'AR': 'AR',
-        'AZ': 'AZ',
-        'CA': 'CA',
-        'CO': 'CO',
-        'CT': 'CT',
-        'DE': 'DE',
-        'DC': 'DC',
-        'FL': 'FL',
-        'GA': 'GA',
-        'GU': 'GU',
-        'HI': 'HI',
-        'ID': 'ID',
-        'IL': 'IL',
-        'IN': 'IN',
-        'IA': 'IA',
-        'KS': 'KS',
-        'KY': 'KY',
-        'LA': 'LA',
-        'ME': 'ME',
-        'MD': 'MD',
-        'MA': 'MA',
-        'MI': 'MI',
-        'MN': 'MN',
-        'MS': 'MS',
-        'MO': 'MO',
-        'MT': 'MT',
-        'NE': 'NE',
-        'NV': 'NV',
-        'NH': 'NH',
-        'NJ': 'NJ',
-        'NM': 'NM',
-        'NY': 'NY',
-        'NC': 'NC',
-        'ND': 'ND',
-        'OH': 'OH',
-        'OK': 'OK',
-        'OR': 'OR',
-        'PA': 'PA',
-        'PR': 'PR',
-        'RI': 'RI',
-        'SC': 'SC',
-        'SD': 'SD',
-        'TN': 'TN',
-        'TX': 'TX',
-        'UT': 'UT',
-        'VT': 'VT',
-        'VI': 'VI',
-        'VA': 'VA',
-        'WA': 'WA',
-        'WV': 'WV',
-        'WI': 'WI',
-        'WY': 'WY'
-    };
-    var MarineAreaCodes = {
-        'PZ': 'PZ',
-        'PK': 'PK',
-        'PH': 'PH',
-        'PS': 'PS',
-        'PM': 'PM',
-        'AN': 'AN',
-        'AM': 'AM',
-        'GM': 'GM',
-        'LS': 'LS',
-        'LM': 'LM',
-        'LH': 'LH',
-        'LC': 'LC',
-        'LE': 'LE',
-        'LO': 'LO'
-    };
-    var RegionCodes = {
-        'AL': 'AL',
-        'AT': 'AT',
-        'GL': 'GL',
-        'GM': 'GM',
-        'PA': 'PA',
-        'PI': 'PI'
-    };
-
     /******************************************************************************
     Copyright (c) Microsoft Corporation.
 
@@ -223,38 +138,6 @@
         return ApiBase;
     }());
 
-    // returns date formatted as YYYYMMDD HH:mm in UTC
-    function formatDate(date) {
-        var year = date.getUTCFullYear();
-        var month = date.getUTCMonth() + 1;
-        var day = date.getUTCDate();
-        var hours = date.getUTCHours();
-        var minutes = date.getUTCMinutes();
-        return "".concat(year).concat(month.toString().padStart(2, "0")).concat(day.toString().padStart(2, "0"), " ").concat(hours.toString().padStart(2, "0"), ":").concat(minutes.toString().padStart(2, "0"));
-    }
-    function createQueryString(params) {
-        if (params) {
-            return Object.keys(params).map(function (key) { return key + '=' + encodeURIComponent(params[key]); }).join('&');
-        }
-        return '';
-    }
-    function appendQueryString(uri, params) {
-        var query = createQueryString(params);
-        if (query) {
-            return "".concat(uri, "?").concat(query);
-        }
-        return uri;
-    }
-    function parseTime(s) {
-        //2019-06-20 03:30
-        //2019-06-22T23:58:22+00:00
-        return new Date(Date.parse(s.replace(' ', 'T') + ':00+00:00'));
-    }
-
-    function getStringValueFromUrl(url) {
-        var parts = url.split('/');
-        return parts[parts.length - 1];
-    }
     function validateProperty(key, data) {
         if (!(key in data)) {
             throw new Error("Required property ".concat(key, " is not present in JSON data"));
@@ -292,9 +175,6 @@
         if (data === void 0) { data = false; }
         validateProperty(key, data);
         return parseDate(getStringValue(key, data));
-    }
-    function parseUnits(value) {
-        return value.split(':')[1];
     }
 
     var Zone = /** @class */ (function () {
@@ -349,23 +229,15 @@
 
     var DataPage = /** @class */ (function () {
         function DataPage(data) {
-            this.title = getStringValue('title', data);
-            this.updated = getDateValue('updated', data);
-            var pagination = getProperty('pagination', data);
-            if ('next' in pagination) {
-                this.nextPageUrl = getStringValue('next', pagination);
+            if ('title' in data) {
+                this.title = getStringValue('title', data);
             }
+            if ('updated' in data) {
+                this.updated = getDateValue('updated', data);
+            }
+            var pagination = getProperty('pagination', data);
+            this.nextPageUrl = getStringValue('next', pagination);
         }
-        Object.defineProperty(DataPage.prototype, "hasMoreData", {
-            get: function () {
-                if (this.nextPageUrl) {
-                    return true;
-                }
-                return false;
-            },
-            enumerable: false,
-            configurable: true
-        });
         return DataPage;
     }());
 
@@ -379,6 +251,20 @@
         }
         return AlertPage;
     }(DataPage));
+
+    function createQueryString(params) {
+        if (params) {
+            return Object.keys(params).map(function (key) { return key + '=' + encodeURIComponent(params[key]); }).join('&');
+        }
+        return '';
+    }
+    function appendQueryString(uri, params) {
+        var query = createQueryString(params);
+        if (query) {
+            return "".concat(uri, "?").concat(query);
+        }
+        return uri;
+    }
 
     var AlertStatus;
     (function (AlertStatus) {
@@ -500,7 +386,7 @@
     }(ApiBase));
 
     var millisecondsPerHour = 3600000;
-    var Interval$1 = /** @class */ (function () {
+    var Interval = /** @class */ (function () {
         function Interval(s) {
             var parts = s.split('/');
             if (parts.length !== 2) {
@@ -550,6 +436,14 @@
         return Interval;
     }());
 
+    function getStringValueFromUrl(url) {
+        var parts = url.split('/');
+        return parts[parts.length - 1];
+    }
+    function parseUnits(value) {
+        return value.split(':')[1];
+    }
+
     var QuantitativeValue = /** @class */ (function () {
         function QuantitativeValue(data) {
             this.value = getFloatValue('value', data);
@@ -577,7 +471,9 @@
 
     var Feature = /** @class */ (function () {
         function Feature(data) {
-            this.type = getStringValue('type', data);
+            if ('type' in data) {
+                this.type = getStringValue('type', data);
+            }
         }
         return Feature;
     }());
@@ -660,7 +556,7 @@
     var IntervalValue = /** @class */ (function () {
         function IntervalValue(data) {
             this.value = getFloatValue('value', data);
-            this.validTime = new Interval$1(getStringValue('validTime', data));
+            this.validTime = new Interval(getStringValue('validTime', data));
         }
         return IntervalValue;
     }());
@@ -824,7 +720,7 @@
             _this.office = getOfficeIdValue('gridId', properties);
             _this.elevation = new QuantitativeValue(getProperty('elevation', properties));
             _this.updateTime = getDateValue('updateTime', properties);
-            _this.validTimes = new Interval$1(getStringValue('validTimes', properties));
+            _this.validTimes = new Interval(getStringValue('validTimes', properties));
             _this.values = {};
             Object.keys(GridpointVariable).forEach(function (key) {
                 if (key in properties) {
@@ -936,7 +832,7 @@
             }
             _this.generatedAt = getDateValue('generatedAt', properties);
             _this.updateTime = getDateValue('updateTime', properties);
-            _this.validTimes = new Interval$1(getStringValue('validTimes', properties));
+            _this.validTimes = new Interval(getStringValue('validTimes', properties));
             _this.elevation = new QuantitativeValue(getProperty('elevation', properties));
             _this.periods = getProperty('periods', properties).map(function (period) { return new GridpointForecastPeriod(period); });
             return _this;
@@ -1043,6 +939,19 @@
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0: return [4 /*yield*/, _super.prototype.get.call(this, "gridpoints/".concat(officeId, "/").concat(x, ",").concat(y, "/stations"))];
+                        case 1:
+                            data = _a.sent();
+                            return [2 /*return*/, new ObservationStationPage(data)];
+                    }
+                });
+            });
+        };
+        GridpointsApi.prototype.getStationsNext = function (page) {
+            return __awaiter(this, void 0, void 0, function () {
+                var data;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, _super.prototype.getNext.call(this, page)];
                         case 1:
                             data = _a.sent();
                             return [2 /*return*/, new ObservationStationPage(data)];
@@ -1168,28 +1077,39 @@
         Datum["NAVD"] = "NAVD";
         Datum["STND"] = "STND"; //Station Datum
     })(Datum || (Datum = {}));
-    // Specify the type of data with the "product=" option parameter. 
-    var DataProduct;
-    (function (DataProduct) {
-        DataProduct["water_level"] = "water_level";
-        DataProduct["air_temperature"] = "air_temperature";
-        DataProduct["water_temperature"] = "water_temperature";
-        DataProduct["wind"] = "wind";
-        DataProduct["air_pressure"] = "air_pressure";
-        DataProduct["air_gap"] = "air_gap";
-        DataProduct["conductivity"] = "conductivity";
-        DataProduct["visibility"] = "visibility";
-        DataProduct["humidity"] = "humidity";
-        DataProduct["salinity"] = "salinity";
-        DataProduct["hourly_height"] = "hourly_height";
-        DataProduct["high_low"] = "high_low";
-        DataProduct["daily_mean"] = "daily_mean";
-        DataProduct["monthly_mean"] = "monthly_mean";
-        DataProduct["one_minute_water_level"] = "one_minute_water_level";
-        DataProduct["predictions"] = "predictions";
-        DataProduct["datums"] = "datums";
-        DataProduct["currents"] = "currents"; //Currents data for currents stations.
-    })(DataProduct || (DataProduct = {}));
+    var TidesAndWaterLevelDataProduct;
+    (function (TidesAndWaterLevelDataProduct) {
+        TidesAndWaterLevelDataProduct["water_level"] = "water_level";
+        TidesAndWaterLevelDataProduct["air_gap"] = "air_gap";
+        TidesAndWaterLevelDataProduct["hourly_height"] = "hourly_height";
+        TidesAndWaterLevelDataProduct["high_low"] = "high_low";
+        TidesAndWaterLevelDataProduct["daily_mean"] = "daily_mean";
+        TidesAndWaterLevelDataProduct["monthly_mean"] = "monthly_mean";
+        TidesAndWaterLevelDataProduct["one_minute_water_level"] = "one_minute_water_level";
+        TidesAndWaterLevelDataProduct["predictions"] = "predictions";
+        TidesAndWaterLevelDataProduct["datums"] = "datums"; //datums data for the stations.
+    })(TidesAndWaterLevelDataProduct || (TidesAndWaterLevelDataProduct = {}));
+    var MeteorologicalDataProduct;
+    (function (MeteorologicalDataProduct) {
+        MeteorologicalDataProduct["air_temperature"] = "air_temperature";
+        MeteorologicalDataProduct["water_temperature"] = "water_temperature";
+        MeteorologicalDataProduct["wind"] = "wind";
+        MeteorologicalDataProduct["air_pressure"] = "air_pressure";
+        MeteorologicalDataProduct["conductivity"] = "conductivity";
+        MeteorologicalDataProduct["visibility"] = "visibility";
+        MeteorologicalDataProduct["humidity"] = "humidity";
+        MeteorologicalDataProduct["salinity"] = "salinity";
+    })(MeteorologicalDataProduct || (MeteorologicalDataProduct = {}));
+    var CurrentsDataProduct;
+    (function (CurrentsDataProduct) {
+        CurrentsDataProduct["currents"] = "currents";
+        CurrentsDataProduct["currents_predictions"] = "currents_predictions";
+        CurrentsDataProduct["currents_header"] = "currents_header"; //Currents header data for the stations. Note! Data length is limited to 1 month.
+    })(CurrentsDataProduct || (CurrentsDataProduct = {}));
+    var OperationalForecastDataProduct;
+    (function (OperationalForecastDataProduct) {
+        OperationalForecastDataProduct["ofs_water_level"] = "ofs_water_level"; //Water level model guidance at 6-minute intervals based on NOS OFS models. Data available from 2020 to present.
+    })(OperationalForecastDataProduct || (OperationalForecastDataProduct = {}));
     // gmt, lst or lst_ldt.The time_zone can be specified with the "time_zone=" option parameter.
     // Example =  time_zone = gmt
     // Retrieve data with GMT date / times.
@@ -1199,177 +1119,41 @@
         TimeZone["lst"] = "lst";
         TimeZone["lst_ldt"] = "lst_ldt"; //Local Standard / Local Daylight Time.The time local to the requested station.
     })(TimeZone || (TimeZone = {}));
-    //The interval for which Meteorological data is returned
-    //Note! The default is 6 minute interval and there is no need to specify it.The hourly interval is supported for Met data and Predictions data only.
-    //    Example =  interval = h-- - Will retrieve hourly Met data 
-    var Interval;
-    (function (Interval) {
-        Interval["h"] = "h";
-        Interval["hilo"] = "hilo";
-    })(Interval || (Interval = {}));
-    //Format
-    //The output format can be specified with the "format=" option parameter.
-    var Format;
-    (function (Format) {
-        Format["json"] = "json";
-        Format["xml"] = "xml";
-        Format["csv"] = "csv"; //Comma Separated Values.This format is suitable for export to Microsoft Excel or other spreadsheet programs.This is also the most easily human - readable format.
-    })(Format || (Format = {}));
+    var TidesAndWaterLevelPredictionsInterval;
+    (function (TidesAndWaterLevelPredictionsInterval) {
+        TidesAndWaterLevelPredictionsInterval["h"] = "h";
+        TidesAndWaterLevelPredictionsInterval["hilo"] = "hilo";
+        TidesAndWaterLevelPredictionsInterval[TidesAndWaterLevelPredictionsInterval["1minutes"] = 1] = "1minutes";
+        TidesAndWaterLevelPredictionsInterval[TidesAndWaterLevelPredictionsInterval["5minutes"] = 5] = "5minutes";
+        TidesAndWaterLevelPredictionsInterval[TidesAndWaterLevelPredictionsInterval["6minutes"] = 6] = "6minutes";
+        TidesAndWaterLevelPredictionsInterval[TidesAndWaterLevelPredictionsInterval["10minutes"] = 10] = "10minutes";
+        TidesAndWaterLevelPredictionsInterval[TidesAndWaterLevelPredictionsInterval["15minutes"] = 15] = "15minutes";
+        TidesAndWaterLevelPredictionsInterval[TidesAndWaterLevelPredictionsInterval["30minutes"] = 30] = "30minutes";
+        TidesAndWaterLevelPredictionsInterval[TidesAndWaterLevelPredictionsInterval["60minutes"] = 60] = "60minutes";
+    })(TidesAndWaterLevelPredictionsInterval || (TidesAndWaterLevelPredictionsInterval = {}));
+    var CurrentDataInterval;
+    (function (CurrentDataInterval) {
+        CurrentDataInterval["h"] = "h";
+    })(CurrentDataInterval || (CurrentDataInterval = {}));
+    var MeteorologicalDataInterval;
+    (function (MeteorologicalDataInterval) {
+        MeteorologicalDataInterval["h"] = "h";
+    })(MeteorologicalDataInterval || (MeteorologicalDataInterval = {}));
+    var CurrentPredictionsInterval;
+    (function (CurrentPredictionsInterval) {
+        CurrentPredictionsInterval["h"] = "h";
+        CurrentPredictionsInterval["max_slack"] = "max_slack";
+        CurrentPredictionsInterval[CurrentPredictionsInterval["1minutes"] = 1] = "1minutes";
+        CurrentPredictionsInterval[CurrentPredictionsInterval["6minutes"] = 6] = "6minutes";
+        CurrentPredictionsInterval[CurrentPredictionsInterval["10minutes"] = 10] = "10minutes";
+        CurrentPredictionsInterval[CurrentPredictionsInterval["30minutes"] = 30] = "30minutes";
+        CurrentPredictionsInterval[CurrentPredictionsInterval["60minutes"] = 60] = "60minutes";
+    })(CurrentPredictionsInterval || (CurrentPredictionsInterval = {}));
     var Units;
     (function (Units) {
         Units["metric"] = "metric";
         Units["english"] = "english"; // English units (fahrenheit, feet, knots appropriate for the data). Note!Visibility data is Nautical Miles (nm), Currents data is in knots.
     })(Units || (Units = {}));
-
-    var TidesAndCurrentsDataApi = /** @class */ (function () {
-        function TidesAndCurrentsDataApi(stationId, product, datum, interval, units) {
-            if (datum === void 0) { datum = undefined; }
-            if (interval === void 0) { interval = undefined; }
-            if (units === void 0) { units = 'metric'; }
-            if (!(product in DataProduct)) {
-                throw new Error('Invalid data product');
-            }
-            if (!(units in Units)) {
-                throw new Error('Invalid units');
-            }
-            this.params = {};
-            this.params['station'] = stationId;
-            this.params['product'] = product;
-            this.params['format'] = Format.json;
-            this.params['units'] = units;
-            this.params['time_zone'] = TimeZone.gmt;
-            if (datum) {
-                if (!(datum in Datum)) {
-                    throw new Error('Invalid datum value');
-                }
-                this.params['datum'] = datum;
-            }
-            if (interval) {
-                if (!(interval in Interval)) {
-                    throw new Error('Invalid interval');
-                }
-                this.params['interval'] = interval;
-            }
-        }
-        TidesAndCurrentsDataApi.prototype.getLatest = function () {
-            this.params['date'] = 'latest';
-            return this.get();
-        };
-        TidesAndCurrentsDataApi.prototype.getRecent = function () {
-            this.params['date'] = 'recent';
-            return this.get();
-        };
-        TidesAndCurrentsDataApi.prototype.getToday = function () {
-            this.params['date'] = 'today';
-            return this.get();
-        };
-        TidesAndCurrentsDataApi.prototype.getLastHours = function (hours) {
-            this.params['range'] = hours;
-            return this.get();
-        };
-        TidesAndCurrentsDataApi.prototype.getHoursAfter = function (start, hours) {
-            this.params['begin_date'] = formatDate(start);
-            this.params['range'] = hours;
-            return this.get();
-        };
-        TidesAndCurrentsDataApi.prototype.getHoursBefore = function (end, hours) {
-            this.params['end_date'] = formatDate(end);
-            this.params['range'] = hours;
-            return this.get();
-        };
-        TidesAndCurrentsDataApi.prototype.getDateRange = function (start, end) {
-            this.params['begin_date'] = formatDate(start);
-            this.params['end_date'] = formatDate(end);
-            return this.get();
-        };
-        TidesAndCurrentsDataApi.prototype.get = function () {
-            var _this = this;
-            var self = this;
-            return new Promise(function (resolve, reject) {
-                var xhr = new XMLHttpRequest();
-                var url = appendQueryString(TidesAndCurrentsDataApi.url, _this.params);
-                xhr.open('GET', url);
-                xhr.onload = function () {
-                    if (xhr.status >= 200 && xhr.status < 300) {
-                        var json = JSON.parse(xhr.response);
-                        if (json['error']) {
-                            reject(json['error']);
-                        }
-                        else {
-                            var data = self.parseResponse(json);
-                            data['parameters'] = Object.assign({}, self.params);
-                            resolve(data);
-                        }
-                    }
-                    else {
-                        reject(xhr);
-                    }
-                };
-                xhr.onerror = function () {
-                    reject(xhr);
-                };
-                xhr.send();
-            });
-        };
-        TidesAndCurrentsDataApi.prototype.parseResponse = function (data) {
-            return data;
-        };
-        /** The API end point */
-        TidesAndCurrentsDataApi.url = 'https://api.tidesandcurrents.noaa.gov/api/prod/datagetter';
-        return TidesAndCurrentsDataApi;
-    }());
-
-    var Datums = /** @class */ (function (_super) {
-        __extends(Datums, _super);
-        function Datums(stationId) {
-            return _super.call(this, stationId, DataProduct.datums, undefined, undefined, Units.metric) || this;
-        }
-        Datums.prototype.parseResponse = function (data) {
-            var datums = [];
-            data['datums'].forEach(function (d) {
-                datums.push({
-                    'name': d['n'],
-                    'value': parseFloat(d['v']),
-                    'unit': 'm'
-                });
-            });
-            return datums;
-        };
-        return Datums;
-    }(TidesAndCurrentsDataApi));
-
-    var Predictions = /** @class */ (function (_super) {
-        __extends(Predictions, _super);
-        function Predictions(stationId, datum) {
-            if (!datum) {
-                datum = Datum.STND;
-            }
-            return _super.call(this, stationId, DataProduct.predictions, datum, Interval.hilo, Units.metric) || this;
-        }
-        Predictions.prototype.parseResponse = function (data) {
-            var predictions = [];
-            data['predictions'].forEach(function (d) {
-                predictions.push({
-                    'time': parseTime(d['t']),
-                    'value': parseFloat(d['v']),
-                    'type': d['type']
-                });
-            });
-            return predictions;
-        };
-        return Predictions;
-    }(TidesAndCurrentsDataApi));
-
-    var Wind = /** @class */ (function (_super) {
-        __extends(Wind, _super);
-        function Wind(stationId, interval) {
-            return _super.call(this, stationId, DataProduct.wind, undefined, interval, Units.metric) || this;
-        }
-        Wind.prototype.parseResponse = function (data) {
-            return data;
-        };
-        return Wind;
-    }(TidesAndCurrentsDataApi));
 
     var TidesAndCurrentsMetadataApi = /** @class */ (function () {
         function TidesAndCurrentsMetadataApi() {
@@ -1474,30 +1258,200 @@
         StationType["lowwater"] = "lowwater"; // Stations that are in Low Water Alert.
     })(StationType || (StationType = {}));
 
-    var TidesAndCurrents = {
-        Format: Format,
-        Datum: Datum,
-        DataProduct: DataProduct,
-        Units: Units,
-        Interval: Interval,
-        StationType: StationType,
-        data: {
-            predictions: function (stationId, datum) {
-                return new Predictions(stationId, datum);
-            },
-            datums: function (stationId) {
-                return new Datums(stationId);
-            },
-            wind: function (stationId, interval) {
-                return new Wind(stationId, interval);
+    var TidesAndCurrentsDataApi = /** @class */ (function () {
+        function TidesAndCurrentsDataApi() {
+        }
+        TidesAndCurrentsDataApi.prototype.get = function (parameters) {
+            return __awaiter(this, void 0, void 0, function () {
+                var url, response, errorData;
+                return __generator(this, function (_b) {
+                    switch (_b.label) {
+                        case 0:
+                            url = "".concat(TidesAndCurrentsDataApi.base_url, "?").concat(createQueryString(parameters));
+                            return [4 /*yield*/, fetch(url)];
+                        case 1:
+                            response = _b.sent();
+                            if (!(response.ok === false)) return [3 /*break*/, 6];
+                            _b.label = 2;
+                        case 2:
+                            _b.trys.push([2, 4, , 5]);
+                            return [4 /*yield*/, response.json()];
+                        case 3:
+                            errorData = _b.sent();
+                            if ('error' in errorData && 'message' in errorData['error']) {
+                                throw new Error(errorData['error']['message']);
+                            }
+                            return [3 /*break*/, 5];
+                        case 4:
+                            _b.sent();
+                            return [3 /*break*/, 5];
+                        case 5: throw new Error("API responded with status ".concat(response.status, " (").concat(response.statusText, ")"));
+                        case 6: return [4 /*yield*/, response.json()];
+                        case 7: return [2 /*return*/, _b.sent()];
+                    }
+                });
+            });
+        };
+        /** The API end point */
+        TidesAndCurrentsDataApi.base_url = 'https://api.tidesandcurrents.noaa.gov/api/prod/datagetter';
+        return TidesAndCurrentsDataApi;
+    }());
+
+    // returns date formatted as YYYYMMDD HH:mm in UTC
+    function formatDate(date) {
+        var year = date.getUTCFullYear();
+        var month = date.getUTCMonth() + 1;
+        var day = date.getUTCDate();
+        var hours = date.getUTCHours();
+        var minutes = date.getUTCMinutes();
+        return "".concat(year).concat(month.toString().padStart(2, "0")).concat(day.toString().padStart(2, "0"), " ").concat(hours.toString().padStart(2, "0"), ":").concat(minutes.toString().padStart(2, "0"));
+    }
+
+    var QueryBuilder = /** @class */ (function () {
+        function QueryBuilder() {
+            this.queryParameters = {
+                format: "json",
+                time_zone: TimeZone.gmt,
+                units: Units.english
+            };
+        }
+        QueryBuilder.prototype.station = function (id) {
+            this.queryParameters.station = id;
+            return this;
+        };
+        QueryBuilder.prototype.product = function (product) {
+            this.queryParameters.product = product;
+            return this;
+        };
+        QueryBuilder.prototype.interval = function (interval) {
+            this.queryParameters.interval = interval;
+            return this;
+        };
+        QueryBuilder.prototype.datum = function (datum) {
+            this.queryParameters.datum = datum;
+            return this;
+        };
+        QueryBuilder.prototype.timezone = function (timezone) {
+            this.queryParameters.time_zone = timezone;
+            return this;
+        };
+        QueryBuilder.prototype.units = function (units) {
+            this.queryParameters.units = units;
+            return this;
+        };
+        QueryBuilder.prototype.dateRange = function (rangeParameters) {
+            if (rangeParameters.begin_date) {
+                this.queryParameters.begin_date = formatDate(rangeParameters.begin_date);
             }
+            if (rangeParameters.end_date) {
+                this.queryParameters.end_date = formatDate(rangeParameters.end_date);
+            }
+            if (rangeParameters.date) {
+                this.queryParameters.date = rangeParameters.date;
+            }
+            if (rangeParameters.range) {
+                this.queryParameters.range = rangeParameters.range;
+            }
+            return this;
+        };
+        QueryBuilder.prototype.build = function () {
+            return this.queryParameters;
+        };
+        return QueryBuilder;
+    }());
+
+    var TideAndWaterLevelDataApi = /** @class */ (function (_super) {
+        __extends(TideAndWaterLevelDataApi, _super);
+        function TideAndWaterLevelDataApi() {
+            return _super.call(this) || this;
+        }
+        TideAndWaterLevelDataApi.prototype.getPredictions = function (stationId, dateRange, datum, units, timezone, interval) {
+            return __awaiter(this, void 0, void 0, function () {
+                var queryBuilder, data, predictions;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            queryBuilder = new QueryBuilder()
+                                .station(stationId)
+                                .product(TidesAndWaterLevelDataProduct.predictions)
+                                .datum(datum)
+                                .units(units)
+                                .timezone(timezone)
+                                .dateRange(dateRange)
+                                .interval(interval);
+                            return [4 /*yield*/, this.get(queryBuilder.build())];
+                        case 1:
+                            data = _a.sent();
+                            predictions = getProperty('predictions', data);
+                            data['predictions'].forEach(function (d) {
+                                predictions.push({
+                                    'time': parseDate(d['t']),
+                                    'value': parseFloat(d['v']),
+                                    'type': d['type']
+                                });
+                            });
+                            return [2 /*return*/, predictions];
+                    }
+                });
+            });
+        };
+        return TideAndWaterLevelDataApi;
+    }(TidesAndCurrentsDataApi));
+
+    var TidesAndCurrentsDateRangeDate;
+    (function (TidesAndCurrentsDateRangeDate) {
+        TidesAndCurrentsDateRangeDate["today"] = "today";
+        TidesAndCurrentsDateRangeDate["latest"] = "latest";
+        TidesAndCurrentsDateRangeDate["recent"] = "recent";
+    })(TidesAndCurrentsDateRangeDate || (TidesAndCurrentsDateRangeDate = {}));
+    var TidesAndCurrentsDateRange = {
+        latest: function () {
+            return {
+                date: TidesAndCurrentsDateRangeDate.latest
+            };
+        },
+        recent: function () {
+            return {
+                date: TidesAndCurrentsDateRangeDate.recent
+            };
+        },
+        today: function () {
+            return {
+                date: TidesAndCurrentsDateRangeDate.today
+            };
+        },
+        // lastHours(hours: number) : TidesAndCurrentsDataApi {
+        //     this.parameters.range = hours;
+        //     return this;
+        // }
+        // hoursAfter(beginDate: Date, hours: number) : TidesAndCurrentsDataApi {
+        //     this.parameters.begin_date = formatDate(beginDate);
+        //     this.parameters.range = hours;
+        //     return this;
+        // }    
+        // hoursBefore(endDate: Date, hours: number) : TidesAndCurrentsDataApi {
+        //     this.parameters.end_date = formatDate(endDate);
+        //     this.parameters.range = hours;
+        //     return this;
+        // }       
+        // dateRange(beginDate: Date, endDate: Date) : TidesAndCurrentsDataApi {
+        //     this.parameters.begin_date = formatDate(beginDate);
+        //     this.parameters.end_date = formatDate(endDate);
+        //     return this;
+        // }
+    };
+
+    var TidesAndCurrents = {
+        Datum: Datum,
+        Units: Units,
+        StationType: StationType,
+        dateRange: TidesAndCurrentsDateRange,
+        data: {
+            tidesAndWaterLevel: new TideAndWaterLevelDataApi
         },
         metadata: new TidesAndCurrentsMetadataApi()
     };
 
-    exports.MarineAreaCodes = MarineAreaCodes;
-    exports.RegionCodes = RegionCodes;
-    exports.StateAreaCodes = StateAreaCodes;
     exports.TidesAndCurrents = TidesAndCurrents;
     exports.Weather = Weather;
 

@@ -1,6 +1,7 @@
-import { getStringValueFromUrl, getProperty, getStringValue } from './utils';
+import { getProperty, getStringValue } from '../../utils/json';
 import { FeaturePoint } from './feature-point';
 import { QuantitativeValue } from './quantitative-value';
+import { getStringValueFromUrl } from './utils';
 
 export class ObservationStation extends FeaturePoint {
     public id: string;

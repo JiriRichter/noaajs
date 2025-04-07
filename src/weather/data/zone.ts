@@ -1,6 +1,6 @@
 import { Feature } from "./feature";
 import { NWSForecastOfficeId } from "./office-id";
-import { getProperty, getStringValue } from "./utils";
+import { getProperty, getStringValue } from "../../utils/json";
 
 export class Zone {
     type: string;

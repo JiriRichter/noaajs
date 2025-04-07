@@ -1,5 +1,6 @@
 import { QuantitativeValue } from './quantitative-value';
-import { getDateValue, getProperty, getStringValue, getStringValueFromUrl } from './utils';
+import { getDateValue, getProperty, getStringValue } from '../../utils/json';
+import { getStringValueFromUrl } from './utils';
 
 export class Observation {
 

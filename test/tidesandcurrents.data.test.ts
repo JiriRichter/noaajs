@@ -1,31 +1,24 @@
+/**
+ * @jest-environment node
+ */
+
 import { expect, test } from '@jest/globals';
 import { TidesAndCurrents } from '../src';
 import { log } from 'console'
+import { Datum, TidesAndWaterLevelPredictionsInterval, TimeZone, Units } from '../src/tidesandcurrents/data/types';
 
-test('data products', () => {
+const stationId = "9447130";
 
-    const stationId = "9447130";
+test('data products', async () => {
 
-    log('Datum');
-    TidesAndCurrents.data.datums(stationId).get().then(function (data) {
-        log(data);
-    }, function (error) {
-        log(error);
-    });
+    let predictions = await TidesAndCurrents.data.tidesAndWaterLevel.getPredictions(
+        stationId,
+        TidesAndCurrents.dateRange.today(),
+        Datum.STND,
+        Units.english,
+        TimeZone.gmt,
+        TidesAndWaterLevelPredictionsInterval.hilo);
 
-    log('Predictions');
-    TidesAndCurrents.data.predictions(stationId).getToday().then(function (data) {
-        log(data);
-    }, function (error) {
-        log(error);
-    });
-
-    log('Wind');
-    TidesAndCurrents.data.wind(stationId).getToday().then(function (data) {
-        log(data);
-    }, function (error) {
-        log(error);
-    });
-
+    expect(predictions).not.toBeNull();
 });
 

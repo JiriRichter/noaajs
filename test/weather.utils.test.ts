@@ -1,7 +1,7 @@
 import { expect, test } from '@jest/globals';
 import * as parameters from '../src/weather/api/parameters';
-import { parseDate } from '../src/weather/data/utils';
 import { millisecondsPerHour, Interval } from '../src/weather/data/interval';
+import { parseDate } from '../src/utils/json';
 
 test('formatDate', () => {
 

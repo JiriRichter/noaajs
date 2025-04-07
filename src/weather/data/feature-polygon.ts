@@ -1,6 +1,6 @@
 import { Coordinate } from "./coordinate";
 import { Feature } from "./feature";
-import { getProperty } from "./utils";
+import { getProperty } from "../../utils/json";
 
 export class FeaturePolygon extends Feature {
     public path: Coordinate[];

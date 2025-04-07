@@ -1,4 +1,4 @@
-import { getFloatValue, getStringValue } from "./utils";
+import { getFloatValue, getStringValue } from "../../utils/json";
 import { Interval } from "./interval";
 
 export class IntervalValue {

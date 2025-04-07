@@ -1,4 +1,5 @@
-import { getFloatValue, getStringValue, parseUnits } from "./utils";
+import { getFloatValue, getStringValue } from "../../utils/json";
+import { parseUnits } from "./utils";
 
 export class QuantitativeValue {
 

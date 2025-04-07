@@ -1,4 +1,4 @@
-import { parseDate } from "./utils";
+import { parseDate } from "../../utils/json";
 
 export const millisecondsPerHour = 3600000;
 

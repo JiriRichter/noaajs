@@ -1,5 +1,5 @@
 import { Interval } from './interval';
-import { getDateValue, getFloatValue, getProperty, getStringValue, parseUnits } from './utils';
+import { getDateValue, getFloatValue, getProperty, getStringValue } from '../../utils/json';
 import { QuantitativeValue } from './quantitative-value';
 import { FeaturePolygon } from './feature-polygon';
 import { GridpointVariable } from './gridpoint-variable';

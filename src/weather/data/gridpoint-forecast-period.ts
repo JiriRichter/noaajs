@@ -17,7 +17,7 @@
 
 import { QuantitativeValue } from "./quantitative-value";
 import { TemperatureTrend, TemperatureUnit, WindDirection } from "./types";
-import { getBoolValue, getDateValue, getIntValue, getFloatValue, getStringValue } from "./utils";
+import { getBoolValue, getDateValue, getIntValue, getFloatValue, getStringValue } from "../../utils/json";
 
 export class GridpointForecastPeriod {
     public number: number;

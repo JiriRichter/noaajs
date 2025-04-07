@@ -1,4 +1,4 @@
-import { getIntValue, getStringValue } from './utils';
+import { getIntValue, getStringValue } from "../../utils/json";
 
 export class ZoneForecastPeriod {
     

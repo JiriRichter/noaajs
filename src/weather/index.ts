@@ -15,5 +15,6 @@ export const Weather = {
     stations: new StationsApi(),
     zones: new ZonesApi(),
     gridPoint: new GridpointsApi(),
+    
     NWSForecastOfficeId: NWSForecastOfficeId
 };

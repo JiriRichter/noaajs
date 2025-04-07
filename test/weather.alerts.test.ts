@@ -14,6 +14,8 @@ test('getPoint', async () => {
 
   expect(alerts).not.toBeNull();
 
-  alerts = await api.getNext(alerts);
+  while(alerts.data.length > 0) {
+    alerts = await api.getNext(alerts);
+  }
 
 }, timeout);

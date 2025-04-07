@@ -1,6 +1,6 @@
 import { Alert } from "./alert";
 import { DataPage } from "./data-page";
-import { getProperty } from "./utils";
+import { getProperty } from "../../utils/json";
 
 export class AlertPage extends DataPage {
     data: Alert[];

@@ -1,6 +1,6 @@
 import { FeaturePoint } from './feature-point';
 import { QuantitativeValue } from './quantitative-value';
-import { getStringValue, getProperty } from './utils';
+import { getStringValue, getProperty } from '../../utils/json';
 
 export class RelativeLocation extends FeaturePoint {
     public city: string;

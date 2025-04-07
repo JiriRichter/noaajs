@@ -1,4 +1,5 @@
-import { getProperty, getStringValue, getStringValueFromUrl } from "./utils";
+import { getProperty, getStringValue } from "../../utils/json";
+import { getStringValueFromUrl } from "./utils";
 
 export class Office {
 

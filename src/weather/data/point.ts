@@ -1,7 +1,8 @@
 import { FeaturePoint } from './feature-point';
 import { getOfficeIdValue, NWSForecastOfficeId } from './office-id';
 import { RelativeLocation } from './relative-location';
-import { getStringValueFromUrl, getProperty, getFloatValue, getStringValue, getIntValue } from './utils';
+import { getProperty, getStringValue, getIntValue } from '../../utils/json';
+import { getStringValueFromUrl } from './utils';
 
 export class Point extends FeaturePoint {
     
